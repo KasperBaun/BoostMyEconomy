@@ -74,6 +74,7 @@ main {
 @media (min-width: 641px) {
     .page {
         flex-direction: row;
+        background-color: #4A6572;
     }
 
     .sidebar {

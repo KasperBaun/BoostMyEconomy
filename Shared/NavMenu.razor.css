@@ -28,6 +28,11 @@
     margin-right: auto;
   }
 
+.logoutbutton {
+    background: transparent;
+    border: transparent;
+}
+
 .nav-item {
     font-size: 0.9rem;
     padding-bottom: 1.5rem;

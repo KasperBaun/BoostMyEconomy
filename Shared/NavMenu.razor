@@ -1,12 +1,14 @@
-﻿<div class="top-row ps-3 navbar">
+﻿
+<div class="top-row ps-3 navbar">
     <div class="container-fluid">
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"><img src="images/SVG/Menu.SVG"></span>
         </button>
     </div>
 </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu" >
+    <span class="navbar-toggler-icon"></span>
     <nav class="flex-column">
         <div class="nav-item_logo px-3 text-center">
             <NavLink class="nav-link" href="home" Match="NavLinkMatch.All">
@@ -19,13 +21,13 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="expenses">
-                <img src="images\SVG\Expenses.svg" class="center navimg">
+            <NavLink class="nav-link" href="income">
+                <img src="images\SVG\Income.svg" class="center navimg">
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="income">
-                <img src="images\SVG\Income.svg" class="center navimg">
+            <NavLink class="nav-link" href="costs">
+                <img src="images\SVG\Cost.svg" class="center navimg">
             </NavLink>
         </div>
         <div class="nav-item px-3 center">
@@ -42,7 +44,7 @@
             </NavLink>
         </div>
         <div class="bottom">
-            <img src="images/SVG/Logout.svg" class="center navimg" alt="logout">
+            <button class="center btn btn-light logoutbutton" @onclick="ToggleLogout"><img src="images/SVG/Logout.svg" class="center navimg" alt="logout"></button>
         </div>
     </nav>
 </div>
@@ -55,5 +57,14 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task ToggleLogout()
+    {
+        @inject IJSRuntime JsRuntime
+        await JsRuntime.InvokeVoidAsync( "Warning!"); // Alert
+
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure?"); // Confirm
+        string prompted = await JsRuntime.InvokeAsync<string>("prompt", "Take some input:"); // Prompt 
     }
 }
