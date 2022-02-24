@@ -1,6 +1,5 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<div class="top-row ps-3 navbar">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">BoostMyEconomy</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -9,20 +8,41 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+        <div class="nav-item_logo px-3 text-center">
+            <NavLink class="nav-link" href="home" Match="NavLinkMatch.All">
+                <img src="images\SVG\Logo.SVG" class="center navimg">
+            </NavLink>
+        </div>
+        <div class="nav-item px-3 ">
+            <NavLink class="nav-link" href="home">
+                <img src="images\SVG\Home.svg" class="center navimg">
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="expenses">
+                <img src="images\SVG\Expenses.svg" class="center navimg">
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            <NavLink class="nav-link" href="income">
+                <img src="images\SVG\Income.svg" class="center navimg">
             </NavLink>
+        </div>
+        <div class="nav-item px-3 center">
+            <NavLink class="nav-link" href="budget">
+                <img src="images\SVG\Budget.svg" class="center navimg">
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <img src="images/SVG/Separator.svg" class="center">
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="settings">
+                <img src="images\SVG\Settings.svg" class="center navimg">
+            </NavLink>
+        </div>
+        <div class="bottom">
+            <img src="images/SVG/Logout.svg" class="center navimg" alt="logout">
         </div>
     </nav>
 </div>
