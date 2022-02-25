@@ -1,4 +1,5 @@
 .page {
+    background-color: #4A6572;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -74,7 +75,6 @@ main {
 @media (min-width: 641px) {
     .page {
         flex-direction: row;
-        background-color: #4A6572;
     }
 
     .sidebar {

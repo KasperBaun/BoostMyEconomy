@@ -12,7 +12,7 @@
     <nav class="flex-column">
         <div class="nav-item_logo px-3 text-center">
             <NavLink class="nav-link" href="home" Match="NavLinkMatch.All">
-                <img src="images\SVG\Logo.SVG" class="center navimg">
+                <img src="images\SVG\Logo.SVG" class="center ">
             </NavLink>
         </div>
         <div class="nav-item px-3 ">
@@ -61,10 +61,13 @@
 
     private async Task ToggleLogout()
     {
+        //string prompted = await JsRuntime.InvokeAsync<string>("prompt", "Take some input:"); // Prompt 
+        //await JsRuntime.InvokeVoidAsync( "Warning!", "Warning!"); // Alert
+        
         @inject IJSRuntime JsRuntime
-        await JsRuntime.InvokeVoidAsync( "Warning!"); // Alert
-
-        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure?"); // Confirm
-        string prompted = await JsRuntime.InvokeAsync<string>("prompt", "Take some input:"); // Prompt 
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "This will log you out of the system. \n Are you sure?"); // Confirm
+            if(confirmed){
+                /* TODO:: Logout function logic */
+            }
     }
 }
