@@ -6,20 +6,13 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-<!--[![MIT License][license-shield]][license-url] -->
-[![LinkedIn][linkedin-shield]][linkedin-url]
-
 
 
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
   <a href="https://github.com/KasperBaun/BoostMyEconomy">
-    <img src="images/dashboard.png" alt="Logo" width="80" height="80">
+    <img src="images/dashboard.png" alt="Logo" width="720" height="512">
   </a>
 
 <h3 align="center">BoostMyEconomy</h3>
@@ -33,6 +26,11 @@
     <a href="https://github.com/KasperBaun/BoostMyEconomy/issues">Report Bug</a>
     ·
     <a href="https://github.com/KasperBaun/BoostMyEconomy/issues">Request Feature</a>
+    
+  [![Contributors][contributors-shield]][contributors-url]
+  [![Forks][forks-shield]][forks-url]
+  [![Stargazers][stars-shield]][stars-url]
+  [![Issues][issues-shield]][issues-url]
   </p>
 </div>
 
@@ -59,7 +57,7 @@
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <!--<li><a href="#acknowledgments">Acknowledgments</a></li>-->
   </ol>
 </details>
 
@@ -68,9 +66,31 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `KasperBaun`, `BoostMyEconomy`, `twitter_handle`, `Kasper-Baun`, `kasperbaun@hotmail.com`, `kasperbaun@hotmail.com_client`, `BoostMyEconomy`, `An awsome multiplatform tool for personal finance - boost your economy today!`
+The purpose of this project is to create an application that can provide the user with a detailed overview of private expenses and income.
+The overview is visualized by graphic data in the application's dashboard.
+The visualization includes pie charts, graphs, tables, lists and headings, all of which help to inform the user about the type and amount of consumption divided into categories such as:
+<ul>
+  <li>Food</li>
+  <li>Personal care</li>
+  <li>Rent, water, electricity and heating</li>
+  <li>Entertainment</li>
+  <li>Transport</li>
+  <li>TV and internet</li>
+  <li>Insurances</li>
+  <li>Repayment of loans (mortgage, consumer loans, etc.)</li>
+  <li>Quality of life</li>
+  </ul>
+  
+  The application will also list various calculations such as:
+  </br>
+  <ul>
+    <li>Average daily consumption</li>
+    <li>Sum of consumption over the last 7 days</li>
+    <li>Sum of consumption per. month</li>
+    <li>Highlights (“You spent $ 500 less on fast food in January than you did in December!”) Such as nudging for more rational behavior</li>
+  </ul>
+  </br>
+The idea is that the overview can be used for reflection and increase awareness of one's own financial behavior. With the possiblity to optimize one's own consumption pattern so that the opportunity is created for more economy for the things that the user feels gives real value.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -83,7 +103,8 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 * [ASP.NET Web API](https://dotnet.microsoft.com/en-us/apps/aspnet/apis)
 * [C#](https://docs.microsoft.com/en-us/dotnet/csharp/)
 * [Figma](https://www.figma.com/)
-The project consists of a Blazor Server application [Frontend](https://github.com/KasperBaun/BoostMyEconomy/) and a EntityFrameWork with ASP.NET Web API [Backend](https://github.com/KasperBaun/BMEAPI)
+</br>
+The project consists of a Blazor Server application [Frontend](https://github.com/KasperBaun/BoostMyEconomy/) and a EntityFrameWork with ASP.NET Web API [Backend](https://github.com/KasperBaun/BMEAPI) (MySQL server).
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
@@ -141,7 +162,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [ ] Hints for improvements and tips for gaining knowledge about personal economy
 - [ ] Net worth calculations
 
-See the [open issues](https://github.com/KasperBaun/BoostMyEconomy/issues) for a full list of proposed features (and known issues).
+<!--See the [open issues](https://github.com/KasperBaun/BoostMyEconomy/issues) for a full list of proposed features (and known issues). -->
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -165,19 +186,19 @@ Don't forget to give the project a star! Thanks again!
 
 
 
-<!-- LICENSE -->
+<!-- LICENSE
 ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
+-->
 
 
 <!-- CONTACT -->
 ## Contact
 
-Kasper Baun - [@twitter_handle](https://twitter.com/twitter_handle) - [mailto:kasperbaun@hotmail.com](kasperbaun@hotmail.com)
+Kasper Baun - [mailto:kasperbaun@hotmail.com](kasperbaun@hotmail.com)
 
 Project Link: [https://github.com/KasperBaun/BoostMyEconomy](https://github.com/KasperBaun/BoostMyEconomy)
 
@@ -185,7 +206,7 @@ Project Link: [https://github.com/KasperBaun/BoostMyEconomy](https://github.com/
 
 
 
-<!-- ACKNOWLEDGMENTS -->
+<!-- ACKNOWLEDGMENTS
 ## Acknowledgments
 
 * []()
@@ -193,6 +214,7 @@ Project Link: [https://github.com/KasperBaun/BoostMyEconomy](https://github.com/
 * []()
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+-->
 
 
 
