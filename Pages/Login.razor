@@ -1,20 +1,44 @@
 ﻿@page "/"
-
 <PageTitle>Login</PageTitle>
+@page "/login"
 
-<h1>Login goes here</h1>
+<!--
+<MudContainer Class="d-flex justify-center align-center ma-auto">
+    <MudPaper Height="400px" Width="50%" Class="rounded-xl">
+        <MudContainer Class="ma-auto">
+            <MudText Align="Align.Center">Powered by MudBlazor</MudText>
+        </MudContainer>
+    </MudPaper>
+</MudContainer>
+-->
 
+<MudContainer Class="d-flex justify-center align-center" Style="margin-top=25%">
+    <MudPaper Elevation="1" Class="pa-10 rounded-xl" style="text-align:center">
+        <MudContainer Class="d-flex flex-column justify-center" style="width: 450px">
+            <MudText Typo="Typo.h5">Welcome</MudText>
+            <MudTextField Label="Email" @bind-Value="email" Variant="Variant.Outlined"></MudTextField>
+            <MudTextField Label="Password" @bind-Value="password" Variant="Variant.Outlined"></MudTextField>
+            <MudButton Class="align-self-start" Color="Color.Primary">Forgot password?</MudButton>
+            <MudButton Variant="Variant.Filled" Class="align-self-center mt-6" Color="Color.Primary">Sign In</MudButton>
+            <img src="./images/SVG/Settings.svg" width="32px">
+        </MudContainer>
+    </MudPaper>
+</MudContainer>
+<MudContainer Class="d-flex justify-center align-center">
+    <MudPaper Elevation="1" Class="pa-10 rounded-xl" style="text-align:center">
+        <MudContainer Class="d-flex flex-column justify-center" style="width: 450px">
+            <MudText Typo="Typo.h5">Welcome</MudText>
+            <MudTextField Label="Email" @bind-Value="email" Variant="Variant.Outlined"></MudTextField>
+            <MudTextField Label="Password" @bind-Value="password" Variant="Variant.Outlined"></MudTextField>
+            <MudButton Class="align-self-start" Color="Color.Primary">Forgot password?</MudButton>
+            <MudButton Variant="Variant.Filled" Class="align-self-center mt-6" Color="Color.Primary">Sign In</MudButton>
+            <img src="./images/SVG/Settings.svg" width="32px">
+        </MudContainer>
+    </MudPaper>
+</MudContainer>
 
 @code {
-    private bool loggedIn = false;
-	
-	[Parameter]
-	public int IncrementAmount { get; set; } = 1;
+    public string email { get; set; }
+    public string password { get; set; }
 
-    private void loginStatus()
-    {
-        if(loggedIn){
-
-        }
-    }
 }

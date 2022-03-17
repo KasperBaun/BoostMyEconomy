@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
-@using MudBlazor.Services
+@using MudBlazor.Services;
+@using BoostMyEconomy.Theme;
 <PageTitle>BoostMyEconomy</PageTitle>
 
 <MudThemeProvider Theme="RallyGreenDarkTheme"/>
@@ -7,12 +8,14 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
-    <MudDrawer Open="true">
+    <MudDrawer Fixed="true" Open="true">
         <NavMenu />
     </MudDrawer>
-    <MudMainContent>
+
+    <MudMainContent Style="height=100%">
         @Body
     </MudMainContent>
+
 </MudLayout>
 
 @code {

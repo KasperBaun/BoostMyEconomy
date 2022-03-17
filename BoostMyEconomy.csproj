@@ -7,11 +7,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Res\**" />
+    <Content Remove="Res\**" />
+    <EmbeddedResource Remove="Res\**" />
+    <None Remove="Res\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MudBlazor" Version="6.0.7" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\css\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Pages\CreateUser.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 
 </Project>
