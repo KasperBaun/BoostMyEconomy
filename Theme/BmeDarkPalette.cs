@@ -12,6 +12,8 @@ namespace BoostMyEconomy.Theme
             {
                 AppbarBackground = Colors.BlueGrey.Darken3,
                 AppbarText = Colors.Grey.Default,
+                TextPrimary = Colors.Shades.White,
+                TextSecondary = Colors.Shades.White,
                 DrawerBackground = Colors.BlueGrey.Darken3,
                 DrawerText = Colors.Green.Default,
                 Background = Colors.BlueGrey.Darken1,
