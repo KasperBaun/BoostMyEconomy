@@ -1,27 +1,60 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All"><img src="./images/SVG/Logo.svg" class="center navimg"></MudNavLink>
-    <MudNavLink Href="/home" Match="NavLinkMatch.Prefix"><img src="./images/SVG/Home.svg" class="center navimg"></MudNavLink>
-    <MudNavLink Href="/income" Match="NavLinkMatch.Prefix"><img src="./images/SVG/Income.svg" class="center navimg"></MudNavLink>
-    <MudNavLink Href="/costs" Match="NavLinkMatch.Prefix"><img src="./images/SVG/Cost.svg" class="center navimg"></MudNavLink>
-    <MudNavLink Href="/budget" Match="NavLinkMatch.Prefix"><img src="./images/SVG/Budget.svg" class="center navimg"></MudNavLink>
-    <MudNavLink Href="/settings" Match="NavLinkMatch.Prefix"><img src="./images/SVG/Settings.svg" class="center navimg"></MudNavLink>
-    <MudButton class="center navimg" @onclick="ToggleLogout"><img src="./images/SVG/Logout.svg" class="center navimg" alt="logout"></MudButton>
+﻿
+<MudNavMenu>
+    <MudButton 
+        FullWidth = "true"
+        Class="mt-10 mb-16 pa-auto"
+        Href="/" Match="NavLinkMatch.All">
+        <img src="./images/SVG/Logo.svg" class="center navimg">
+    </MudButton>
+
+    <MudNavLink 
+        Class="my-5 mt-12 pa-auto"
+        Href="/" Match="NavLinkMatch.Prefix">
+        <img src="./images/SVG/Home.svg" class="center navimg">
+    </MudNavLink>
+
+    <MudNavLink
+        Class="my-5 pa-auto"
+        Href="/income" Match="NavLinkMatch.Prefix">
+        <img src="./images/SVG/Income.svg" class="center navimg">
+    </MudNavLink>
+
+    <MudNavLink 
+        Class="my-5 pa-auto"
+        Href="/costs" Match="NavLinkMatch.Prefix">
+        <img src="./images/SVG/Cost.svg" class="center navimg">
+    </MudNavLink>
+    
+    <MudNavLink 
+        Class="my-5 pa-auto"
+        Href="/budget" Match="NavLinkMatch.Prefix">
+        <img src="./images/SVG/Budget.svg" class="center navimg">
+   
+    </MudNavLink>
+    
+    <MudNavLink 
+        Class="my-5 pa-auto"
+        Href="/settings" Match="NavLinkMatch.Prefix">
+        <img src="./images/SVG/Settings.svg" class="center navimg">
+    </MudNavLink>
+
+    <MudDivider
+        Class=" mt-12 mb-5 ml-16 mr-16 pa-auto mud-theme-primary">
+    </MudDivider>
+    
+    <MudButton
+        FullWidth = "true"
+        Class="my-8 pa-5"
+        @onclick="ToggleLogout">
+        <img src="./images/SVG/Logout.svg" alt="logout">
+    </MudButton>
+
 </MudNavMenu>
 
 @code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-
+    
     private async Task ToggleLogout()
     {
-        //string prompted = await JsRuntime.InvokeAsync<string>("prompt", "Take some input:"); // Prompt 
-        //await JsRuntime.InvokeVoidAsync( "Warning!", "Warning!"); // Alert
         
         @inject IJSRuntime JsRuntime
         bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "This will log you out of the system. \n Are you sure?"); // Confirm
@@ -30,8 +63,3 @@
             }
     }
 }
-<!--    <MudNavGroup Title="Settings" Expanded="true">
-        <MudNavLink Href="/users"  Match="NavLinkMatch.Prefix">Users</MudNavLink>
-        <MudNavLink Href="/security"  Match="NavLinkMatch.Prefix">Security</MudNavLink>
-    </MudNavGroup>
-    -->
