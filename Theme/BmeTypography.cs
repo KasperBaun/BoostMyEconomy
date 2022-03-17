@@ -111,13 +111,6 @@ namespace BoostMyEconomy.Theme
                 {
                     FontFamily = new[] { "RobotoCondensed", "Roboto", "Helvetica", "Arial" },
                     FontSize = "0.8rem",
-                },
-
-                Overline = new Overline()
-                {
-                    FontFamily = new[] { "RobotoCondensed", "Roboto", "Helvetica", "Arial" },
-                    FontSize = "0.9rem",
-                    FontWeight = 500
                 }
             };
         }
