@@ -4,7 +4,7 @@
 
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="mt-10">
-    <MudPaper Class="px-10 pt-4 mt-4 rounded-xl">
+    <MudPaper Class="px-10 pt-4 pb-4 mt-4 rounded-xl">
         <MudGrid>
             <MudItem xs="12">
                 <div class="d-flex justify-center">
@@ -38,10 +38,17 @@
                 <MudCheckBox T="bool" Label="Remember me?" Color="Color.Primary" Class="ml-n1"></MudCheckBox> <MudLink Href="/account/forgot-password">Forgot password?</MudLink>
             </MudItem>
             <MudItem xs="12" Class="d-flex justify-center">
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Style="width: 100%"> Login  </MudButton>
-            </MudItem>
-            <MudItem xs="12">
-                <MudButton >Fill Administrator Credentials</MudButton>
+                <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" OnClick="OnLoginClicked" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="rounded-lg" Style="width: 100%; height: 50px;">
+                    @if (_processing)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                        <MudText Class="ms-2">Processing</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Login</MudText>
+                    }
+                </MudButton>
             </MudItem>
         </MudGrid>
      </MudPaper>
@@ -79,6 +86,15 @@
             PasswordInputIcon = Icons.Material.Filled.Visibility;
             PasswordInput = InputType.Text;
         }
+    }
+
+    private bool _processing = false;
+
+    async Task OnLoginClicked()
+    {
+        _processing = true;
+        await Task.Delay(2000);
+        _processing = false;
     }
 
 }
