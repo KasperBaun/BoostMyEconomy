@@ -22,6 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\Mudblazor.min.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="Pages\CreateUser.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
