@@ -12,11 +12,14 @@
     padding-bottom: 10rem;
 }
 
-
+.ignore-mudtext {
+    margin-left: 0px !important;
+    margin-inline-start: 0px !important;
+}
 
 .navimg {
     transition: transform .7s ease-in-out;
-    height: 30px;
+    height: 32px;
   }
   .navimg:hover {
     transform: rotate(360deg);
