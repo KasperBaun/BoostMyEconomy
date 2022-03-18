@@ -2,29 +2,83 @@
 <PageTitle>Login</PageTitle>
 @page "/login"
 
-<!--
-<MudContainer Class="d-flex flex-column justify-center" style="width: 450px">
-            <MudText Typo="Typo.h5">Welcome</MudText>
-            <MudTextField Label="Email" @bind-Value="email" Variant="Variant.Outlined"></MudTextField>
-            <MudTextField Label="Password" @bind-Value="password" Variant="Variant.Outlined"></MudTextField>
-            <MudButton Class="align-self-start" Color="Color.Primary">Forgot password?</MudButton>
-            <MudButton Variant="Variant.Filled" Class="align-self-center mt-6" Color="Color.Primary">Sign In</MudButton>
-            <img src="./images/SVG/Settings.svg" width="32px">
-        </MudContainer>
--->
 
-<MudGrid>
-    <MudItem xs=12 style="height:25%;">
-        <MudPaper Class="rounded-xl" Height="0.25"/>
-    </MudItem>
-    <MudItem xs=12>
-        <MudPaper Class="rounded-xl" Height="25%"/>
-    </MudItem>
-</MudGrid>
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-10">
+    <MudPaper Class="px-10 pt-4 mt-4 rounded-xl">
+        <MudGrid>
+            <MudItem xs="12">
+                <div class="d-flex justify-center">
+                        <MudIcon Icon="@Icons.Material.Filled.SupervisedUserCircle" Color="Color.Primary" Style="height:50%; width:50%;"/>
+                </div>
+            </MudItem>
+            <MudItem xs="12">
+                <div class="d-flex justify-center">
+                    <MudText Typo="Typo.h4">Boost My Economy</MudText>
+                </div>
+            </MudItem>
+            <MudItem xs="12">
+                <div class="d-flex justify-center">
+                    <MudText>Personal Finance Workspace to analyze spending in detail</MudText>
+                </div>
+            </MudItem>
+             <MudItem xs="12">
+                <div class="d-flex justify-center">
+                    <MudText>Boost your economy today!</MudText>
+                </div>
+            </MudItem>
+           
+            <MudItem xs="12">
+                <MudTextField T="string" Label="E-mail" Variant="Variant.Outlined"
+                              />
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField  @bind-Value="Password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" />
+            </MudItem>
+            <MudItem xs="12" Class="d-flex justify-space-between align-center">
+                <MudCheckBox T="bool" Label="Remember me?" Color="Color.Primary" Class="ml-n1"></MudCheckBox> <MudLink Href="/account/forgot-password">Forgot password?</MudLink>
+            </MudItem>
+            <MudItem xs="12" Class="d-flex justify-center">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Style="width: 100%"> Login  </MudButton>
+            </MudItem>
+            <MudItem xs="12">
+                <MudButton >Fill Administrator Credentials</MudButton>
+            </MudItem>
+        </MudGrid>
+     </MudPaper>
+
+     <MudGrid>
+        <MudItem xs="12">
+            <div class="d-flex justify-start mt-4">
+                <MudText>Don't have an account?   <MudLink Href="/register"> Register here! </MudLink></MudText>
+            </div>
+        </MudItem>
+    </MudGrid>
+
+</MudContainer>
 
 
 @code {
-    public string Email { get; set; }
-    public string Password { get; set; }
+    public double? Amount { get; set; }
+    public int? Weight { get; set; }
+    public string Password { get; set;} = "";
+
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void ButtonTestclick()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
 
 }

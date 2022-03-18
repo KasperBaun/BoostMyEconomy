@@ -10,12 +10,12 @@
 
 <MudLayout>
 
-    <MudDrawer @bind-Open="@UserConfigController.isDrawerOpen">
+    <MudDrawer Open="true">
         <NavMenu />
     </MudDrawer>
 
     <MudMainContent>
-    <MudButton OnClick="@(() => UserConfigController.ToggleDrawer())">Åben</MudButton>
+    <!-- <MudButton OnClick="@(() => UserConfigController.ToggleDrawer())">Åben</MudButton> -->
         @Body
     </MudMainContent>
 
