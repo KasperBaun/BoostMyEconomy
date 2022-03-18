@@ -14,21 +14,18 @@
 -->
 
 <MudGrid>
-    <MudPaper 
-        xs="12"
-        Class="rounded-xl"  
-        Height="300px"
-        style="margin:auto;"
-    >
-    <MudText Typo="Typo.h5">Welcome</MudText>
-      
-    </MudPaper>
+    <MudItem xs=8 Style="height: 25%;">
 
+    </MudItem>
+    <MudItem xs=8>
+        <MudPaper Class="rounded-xl" Height="300px">
+        </MudPaper>
+    </MudItem>
 </MudGrid>
 
 
 @code {
-    public string email { get; set; }
-    public string password { get; set; }
+    public string Email { get; set; }
+    public string Password { get; set; }
 
 }

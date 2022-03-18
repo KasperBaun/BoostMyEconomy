@@ -20,6 +20,19 @@
 </MudLayout>
 
 @code {
+    bool open = true;
+
+    void ToggleDrawer()
+    {
+        if (!open)
+        {
+            open = true;
+        } else
+        {
+            open = false;
+        }
+    }
+
     MudTheme RallyGreenDarkTheme = new MudTheme()
         {
             Palette = new Palette()
