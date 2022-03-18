@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @using MudBlazor.Services;
 @using BoostMyEconomy.Theme;
+@using BoostMyEconomy.Models;
 <PageTitle>BoostMyEconomy</PageTitle>
 
 <MudThemeProvider Theme="RallyGreenDarkTheme"/>
@@ -9,29 +10,23 @@
 
 <MudLayout>
 
-    <MudDrawer Fixed="true" Open="true">
+    <MudDrawer @bind-Open="@UserConfigController.isDrawerOpen">
         <NavMenu />
     </MudDrawer>
 
     <MudMainContent>
+    <MudButton OnClick="@(() => UserConfigController.ToggleDrawer())">Åben</MudButton>
         @Body
     </MudMainContent>
 
 </MudLayout>
 
 @code {
-    bool open = true;
+    UserConfigController uConfig = UserConfigController.GetInstance("Singleton uConfig er instantieret");
+    
+    
 
-    void ToggleDrawer()
-    {
-        if (!open)
-        {
-            open = true;
-        } else
-        {
-            open = false;
-        }
-    }
+
 
     MudTheme RallyGreenDarkTheme = new MudTheme()
         {
