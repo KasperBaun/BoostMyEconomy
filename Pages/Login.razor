@@ -4,35 +4,45 @@
 
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
+@inject IDialogService DialogService
 
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
     <MudPaper Class="px-10 pt-4 pb-4 mt-4 rounded-xl" Elevation="4">
         <div class="d-flex justify-center">
-            <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Primary" Style="height:50%; width:50%;"/>
+            <MudIcon Icon="@Icons.Material.Filled.AreaChart" Color="Color.Primary" Style="height:50%; width:50%;"/>
         </div>
-        <MudText Class="mud-typography-h3" Align="Align.Center">
+        <MudText Class="mud-typography-h3 mt-2" Align="Align.Center">
             Boost My Economy
         </MudText>
-        <MudText Class="mud-typography-h6" Color="Color.Primary" Align="Align.Center">Personal Finance Workspace to analyze spending in detail</MudText>
+        <MudText Class="mud-typography-h5 mt-2 mb-6" Color="Color.Primary" Align="Align.Center">Personal Finance Workspace</MudText>
 
         <MudGrid>
             <!-- Email Field -->
             <MudItem xs="12">
-                <MudTextField T="string" Label="E-mail" Variant="Variant.Outlined"
-                Required="false" RequiredError="Email is required!"
-                                  Validation="@(new EmailAddressAttribute() {ErrorMessage = "Email address is invalid!"})"
+                <MudTextField 
+                        T="string" 
+                        Label="E-mail" 
+                        Variant="Variant.Outlined"
+                        Required="false" 
+                        RequiredError="Email is required!"
+                        Validation="@(new EmailAddressAttribute() {ErrorMessage = "Email address is invalid!"})"
+                        Adornment="Adornment.Start" 
+                        AdornmentColor="Color.Primary" 
+                        AdornmentIcon="@Icons.Material.Filled.Person"
+                        IconSize="Size.Large"
                               />
             </MudItem>
             <!-- Password Field -->
             <MudItem xs="12">
                 <MudPaper>
                 <MudTextField  
-                        T="string" @bind-Value="Password" 
-                        Label="Password" 
+                        T="string" @bind-Value="Password"
+                        IconSize="Size.Large"
+                        Label="Password"
                         Variant="Variant.Outlined" 
                         InputType="@PasswordInput" 
-                        Adornment="Adornment.End" 
+                        Adornment="Adornment.Start" 
                         AdornmentColor="Color.Primary" 
                         AdornmentIcon="@PasswordInputIcon" 
                         OnAdornmentClick="TogglePasswordHidden" />
@@ -40,10 +50,10 @@
             </MudItem>
             <!-- Remember me field-->
             <MudItem xs="12" Class="d-flex justify-space-between align-center">
-                <MudCheckBox T="bool" Label="Remember me?" Color="Color.Primary" Class="ml-n1"></MudCheckBox> <MudLink Href="/account/forgot-password">Forgot password?</MudLink>
+                <MudCheckBox T="bool" Label="Remember me?" Color="Color.Primary" Class="ml-n1"></MudCheckBox> <MudButton  Variant="Variant.Text" Color="Color.Primary" OnClick="OpenForgottenPasswordDialog" >Forgot password?</MudButton>
             </MudItem>
             <!-- Login button -->
-            <MudItem xs="12" Class="d-flex justify-center">
+            <MudItem xs="12" Class="d-flex justify-center mb-4">
                 <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" OnClick="OnLoginClicked" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="rounded-lg" Style="width: 100%; height: 50px;">
                     @if (_processing)
                     {
@@ -85,23 +95,36 @@
     public int? Weight { get; set; }
     public string Password { get; set;} = "";
 
-    bool isShow;
+    bool isShow = false;
     InputType PasswordInput = InputType.Password;
-    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    string PasswordInputIcon = Icons.Material.Outlined.Lock;
 
     void TogglePasswordHidden()
     {
         @if (isShow)
         {
             isShow = false;
-            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInputIcon = Icons.Material.Outlined.Lock;
             PasswordInput = InputType.Password;
         }
         else {
             isShow = true;
-            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInputIcon = Icons.Material.Outlined.LockOpen;
             PasswordInput = InputType.Text;
         }
+    }
+
+    async Task OpenForgottenPasswordDialog()
+    {
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<ForgottenPasswordDialog>("Forgotten Password Dialog", options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            // Snackbar with could not find user
+        }
+        dialog.Close();
     }
 
 }
