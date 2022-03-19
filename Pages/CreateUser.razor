@@ -1,7 +1,161 @@
-﻿@page "/createuser"
+﻿@page "/register"
 
-<PageTitle>Create User</PageTitle>
+<PageTitle>Register</PageTitle>
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
 
+<MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">
+    
+    <MudText Class="mud-typography-h2">
+        Thanks for stopping by! 
+    </MudText>
+    <MudText Class="mud-typography-h2">
+        Let's sign you up and get to
+    </MudText>
+    <MudText Class="mud-typography-h2 mb-4" Color="Color.Primary">boosting.</MudText>
+    
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator/>
+        <MudGrid>
+            <MudItem xs="12" sm="7">
+                <MudCard Class="px-10 pt-4 pb-4 mt-4 rounded-xl" Elevation="4">
+                    <MudCardContent>
+                        
+                        <MudItem xs=12>
+                            <MudTextField Label="First name" 
+                              @bind-Value="model.FirstName" For="@(() => model.FirstName)"/>
+
+                            <MudTextField Label="Last name" 
+                              @bind-Value="model.LastName" For="@(() => model.LastName)"/>
+                        </MudItem>
+                        
+                        <MudTextField Label="Email" Class="mt-3"
+                              @bind-Value="model.Email" For="@(() => model.Email)"/>
+
+                        <MudTextField 
+                                Label="Password"
+                                @bind-Value="model.Password"
+                                For="@(() => model.Password)"
+                                HelperText="Choose a strong password"  
+                                InputType="InputType.Password"
+                                Class="mt-3"
+                                /> 
+
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+            <!-- Validation Summary for testing the constraints on user input
+            <MudItem xs="12" sm="5">
+                <MudPaper Class="pa-4 mud-height-full">
+                    <MudText Typo="Typo.subtitle2">Validation Summary</MudText>
+                    @if (success)
+                    {
+                        <MudText Color="Color.Success">Success</MudText>
+                    }
+                    else
+                    {
+                        <MudText Color="@Color.Error">
+                            <ValidationSummary />
+                        </MudText>
+                    }
+                </MudPaper>
+            </MudItem>
+            -->
+        </MudGrid>
+    </EditForm>
+</MudContainer>
+
+@code {
+    RegisterAccountForm model = new RegisterAccountForm();
+    bool success;
+
+    public class RegisterAccountForm
+    {
+        [Required]
+        [StringLength(20, ErrorMessage = "Name length can't be more than 20.")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [StringLength(20, ErrorMessage = "Name length can't be more than 20.")]
+        public string LastName { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
+        public string Password { get; set; }
+
+    }
+
+    private void OnValidSubmit(EditContext context)
+    {
+        success = true;
+        StateHasChanged();
+    }
+
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
 <MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">
     <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">Checkout</MudText>
     <MudGrid Spacing="6" Class="mt-16">
@@ -77,6 +231,8 @@
         </MudItem>
     </MudGrid>
 </MudContainer>
+
+-->
 
 @code {
     private int currentCount = 0;
