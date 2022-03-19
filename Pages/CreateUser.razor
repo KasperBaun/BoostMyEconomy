@@ -4,67 +4,70 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 
-<MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">
+
+<MudContainer Class="mt-16" MaxWidth="MaxWidth.Small">
     
-    <MudText Class="mud-typography-h2">
-        Thanks for stopping by! 
-    </MudText>
-    <MudText Class="mud-typography-h2">
-        Let's sign you up and get to
-    </MudText>
-    <MudText Class="mud-typography-h2 mb-4" Color="Color.Primary">boosting.</MudText>
-    
+  
+  
     <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-        <DataAnnotationsValidator/>
-        <MudGrid>
-            <MudItem xs="12" sm="7">
-                <MudCard Class="px-10 pt-4 pb-4 mt-4 rounded-xl" Elevation="4">
-                    <MudCardContent>
-                        
-                        <MudItem xs=12>
-                            <MudTextField Label="First name" 
-                              @bind-Value="model.FirstName" For="@(() => model.FirstName)"/>
+        <MudPaper Class="center rounded-xl pa-12 mt-1" Elevation="4">
+            <div class="d-flex justify-center">
+                <MudIcon Icon="@Icons.Material.Filled.AreaChart" Color="Color.Primary" Style="height:50%; width:50%;"/>
+            </div>
+            <MudText Class="mud-typography-h3" Align="Align.Center">
+                   Sign up and get to
+            </MudText>
+            <MudText Class="mud-typography-h3" Color="Color.Primary" Align="Align.Center">boosting.</MudText>
 
-                            <MudTextField Label="Last name" 
-                              @bind-Value="model.LastName" For="@(() => model.LastName)"/>
+            <MudGrid Spacing="6">
+                <MudItem xs="12">
+                    <MudGrid Class="mt-10">
+                        <DataAnnotationsValidator/>
+                        <!-- First name field-->
+                        <MudItem xs=12 md="6" lg="6" xl="6">
+                            <MudTextField Label="First name" @bind-Value="model.FirstName" Placeholder="John" For="@(() => model.FirstName)"Variant="Variant.Outlined"/>
                         </MudItem>
-                        
-                        <MudTextField Label="Email" Class="mt-3"
-                              @bind-Value="model.Email" For="@(() => model.Email)"/>
+                        <!-- Last name field-->
+                        <MudItem xs=12 md="6" lg="6" xl="6">
+                            <MudTextField Label="Last name" @bind-Value="model.LastName" Placeholder="Doe" For="@(() => model.LastName)"Variant="Variant.Outlined"/>
+                        </MudItem>
+                        <!-- Email field-->    
+                        <MudItem xs=12>
+                            <MudTextField Label="Email" @bind-Value="model.Email" Placeholder="Your email adress" For="@(() => model.Email)" Variant="Variant.Outlined"/>
+                        </MudItem>
+                        <!-- Password field-->
+                        <MudItem xs=12>
+                            <MudTextField   Label="Password" @bind-Value="model.Password" 
+                                            Placeholder="Create a password" 
+                                            For="@(() => model.Password)" 
+                                            HelperText="Use 8 or more characters with a mix of letters, numbers & symbols" 
+                                            InputType="@PasswordInput"
+                                            Variant="Variant.Outlined"
+                                            Adornment="Adornment.End" 
+                                            AdornmentColor="Color.Primary" 
+                                            AdornmentIcon="@PasswordInputIcon"
+                                            OnAdornmentClick="TogglePasswordHidden"
+                                            /> 
+                        </MudItem>
 
-                        <MudTextField 
-                                Label="Password"
-                                @bind-Value="model.Password"
-                                For="@(() => model.Password)"
-                                HelperText="Choose a strong password"  
-                                InputType="InputType.Password"
-                                Class="mt-3"
-                                /> 
-
-                    </MudCardContent>
-                    <MudCardActions>
-                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
-                    </MudCardActions>
-                </MudCard>
-            </MudItem>
-            <!-- Validation Summary for testing the constraints on user input
-            <MudItem xs="12" sm="5">
-                <MudPaper Class="pa-4 mud-height-full">
-                    <MudText Typo="Typo.subtitle2">Validation Summary</MudText>
-                    @if (success)
-                    {
-                        <MudText Color="Color.Success">Success</MudText>
-                    }
-                    else
-                    {
-                        <MudText Color="@Color.Error">
-                            <ValidationSummary />
-                        </MudText>
-                    }
-                </MudPaper>
-            </MudItem>
-            -->
-        </MudGrid>
+                        <!-- Register button -->
+                        <MudItem xs="12" Class="d-flex justify-center">
+                            <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="rounded-lg" Style="width: 100%; height: 50px;">
+                                @if (_processing)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                                    <MudText Class="ms-2">Processing</MudText>
+                                }
+                                else
+                                {
+                                    <MudText>Register</MudText>
+                                }
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
     </EditForm>
 </MudContainer>
 
@@ -76,26 +79,61 @@
     {
         [Required]
         [StringLength(20, ErrorMessage = "Name length can't be more than 20.")]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
 
         [Required]
         [StringLength(20, ErrorMessage = "Name length can't be more than 20.")]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Required]
         [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
+    }/* This block of code is used to handle user registrering when pressing the register button */ 
+    private bool _processing = false;
+
+    async Task OnRegisterClicked()
+    {
+        if (success)
+        {
+            _processing = true;
+            await Task.Delay(2000);
+            _processing = false;
+        }
+        else
+        {
+            // Do nothing
+        }
     }
 
-    private void OnValidSubmit(EditContext context)
+    private async Task OnValidSubmit(EditContext context)
     {
         success = true;
         StateHasChanged();
+        await OnRegisterClicked();
+    }
+
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void TogglePasswordHidden()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
     }
 
     private IEnumerable<string> PasswordStrength(string pw)
