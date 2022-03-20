@@ -23,7 +23,7 @@
 
     <MudGrid Spacing="4" Class="mt-6">
 
-        <MudItem xs="12" sm="9" md="9">
+        <MudItem xs="12" sm="12" md="9">
             <MudGrid>
                  <!-- Notifications -->
                 <MudItem xs="12" sm="12" md="12">
@@ -35,45 +35,46 @@
                 </MudItem>
 
                 <!--Income-->
-                <MudItem xs="12" sm="5" md="5">
+                <MudItem xs="12" sm="12" md="5">
                     <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
                         <MudText Typo="Typo.h5">Income</MudText>
                         <MudChart ChartType="ChartType.Bar" ChartSeries="@Income" @bind-SelectedIndex="Index"
-                            XAxisLabels="@IncomeLabels" Width="100%" Height="100%" LegendPosition="Position.Right"></MudChart>
+                            XAxisLabels="@IncomeLabels" Width="100%" Height="100%" ChartOptions="@IncomeOptions"></MudChart>
                     </MudPaper>
                 </MudItem>
 
                 <!--Income & total expenses-->
-               <MudItem xs="12" sm="4" md="4">
+               <MudItem xs="12" sm="12" md="4" >
                     <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
                         <MudText Typo="Typo.h5">Income & total expenses</MudText>
                         <MudChart ChartType="ChartType.Line" ChartSeries="@IncomeExpense" @bind-SelectedIndex="Index" 
-                            LegendPosition="Position.Right" XAxisLabels="@IncomeExpenseLabels" Width="100%" Height="100%" ChartOptions="new ChartOptions{LineStrokeWidth=3}"></MudChart>
+                            LegendPosition="Position.Right" XAxisLabels="@IncomeExpenseLabels" Width="100%" Height="100%" ChartOptions="@IncomeExpensesOptions"></MudChart>
                     </MudPaper>
                 </MudItem>
 
                 <!--Result-->
-                <MudItem xs="12" sm="3" md="3">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
+                <MudItem xs="12" sm="12" md="3" >
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3 overflow-y-scroll" Style="height: 300px;" >
                         <MudText Typo="Typo.h5">Result</MudText>
-                        <MudDataGrid Items="@Results.Take(4)">
+                        <MudDataGrid Items="@Results.Take(Results.Count())" Bordered="true" Dense="true" Class="overflow-y-scroll">
                             <Columns>
                                 <Column T="Result" Field="Position" Title="Nr" />
                                 <Column T="Result" Field="Month" />
-                                <Column T="Result" Field="Value"  />
+                                <Column T="Result" Field="Value" CellStyleFunc="@_cellStyleFunc"  />
                             </Columns>
                         </MudDataGrid>
                     </MudPaper>
                 </MudItem>
 
                 <!--Variable expenses-->
-                <MudItem xs="12" sm="6" md="6">
+                <MudItem xs="12" sm="12" md="6">
                     <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
                         <MudText Typo="Typo.h5">Variable expenses</MudText>
+                        <MudChart ChartType="ChartType.Line" ChartSeries="@VarExpenses" XAxisLabels="@VarExpensesLabels" Width="100%" Height="250px" ChartOptions="varExpensesOptions"></MudChart>
                     </MudPaper>
                 </MudItem>
                 <!--Categories-->
-                <MudItem xs="12" sm="6" md="6">
+                <MudItem xs="12" sm="12" md="6">
                     <MudPaper Elevation="2" Class=" rounded-xl pa-3" Style="height: 300px;">
                         <MudText Typo="Typo.h5">Categories</MudText>
                         <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
@@ -84,7 +85,7 @@
             </MudGrid>
         </MudItem>
 
-        <MudItem xs="12" sm="3" md="3">
+        <MudItem xs="12" sm="12" md="3">
             <MudGrid>
                 <!-- User info -->
                 <MudItem xs="12">
@@ -114,6 +115,14 @@
 
     private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
 
+    private ChartOptions IncomeOptions = new ChartOptions()
+        {
+            DisableLegend = true,
+            LineStrokeWidth = 5,
+            InterpolationOption = InterpolationOption.EndSlope,
+            YAxisFormat = "c2"
+    };
+
     public List<ChartSeries> Income = new List<ChartSeries>()
     {
         new ChartSeries() { Name = "Income", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15, 99, 83, 96 } },
@@ -123,7 +132,13 @@
 
     /* Income & total expenses */
 
-
+    private ChartOptions IncomeExpensesOptions = new ChartOptions()
+        {
+            DisableLegend = true,
+            LineStrokeWidth = 5,
+            InterpolationOption = InterpolationOption.EndSlope,
+            YAxisFormat = "c2"
+    };
     public List<ChartSeries> IncomeExpense = new List<ChartSeries>()
     {
         new ChartSeries() { Name = "Income", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70, 86,93,79 } },
@@ -134,22 +149,57 @@
     /* Result */
     public class Result
     {
-        public string Month { get; set; }
+        public string Month { get; set; } = String.Empty;
         public int Position { get; set; }
         public int Value { get; set; }
 
     }
     private IEnumerable<Result> Results = new List<Result>()
     {
-        new Result() { Position = 0, Month="Jan", Value = 4500 },
-        new Result() { Position = 1, Month="Feb", Value = 4500 },
-        new Result() { Position = 2, Month="Mar", Value = 4500 },
-        new Result() { Position = 3, Month="Apr", Value = 4500 }
+        new Result() { Position = 1, Month="Jan", Value = 4500 },
+        new Result() { Position = 2, Month="Feb", Value = -3500 },
+        new Result() { Position = 3, Month="Mar", Value = 2500 },
+        new Result() { Position = 4, Month="Apr", Value = -1500 },
+        new Result() { Position = 5, Month="May", Value = -1500 },
+        new Result() { Position = 6, Month="Jun", Value = -1500 },
+        new Result() { Position = 7, Month="Jul", Value = -1500 },
+        new Result() { Position = 8, Month="Aug", Value = -1500 },
+        new Result() { Position = 9, Month="Sep", Value = -1500 },
+        new Result() { Position = 10, Month="Oct", Value = -1500 },
+        new Result() { Position = 11, Month="Nov", Value = -1500 },
+        new Result() { Position = 12, Month="Dec", Value = -1500 }
     };
+    // Style the cells according to a positive or negative result
+    private Func<Result, string> _cellStyleFunc => x =>
+    {
+        string style = "";
+
+        if (x.Value >= 0)
+            style += "color:#00FF00";
+
+        else
+            style += "color:#FF0000";
+
+        return style;
+    };
+
 
     /* Recent transactions */
 
     /* Variable expenses */
+
+    private ChartOptions varExpensesOptions = new ChartOptions()
+        {
+            DisableLegend = true,
+            LineStrokeWidth = 5,
+            InterpolationOption = InterpolationOption.EndSlope,
+            YAxisFormat = "c2"
+    };
+    public List<ChartSeries> VarExpenses = new List<ChartSeries>()
+    {
+        new ChartSeries() { Data = new double[] { 35, 41, 35, 51, 49, 62, 69, 91, 148, 64, 39, 25 } },
+    };
+    public string[] VarExpensesLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
     /* Categories*/
     public double[] data = { 25, 77, 28, 5 };
