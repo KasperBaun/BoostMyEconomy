@@ -27,7 +27,7 @@
             <MudGrid>
                  <!-- Notifications -->
                 <MudItem xs="12" sm="12" md="12">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 125px;">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 125px;">
                         <MudText Typo="Typo.h5">Notifications</MudText>
                         <MudText Typo="Typo.body1">Welcome Kasper Baun !</MudText>
                         <MudText Typo="Typo.body1">Last time you logged on was 17th feb. 15:36</MudText>
@@ -36,34 +36,45 @@
 
                 <!--Income-->
                 <MudItem xs="12" sm="5" md="5">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 300px;">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
                         <MudText Typo="Typo.h5">Income</MudText>
+                        <MudChart ChartType="ChartType.Bar" ChartSeries="@Income" @bind-SelectedIndex="Index"
+                            XAxisLabels="@IncomeLabels" Width="100%" Height="100%" LegendPosition="Position.Right"></MudChart>
                     </MudPaper>
                 </MudItem>
 
                 <!--Income & total expenses-->
                <MudItem xs="12" sm="4" md="4">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 300px;">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
                         <MudText Typo="Typo.h5">Income & total expenses</MudText>
+                        <MudChart ChartType="ChartType.Line" ChartSeries="@IncomeExpense" @bind-SelectedIndex="Index" 
+                            LegendPosition="Position.Right" XAxisLabels="@IncomeExpenseLabels" Width="100%" Height="100%" ChartOptions="new ChartOptions{LineStrokeWidth=3}"></MudChart>
                     </MudPaper>
                 </MudItem>
 
                 <!--Result-->
                 <MudItem xs="12" sm="3" md="3">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 300px;">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
                         <MudText Typo="Typo.h5">Result</MudText>
+                        <MudDataGrid Items="@Results.Take(4)">
+                            <Columns>
+                                <Column T="Result" Field="Position" Title="Nr" />
+                                <Column T="Result" Field="Month" />
+                                <Column T="Result" Field="Value"  />
+                            </Columns>
+                        </MudDataGrid>
                     </MudPaper>
                 </MudItem>
 
                 <!--Variable expenses-->
                 <MudItem xs="12" sm="6" md="6">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 300px;">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
                         <MudText Typo="Typo.h5">Variable expenses</MudText>
                     </MudPaper>
                 </MudItem>
                 <!--Categories-->
                 <MudItem xs="12" sm="6" md="6">
-                    <MudPaper Elevation="2" Class=" rounded-xl pa-4" Style="height: 300px;">
+                    <MudPaper Elevation="2" Class=" rounded-xl pa-3" Style="height: 300px;">
                         <MudText Typo="Typo.h5">Categories</MudText>
                         <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
                             InputData="@data" InputLabels="@labels">
@@ -77,14 +88,14 @@
             <MudGrid>
                 <!-- User info -->
                 <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 250px;">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 250px;">
                         <MudText Typo="Typo.h5">User information</MudText>
                     </MudPaper>
                 </MudItem>
 
                 <!-- Recent transactions -->
                 <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 499px;">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 499px;">
                         <MudText Typo="Typo.h5">Recent transactions</MudText>
                     </MudPaper>
                 </MudItem>
@@ -101,9 +112,40 @@
 
     /* Income */
 
+    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
+
+    public List<ChartSeries> Income = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Income", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15, 99, 83, 96 } },
+        new ChartSeries() { Name = "Expense", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31, 60, 37, 49 } },
+    };
+    public string[] IncomeLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
     /* Income & total expenses */
 
+
+    public List<ChartSeries> IncomeExpense = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Income", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70, 86,93,79 } },
+        new ChartSeries() { Name = "Expense", Data = new double[] { 10, 41, 35, 51, 49, 62, 69, 91, 148, 89, 86, 99 } },
+    };
+    public string[] IncomeExpenseLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
     /* Result */
+    public class Result
+    {
+        public string Month { get; set; }
+        public int Position { get; set; }
+        public int Value { get; set; }
+
+    }
+    private IEnumerable<Result> Results = new List<Result>()
+    {
+        new Result() { Position = 0, Month="Jan", Value = 4500 },
+        new Result() { Position = 1, Month="Feb", Value = 4500 },
+        new Result() { Position = 2, Month="Mar", Value = 4500 },
+        new Result() { Position = 3, Month="Apr", Value = 4500 }
+    };
 
     /* Recent transactions */
 
