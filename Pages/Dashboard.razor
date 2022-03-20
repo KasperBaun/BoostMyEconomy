@@ -3,106 +3,113 @@
 <PageTitle>Dashboard</PageTitle>
 
 <!-- Container for the entire dashboard -->
-<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
-    <MudGrid>
-        <MudItem xs="12" sm="8" md="8">
-            <MudPaper Elevation="2" Class="pl-4 pr-16 rounded-xl" Style="height: 150px;">
-                <MudIcon></MudIcon>
-                <MudText Typo="Typo.h5" Class="mb-4">Notifications</MudText>
-                <MudText Typo="Typo.body1">Welcome Kasper Baun !</MudText>
-                <MudText Typo="Typo.body1">Last time you logged on was 17th feb. 15:36</MudText>
-            </MudPaper>
-        </MudItem>
+<MudContainer Class="mt-12 px-8" MaxWidth="MaxWidth.False">
 
-        <MudItem xs="4" sm="4" md="4">
-            <MudPaper Elevation="2" Class="pl-4 pr-16 rounded-xl" Style="height: 300px;">User-info</MudPaper>
-        </MudItem>
-       
-        <MudItem xs="12">
+    <!-- Toolbar -->
+    <MudPaper Elevation="25" Class="rounded-xl">
+        <MudToolBar>
+            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Add" Color="Color.Inherit" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Edit" Color="Color.Inherit" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Settings" Color="Color.Inherit" />
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit"/>
+            <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
+            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" />
+            <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
+        </MudToolBar>
+    </MudPaper>
 
-        <MudItem xs="8">
+    <MudGrid Spacing="4" Class="mt-6">
+
+        <MudItem xs="12" sm="9" md="9">
             <MudGrid>
+                 <!-- Notifications -->
+                <MudItem xs="12" sm="12" md="12">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 125px;">
+                        <MudText Typo="Typo.h5">Notifications</MudText>
+                        <MudText Typo="Typo.body1">Welcome Kasper Baun !</MudText>
+                        <MudText Typo="Typo.body1">Last time you logged on was 17th feb. 15:36</MudText>
+                    </MudPaper>
+                </MudItem>
+
                 <!--Income-->
-                <MudItem xs="5">
-                    <MudPaper Elevation="2" Class="pl-4 pr-16 rounded-xl" Style="height: 250px;">Income</MudPaper>
+                <MudItem xs="12" sm="5" md="5">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">Income</MudText>
+                    </MudPaper>
                 </MudItem>
+
                 <!--Income & total expenses-->
-               <MudItem xs="4">
-                    <MudPaper Elevation="2" Class="pl-4 pr-16 rounded-xl" Style="height: 250px;">Income & total expenses</MudPaper>
+               <MudItem xs="12" sm="4" md="4">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">Income & total expenses</MudText>
+                    </MudPaper>
                 </MudItem>
+
                 <!--Result-->
-                <MudItem xs="3">
-                    <MudPaper Elevation="2" Class="pl-4 pr-16 rounded-xl" Style="height: 250px;">Result</MudPaper>
+                <MudItem xs="12" sm="3" md="3">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">Result</MudText>
+                    </MudPaper>
                 </MudItem>
 
-            </MudGrid>
-        </MudItem>
-
-         <MudItem xs="8">
-            <MudGrid>
                 <!--Variable expenses-->
-                <MudItem xs="6">
-                    <MudPaper Elevation="2" Class="pa-4 rounded-xl" Style="height: 250px;">Income</MudPaper>
+                <MudItem xs="12" sm="6" md="6">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">Variable expenses</MudText>
+                    </MudPaper>
                 </MudItem>
                 <!--Categories-->
-               <MudItem xs="6">
-                    <MudPaper Elevation="2" Class="pa-4 rounded-xl" Style="height: 250px;">
+                <MudItem xs="12" sm="6" md="6">
+                    <MudPaper Elevation="2" Class=" rounded-xl pa-4" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">Categories</MudText>
                         <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
                             InputData="@data" InputLabels="@labels">
                         </MudChart>
                     </MudPaper>
                 </MudItem>
-
             </MudGrid>
         </MudItem>
 
-        <MudItem xs="4" sm="4" md="4">
-            <MudPaper Elevation="2" Class="pl-4 pr-16 rounded-xl" Style="height: 300px;">User-info</MudPaper>
-        </MudItem>
-
-        </MudItem>
-        
-
-        <!--
-        <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-
-        <MudItem xs="12" sm="12" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-
-        <MudItem xs="12" sm="6">
+        <MudItem xs="12" sm="3" md="3">
             <MudGrid>
+                <!-- User info -->
                 <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 250px;">
+                        <MudText Typo="Typo.h5">User information</MudText>
+                    </MudPaper>
                 </MudItem>
+
+                <!-- Recent transactions -->
                 <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+                    <MudPaper Elevation="2" Class="rounded-xl pa-4" Style="height: 499px;">
+                        <MudText Typo="Typo.h5">Recent transactions</MudText>
+                    </MudPaper>
                 </MudItem>
             </MudGrid>
         </MudItem>
-
-        <MudItem xs="12" sm="6">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 100%"></MudPaper>
-        </MudItem>
-
-        <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-
-        <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-
-        <MudItem xs="12" sm="12" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-        -->
+         
     </MudGrid>
 </MudContainer>
 
 @code {
+    /* Notifications */
+
+    /* User information */
+
+    /* Income */
+
+    /* Income & total expenses */
+
+    /* Result */
+
+    /* Recent transactions */
+
+    /* Variable expenses */
+
+    /* Categories*/
     public double[] data = { 25, 77, 28, 5 };
     public string[] labels = { "Oil", "Coal", "Gas", "Biomass" };
 }
