@@ -1,4 +1,5 @@
 ﻿@page "/home"
+@using BoostMyEconomy.Models
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -98,6 +99,22 @@
                 <MudItem xs="12">
                     <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 499px;">
                         <MudText Typo="Typo.h5">Recent transactions</MudText>
+                        <MudTable Items="@RecentTransactions.Take(RecentTransactions.Count())" Hover="true" Dense="true" Striped="true" Loading="@LoadingTransactions" Breakpoint="Breakpoint.Sm"  OnRowClick="RowClickEvent" T="Transaction">
+                        <HeaderContent>
+                            <MudTh>Nr</MudTh>
+                            <MudTh>Icon</MudTh>
+                            <MudTh>Source</MudTh>
+                            <MudTh>Date</MudTh>
+                            <MudTh>Value</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Nr">@context.Id</MudTd>
+                            <MudTd DataLabel="Sign">@context.Description</MudTd>
+                            <MudTd DataLabel="Name">@context.Source</MudTd>
+                            <MudTd DataLabel="Position">@context.MadeAt</MudTd>
+                            <MudTd DataLabel="Molar mass">@context.Value</MudTd>
+                        </RowTemplate>
+                    </MudTable>
                     </MudPaper>
                 </MudItem>
             </MudGrid>
@@ -185,6 +202,30 @@
 
 
     /* Recent transactions */
+    private bool LoadingTransactions { get; set; } = false;
+
+
+    public IEnumerable<Transaction> RecentTransactions = new List<Transaction>()
+    {
+        new Transaction() { CategoryId = 1, Description = "Icons.Material.Filled.Home", Id = 1, Value = -500, Source = "IKEA", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateTime.Today.Date },
+        new Transaction() { CategoryId = 4, Description = " ", Id = 2, Value = 500, Source = "F24", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateTime.Today.Date },
+        new Transaction() { CategoryId = 2, Description = " ", Id = 3, Value = -500, Source = "Danske Bank", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateTime.Today.Date },
+        new Transaction() { CategoryId = 3, Description = " ", Id = 4, Value = -500, Source = "Zalando", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateTime.Today.Date }
+    };
+
+    private void RowClickEvent(TableRowClickEventArgs<Transaction> tableRowClickEventArgs)
+    {
+        /* TODO Implement navigation-logic*/
+        if (LoadingTransactions)
+        {
+            LoadingTransactions = false;
+        } else
+        {
+            LoadingTransactions = true;
+        }
+
+    }
+   
 
     /* Variable expenses */
 
