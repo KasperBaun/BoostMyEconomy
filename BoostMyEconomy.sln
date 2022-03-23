@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32210.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BmeBlazorServer", "BmeBlazorServer\BmeBlazorServer.csproj", "{5B5B3652-8B15-4F28-B019-E99AB2B9DF57}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BmeWebAPI", "BmeWebAPI\BmeWebAPI.csproj", "{3C5D90CE-5EF0-42A6-BEBD-8C30CC11E843}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{5B5B3652-8B15-4F28-B019-E99AB2B9DF57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B5B3652-8B15-4F28-B019-E99AB2B9DF57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B5B3652-8B15-4F28-B019-E99AB2B9DF57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C5D90CE-5EF0-42A6-BEBD-8C30CC11E843}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C5D90CE-5EF0-42A6-BEBD-8C30CC11E843}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C5D90CE-5EF0-42A6-BEBD-8C30CC11E843}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C5D90CE-5EF0-42A6-BEBD-8C30CC11E843}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
