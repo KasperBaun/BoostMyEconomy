@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using BoostMyEconomy.Data;
-using BoostMyEconomy.Models;
+using BmeBlazorServer.Data;
+using BmeBlazorServer.Models;
 using MudBlazor.Services;
 
         

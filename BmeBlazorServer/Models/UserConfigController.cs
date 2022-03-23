@@ -1,5 +1,5 @@
 ﻿using System;
-namespace BoostMyEconomy.Models
+namespace BmeBlazorServer.Models
 {
 
     public sealed class UserConfigController

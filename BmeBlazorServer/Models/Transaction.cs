@@ -1,4 +1,4 @@
-﻿namespace BoostMyEconomy.Models
+﻿namespace BmeBlazorServer.Models
 {
     public class Transaction
     {

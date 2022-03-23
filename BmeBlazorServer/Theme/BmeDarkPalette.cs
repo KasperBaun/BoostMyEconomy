@@ -1,5 +1,5 @@
 ﻿using MudBlazor;
-namespace BoostMyEconomy.Theme
+namespace BmeBlazorServer.Theme
 
 {
     public class BmeDarkPalette : Palette

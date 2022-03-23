@@ -1,4 +1,4 @@
-namespace BoostMyEconomy.Data;
+namespace BmeBlazorServer.Data;
 
 public class WeatherForecastService
 {

@@ -1,6 +1,6 @@
 ﻿using MudBlazor;
 using MudBlazor.Utilities;
-namespace BoostMyEconomy.Theme
+namespace BmeBlazorServer.Theme
 {
     public class RallyGreenDarkTheme : MudTheme
     {
