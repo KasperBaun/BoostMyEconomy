@@ -1,0 +1,132 @@
+﻿@page "/"
+<PageTitle>Login</PageTitle>
+@page "/login"
+
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@inject IDialogService DialogService
+@inject NavigationManager _nav
+
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
+    <MudPaper Class="px-10 pt-4 pb-4 mt-4 rounded-xl" Elevation="4">
+        <div class="d-flex justify-center">
+            <MudIcon Icon="@Icons.Material.Filled.AreaChart" Color="Color.Primary" Style="height:50%; width:50%;"/>
+        </div>
+        <MudText Class="mud-typography-h3 mt-2" Align="Align.Center">
+            Boost My Economy
+        </MudText>
+        <MudText Class="mud-typography-h5 mt-2 mb-6" Color="Color.Primary" Align="Align.Center">Personal Finance Workspace</MudText>
+
+        <MudGrid>
+            <!-- Email Field -->
+            <MudItem xs="12">
+                <MudTextField 
+                        T="string" 
+                        Label="E-mail" 
+                        Variant="Variant.Outlined"
+                        Required="false" 
+                        RequiredError="Email is required!"
+                        Validation="@(new EmailAddressAttribute() {ErrorMessage = "Email address is invalid!"})"
+                        Adornment="Adornment.Start" 
+                        AdornmentColor="Color.Primary" 
+                        AdornmentIcon="@Icons.Material.Filled.Person"
+                        IconSize="Size.Large"
+                              />
+            </MudItem>
+            <!-- Password Field -->
+            <MudItem xs="12">
+                <MudPaper>
+                <MudTextField  
+                        T="string" @bind-Value="Password"
+                        IconSize="Size.Large"
+                        Label="Password"
+                        Variant="Variant.Outlined" 
+                        InputType="@PasswordInput" 
+                        Adornment="Adornment.Start" 
+                        AdornmentColor="Color.Primary" 
+                        AdornmentIcon="@PasswordInputIcon" 
+                        OnAdornmentClick="TogglePasswordHidden" />
+                </MudPaper>
+            </MudItem>
+            <!-- Remember me field-->
+            <MudItem xs="12" Class="d-flex justify-space-between align-center">
+                <MudCheckBox T="bool" Label="Remember me?" Color="Color.Primary" Class="ml-n1"></MudCheckBox> <MudButton  Variant="Variant.Text" Color="Color.Primary" OnClick="OpenForgottenPasswordDialog" >Forgot password?</MudButton>
+            </MudItem>
+            <!-- Login button -->
+            <MudItem xs="12" Class="d-flex justify-center mb-4">
+                <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" OnClick="OnLoginClicked" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="rounded-lg" Style="width: 100%; height: 50px;">
+                    @if (_processing)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                        <MudText Class="ms-2">Processing</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Login</MudText>
+                    }
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+     </MudPaper>
+     <MudGrid>
+        <MudItem xs="12">
+            <div class="d-flex justify-start mt-4">
+                <MudText>Don't have an account?   <MudLink Href="/register"> Register here! </MudLink></MudText>
+            </div>
+        </MudItem>
+    </MudGrid>
+
+</MudContainer>
+
+
+@code {
+    /* This block of code is used to handle user-login when pressing the Login button */ 
+    private bool _processing = false;
+
+    async Task OnLoginClicked()
+    {
+        _processing = true;
+        await Task.Delay(2000);
+        _processing = false;
+        _nav.NavigateTo("home");
+    }
+
+
+    public double? Amount { get; set; }
+    public int? Weight { get; set; }
+    public string Password { get; set;} = "";
+
+    bool isShow = false;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Outlined.Lock;
+
+    void TogglePasswordHidden()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Outlined.Lock;
+            PasswordInput = InputType.Password;
+        }
+        else {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Outlined.LockOpen;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    async Task OpenForgottenPasswordDialog()
+    {
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<ForgottenPasswordDialog>("Forgotten Password Dialog", options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            // Snackbar with could not find user
+        }
+        dialog.Close();
+    }
+
+}

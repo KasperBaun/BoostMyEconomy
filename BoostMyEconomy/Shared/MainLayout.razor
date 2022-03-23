@@ -1,0 +1,60 @@
+﻿@inherits LayoutComponentBase
+@using MudBlazor.Services;
+@using BoostMyEconomy.Theme;
+@using BoostMyEconomy.Models;
+<PageTitle>BoostMyEconomy</PageTitle>
+
+<MudThemeProvider Theme="RallyGreenDarkTheme"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+
+    <MudDrawer Elevation="4" Open="true">
+        <NavMenu />
+    </MudDrawer>
+
+    <MudMainContent>
+    <!-- <MudButton OnClick="@(() => UserConfigController.ToggleDrawer())">Åben</MudButton> -->
+        @Body
+    </MudMainContent>
+
+</MudLayout>
+
+@code {
+    UserConfigController uConfig = UserConfigController.GetInstance("Singleton uConfig er instantieret");
+    
+    
+
+
+
+    MudTheme RallyGreenDarkTheme = new MudTheme()
+        {
+            Palette = new Palette()
+            {
+                AppbarBackground = Colors.BlueGrey.Darken3,
+                AppbarText = Colors.Grey.Default, 
+                TextPrimary = Colors.Shades.White,
+                TextSecondary = Colors.Shades.White,
+                DrawerBackground = Colors.BlueGrey.Darken3,
+                DrawerText = Colors.Green.Default,
+                Background = Colors.BlueGrey.Darken1,
+                Surface = Colors.BlueGrey.Darken3,
+                Primary = Colors.Teal.Default,
+                Secondary = Colors.Green.Darken1,
+                Tertiary = Colors.Green.Darken1,
+                Info = Colors.Green.Darken1,
+                Success = Colors.Green.Darken1,
+                Warning = Colors.Green.Darken1,
+                Error = Colors.Red.Darken1
+            },
+          
+            LayoutProperties = new LayoutProperties()
+            {
+                DrawerWidthLeft = "100px",
+                DrawerWidthRight = "100px",
+                AppbarHeight = "5px"
+               
+            }
+        };
+}

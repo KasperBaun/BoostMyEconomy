@@ -1,0 +1,248 @@
+﻿@page "/home"
+@using BoostMyEconomy.Models
+
+<PageTitle>Dashboard</PageTitle>
+
+<!-- Container for the entire dashboard -->
+<MudContainer Class="mt-12 px-8" MaxWidth="MaxWidth.False">
+
+    <!-- Toolbar -->
+    <MudPaper Elevation="25" Class="rounded-xl">
+        <MudToolBar>
+            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Add" Color="Color.Inherit" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Edit" Color="Color.Inherit" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Settings" Color="Color.Inherit" />
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit"/>
+            <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
+            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" />
+            <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
+        </MudToolBar>
+    </MudPaper>
+
+    <MudGrid Spacing="4" Class="mt-6">
+
+        <MudItem xs="12" sm="12" md="9">
+            <MudGrid>
+                 <!-- Notifications -->
+                <MudItem xs="12" sm="12" md="12">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 125px;">
+                        <MudText Typo="Typo.h5">Notifications</MudText>
+                        <MudText Typo="Typo.body1">Welcome Kasper Baun !</MudText>
+                        <MudText Typo="Typo.body1">Last time you logged on was 17th feb. 15:36</MudText>
+                    </MudPaper>
+                </MudItem>
+
+                <!--Income-->
+                <MudItem xs="12" sm="12" md="5">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">Income</MudText>
+                        <MudChart ChartType="ChartType.Bar" ChartSeries="@Income" @bind-SelectedIndex="Index"
+                            XAxisLabels="@IncomeLabels" Width="100%" Height="100%" ChartOptions="@IncomeOptions"></MudChart>
+                    </MudPaper>
+                </MudItem>
+
+                <!--Income & total expenses-->
+               <MudItem xs="12" sm="12" md="4" >
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">Income & total expenses</MudText>
+                        <MudChart ChartType="ChartType.Line" ChartSeries="@IncomeExpense" @bind-SelectedIndex="Index" 
+                            LegendPosition="Position.Right" XAxisLabels="@IncomeExpenseLabels" Width="100%" Height="100%" ChartOptions="@IncomeExpensesOptions"></MudChart>
+                    </MudPaper>
+                </MudItem>
+
+                <!--Result-->
+                <MudItem xs="12" sm="12" md="3" >
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3 overflow-y-scroll" Style="height: 300px;" >
+                        <MudText Typo="Typo.h5">Result</MudText>
+                        <MudDataGrid Items="@Results.Take(Results.Count())" Bordered="true" Dense="true" Class="overflow-y-scroll">
+                            <Columns>
+                                <Column T="Result" Field="Position" Title="Nr" />
+                                <Column T="Result" Field="Month" />
+                                <Column T="Result" Field="Value" CellStyleFunc="@_cellStyleFunc"  />
+                            </Columns>
+                        </MudDataGrid>
+                    </MudPaper>
+                </MudItem>
+
+                <!--Variable expenses-->
+                <MudItem xs="12" sm="12" md="6">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">Variable expenses</MudText>
+                        <MudChart ChartType="ChartType.Line" ChartSeries="@VarExpenses" XAxisLabels="@VarExpensesLabels" Width="100%" Height="250px" ChartOptions="varExpensesOptions"></MudChart>
+                    </MudPaper>
+                </MudItem>
+                <!--Categories-->
+                <MudItem xs="12" sm="12" md="6">
+                    <MudPaper Elevation="2" Class=" rounded-xl pa-3" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">Categories</MudText>
+                        <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
+                            InputData="@data" InputLabels="@labels">
+                        </MudChart>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+
+        <MudItem xs="12" sm="12" md="3">
+            <MudGrid>
+                <!-- User info -->
+                <MudItem xs="12">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 250px;">
+                        <MudText Typo="Typo.h5">User information</MudText>
+                    </MudPaper>
+                </MudItem>
+
+                <!-- Recent transactions -->
+                <MudItem xs="12">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 499px;">
+                        <MudText Typo="Typo.h5">Recent transactions</MudText>
+                        <MudTable Items="@RecentTransactions.Take(RecentTransactions.Count())" Hover="true" Dense="true" Striped="true" Loading="@LoadingTransactions" Breakpoint="Breakpoint.Sm"  OnRowClick="RowClickEvent" T="Transaction">
+                        <HeaderContent>
+                            <MudTh>Nr</MudTh>
+                            <MudTh>Icon</MudTh>
+                            <MudTh>Source</MudTh>
+                            <MudTh>Date</MudTh>
+                            <MudTh>Value</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Nr">@context.Id</MudTd>
+                            <MudTd DataLabel="Sign">@context.Description</MudTd>
+                            <MudTd DataLabel="Name">@context.Source</MudTd>
+                            <MudTd DataLabel="Position">@context.MadeAt</MudTd>
+                            <MudTd DataLabel="Molar mass">@context.Value</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+         
+    </MudGrid>
+</MudContainer>
+
+@code {
+    /* Notifications */
+
+    /* User information */
+
+    /* Income */
+
+    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
+
+    private ChartOptions IncomeOptions = new ChartOptions()
+        {
+            DisableLegend = true,
+            LineStrokeWidth = 5,
+            InterpolationOption = InterpolationOption.EndSlope,
+            YAxisFormat = "c2"
+    };
+
+    public List<ChartSeries> Income = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Income", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15, 99, 83, 96 } },
+        new ChartSeries() { Name = "Expense", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31, 60, 37, 49 } },
+    };
+    public string[] IncomeLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+    /* Income & total expenses */
+
+    private ChartOptions IncomeExpensesOptions = new ChartOptions()
+        {
+            DisableLegend = true,
+            LineStrokeWidth = 5,
+            InterpolationOption = InterpolationOption.EndSlope,
+            YAxisFormat = "c2"
+    };
+    public List<ChartSeries> IncomeExpense = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Income", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70, 86,93,79 } },
+        new ChartSeries() { Name = "Expense", Data = new double[] { 10, 41, 35, 51, 49, 62, 69, 91, 148, 89, 86, 99 } },
+    };
+    public string[] IncomeExpenseLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+    /* Result */
+    public class Result
+    {
+        public string Month { get; set; } = String.Empty;
+        public int Position { get; set; }
+        public int Value { get; set; }
+
+    }
+    private IEnumerable<Result> Results = new List<Result>()
+    {
+        new Result() { Position = 1, Month="Jan", Value = 4500 },
+        new Result() { Position = 2, Month="Feb", Value = -3500 },
+        new Result() { Position = 3, Month="Mar", Value = 2500 },
+        new Result() { Position = 4, Month="Apr", Value = -1500 },
+        new Result() { Position = 5, Month="May", Value = -1500 },
+        new Result() { Position = 6, Month="Jun", Value = -1500 },
+        new Result() { Position = 7, Month="Jul", Value = -1500 },
+        new Result() { Position = 8, Month="Aug", Value = -1500 },
+        new Result() { Position = 9, Month="Sep", Value = -1500 },
+        new Result() { Position = 10, Month="Oct", Value = -1500 },
+        new Result() { Position = 11, Month="Nov", Value = -1500 },
+        new Result() { Position = 12, Month="Dec", Value = -1500 }
+    };
+    // Style the cells according to a positive or negative result
+    private Func<Result, string> _cellStyleFunc => x =>
+    {
+        string style = "";
+
+        if (x.Value >= 0)
+            style += "color:#00FF00";
+
+        else
+            style += "color:#FF0000";
+
+        return style;
+    };
+
+
+    /* Recent transactions */
+    private bool LoadingTransactions { get; set; } = false;
+
+
+    public IEnumerable<Transaction> RecentTransactions = new List<Transaction>()
+    {
+        new Transaction() { CategoryId = 1, Description = "Icons.Material.Filled.Home", Id = 1, Value = -500, Source = "IKEA", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateTime.Today.Date },
+        new Transaction() { CategoryId = 4, Description = " ", Id = 2, Value = 500, Source = "F24", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateTime.Today.Date },
+        new Transaction() { CategoryId = 2, Description = " ", Id = 3, Value = -500, Source = "Danske Bank", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateTime.Today.Date },
+        new Transaction() { CategoryId = 3, Description = " ", Id = 4, Value = -500, Source = "Zalando", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateTime.Today.Date }
+    };
+
+    private void RowClickEvent(TableRowClickEventArgs<Transaction> tableRowClickEventArgs)
+    {
+        /* TODO Implement navigation-logic*/
+        if (LoadingTransactions)
+        {
+            LoadingTransactions = false;
+        } else
+        {
+            LoadingTransactions = true;
+        }
+
+    }
+   
+
+    /* Variable expenses */
+
+    private ChartOptions varExpensesOptions = new ChartOptions()
+        {
+            DisableLegend = true,
+            LineStrokeWidth = 5,
+            InterpolationOption = InterpolationOption.EndSlope,
+            YAxisFormat = "c2"
+    };
+    public List<ChartSeries> VarExpenses = new List<ChartSeries>()
+    {
+        new ChartSeries() { Data = new double[] { 35, 41, 35, 51, 49, 62, 69, 91, 148, 64, 39, 25 } },
+    };
+    public string[] VarExpensesLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+    /* Categories*/
+    public double[] data = { 25, 77, 28, 5 };
+    public string[] labels = { "Oil", "Coal", "Gas", "Biomass" };
+}
