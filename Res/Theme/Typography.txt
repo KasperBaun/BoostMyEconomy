@@ -1,3 +1,0 @@
-H1 = Arial Regular 36
-H2 = Arial Regular 24
-TextComponent = Arial Regular 18
