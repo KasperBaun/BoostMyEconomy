@@ -1,21 +1,135 @@
 ﻿@page "/income"
+@using BmeBlazorServer.Models;
 
 <PageTitle>Income</PageTitle>
 
-<h1>Income goes here</h1>
+<h1>Income</h1>
 
-<p role="status">Current count: @currentCount</p>
+<!-- Container for the entire dashboard -->
+<MudContainer Class="mt-12 px-8" MaxWidth="MaxWidth.False">
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+    <!-- Toolbar -->
+    <MudPaper Elevation="25" Class="rounded-xl">
+        <MudToolBar>
+            <MudDateRangePicker Label="Period" Style="width:40%" StartMonth="@DateTime.Now.AddMonths(-1)" @bind-DateRange="_dateRange" Color="Color.Primary" />
+            <MudTextField @bind-Value="searchString1" Style="width:40%" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudIconButton Icon="@Icons.Material.Outlined.Add" Color="Color.Primary" />
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Primary"/>
+        </MudToolBar>
+    </MudPaper>
+
+    <MudGrid Spacing="4" Class="mt-6">
+
+        <MudItem xs="12" sm="12" md="9">
+            <MudGrid>
+                 <!-- Income transactions -->
+                <MudItem xs="12" sm="12" md="12">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 449px;">
+                        <MudTable Items="@Transactions" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Transaction,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+                        <HeaderContent>
+                            <MudTh>Type</MudTh>
+                            <MudTh>Source</MudTh>
+                            <MudTh>Value</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Name">@context.Type</MudTd>
+                            <MudTd DataLabel="Position">@context.Source</MudTd>
+                            <MudTd DataLabel="Molar mass">@context.Value</MudTd>
+                        </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager />
+                        </PagerContent>
+                    </MudTable>
+
+                    <div class="d-flex flex-wrap mt-4">
+                        <MudSwitch @bind-Checked="@hover" Color="Color.Primary">Hover</MudSwitch>
+                        <MudSwitch @bind-Checked="@dense" Color="Color.Secondary">Dense</MudSwitch>
+                        <MudSwitch @bind-Checked="@striped" Color="Color.Tertiary">Striped</MudSwitch>
+                        <MudSwitch @bind-Checked="@bordered" Color="Color.Warning">Bordered</MudSwitch>
+                        <MudSpacer />
+                        <div style="min-width:200px;">
+                            <MudText Inline="true" Class="align-self-center">Selected1: @selectedItem1?.Type</MudText>
+                        </div>
+                    </div>
+
+                    </MudPaper>
+                </MudItem>
+
+                <!--Variable expenses-->
+                <MudItem xs="12" sm="12" md="6">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
+                        Variable expenses
+                    </MudPaper>
+                </MudItem>
+                <!--Categories-->
+                <MudItem xs="12" sm="12" md="6">
+                    <MudPaper Elevation="2" Class=" rounded-xl pa-3" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">Categories</MudText>
+                        <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
+                            InputData="@data" InputLabels="@labels">
+                        </MudChart>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+
+        <MudItem xs="12" sm="12" md="3">
+            <MudGrid>
+                <!-- User info -->
+                <MudItem xs="12">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 250px;">
+                        <MudText Typo="Typo.h5">User information</MudText>
+                    </MudPaper>
+                </MudItem>
+
+                <!-- Recent transactions -->
+                <MudItem xs="12">
+                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 499px;">
+                        
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+         
+    </MudGrid>
+</MudContainer>
+
 
 @code {
-    private int currentCount = 0;
-	
-	[Parameter]
-	public int IncrementAmount { get; set; } = 1;
+    public double[] data = { 25, 77, 28, 5 };
+    public string[] labels = { "Oil", "Coal", "Gas", "Biomass" };
 
-    private void IncrementCount()
+    DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
+
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = false;
+    private bool bordered = false;
+    private string searchString1 = "";
+    private Transaction selectedItem1 = null;
+    private HashSet<Transaction> selectedItems = new HashSet<Transaction>();
+
+    private IEnumerable<Transaction> Transactions = new List<Transaction>(){
+        new Transaction() { CategoryId = 1, Description = "Icons.Material.Filled.Home", Id = 1, Value = -500, Source = "IKEA", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateTime.Today.Date },
+        new Transaction() { CategoryId = 4, Description = " ", Id = 2, Value = 500, Source = "F24", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateTime.Today.Date },
+        new Transaction() { CategoryId = 2, Description = " ", Id = 3, Value = -500, Source = "Danske Bank", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateTime.Today.Date },
+        new Transaction() { CategoryId = 3, Description = " ", Id = 4, Value = -500, Source = "Zalando", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateTime.Today.Date }
+    };
+
+    public bool FilterFunc1(Transaction transaction) => FilterFunc(transaction, searchString1);
+
+    public bool FilterFunc(Transaction transaction, string searchString)
     {
-        currentCount+= IncrementAmount;
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (transaction.Type.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (transaction.Source.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{transaction.Description} {transaction.CategoryId} {transaction.MadeAt}".Contains(searchString))
+            return true;
+        return false;
     }
+
 }
