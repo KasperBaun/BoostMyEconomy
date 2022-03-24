@@ -3,69 +3,104 @@
 
 <PageTitle>Income</PageTitle>
 
-<h1>Income</h1>
 
 <!-- Container for the entire dashboard -->
-<MudContainer Class="mt-12 px-8" MaxWidth="MaxWidth.False">
-
-    <!-- Toolbar -->
-    <MudPaper Elevation="25" Class="rounded-xl">
-        <MudToolBar>
-            <MudDateRangePicker Label="Period" Style="width:40%" StartMonth="@DateTime.Now.AddMonths(-1)" @bind-DateRange="_dateRange" Color="Color.Primary" />
-            <MudTextField @bind-Value="searchString1" Style="width:40%" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            <MudIconButton Icon="@Icons.Material.Outlined.Add" Color="Color.Primary" />
-            <MudSpacer />
-            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Primary"/>
-        </MudToolBar>
-    </MudPaper>
+<MudContainer Class="mt-6 px-8" MaxWidth="MaxWidth.False">
 
     <MudGrid Spacing="4" Class="mt-6">
 
+         <!-- Title -->
+        <MudItem xs="12" sm="6" md="3" >
+            <MudText Typo="Typo.h2" Class="ma-auto" Color="Color.Primary">Income</MudText>
+        </MudItem>
+
+        <!-- Datepicker -->
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="25" Class="rounded-xl">
+                <MudToolBar>
+                    <MudDateRangePicker Class="ma-auto" StartMonth="@DateTime.Now.AddMonths(-1)" @bind-DateRange="_dateRange" Color="Color.Primary" AdornmentColor="Color.Primary" IconSize="Size.Medium" />
+                </MudToolBar>
+            </MudPaper>
+        </MudItem>
+
+         <!-- Search -->
+        <MudItem xs="12" sm="6" md="3" >
+            <MudPaper Elevation="25" Class="rounded-xl">
+                <MudToolBar>
+                    <MudTextField Class="ma-auto" @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
+                </MudToolBar>
+            </MudPaper>
+        </MudItem>
+
+         <!-- Add expense -->
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="25" Class="rounded-xl">
+                <MudToolBar Class="px-0">
+                <MudButton Variant="Variant.Filled"  Class="rounded-xl mud-height-full mud-button-full-width" StartIcon="@Icons.Material.Outlined.Add" Color="Color.Primary">
+                    Add income
+                </MudButton>
+                </MudToolBar>
+            </MudPaper>
+        </MudItem>
+
+        <!-- Income table -->
         <MudItem xs="12" sm="12" md="9">
             <MudGrid>
-                 <!-- Income transactions -->
                 <MudItem xs="12" sm="12" md="12">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 449px;">
-                        <MudTable Items="@Transactions" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Transaction,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+                        <MudTable
+                            Height="360px"
+                            Items="@Transactions" 
+                            Elevation="25"
+                            Class="rounded-xl"
+                            Style="margin:auto; overflow-y:hidden" 
+                            Dense="@dense" 
+                            Hover="true" 
+                            Bordered="false" 
+                            Striped="@striped"
+                            Filter="new Func<Transaction,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                            >
                         <HeaderContent>
-                            <MudTh>Type</MudTh>
+                            <MudTh>Date</MudTh>
                             <MudTh>Source</MudTh>
                             <MudTh>Value</MudTh>
                         </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Name">@context.Type</MudTd>
-                            <MudTd DataLabel="Position">@context.Source</MudTd>
-                            <MudTd DataLabel="Molar mass">@context.Value</MudTd>
+
+                        <RowTemplate
+                            
+                        >
+                            <MudTd DataLabel="Date">@context.MadeAt</MudTd>
+                            <MudTd DataLabel="Source">@context.Source</MudTd>
+                            <MudTd DataLabel="Value">@context.Value</MudTd>
                         </RowTemplate>
-                        <PagerContent>
+
+                        <PagerContent >
+                            <MudSwitch @bind-Checked="@dense" Color="Color.Primary" Class="ml-1">Fold/unfold</MudSwitch>
+                            <MudSwitch @bind-Checked="@striped" Color="Color.Primary" Class="ml-1">Striped</MudSwitch>
                             <MudTablePager />
                         </PagerContent>
+
                     </MudTable>
+                </MudItem>
 
-                    <div class="d-flex flex-wrap mt-4">
-                        <MudSwitch @bind-Checked="@hover" Color="Color.Primary">Hover</MudSwitch>
-                        <MudSwitch @bind-Checked="@dense" Color="Color.Secondary">Dense</MudSwitch>
-                        <MudSwitch @bind-Checked="@striped" Color="Color.Tertiary">Striped</MudSwitch>
-                        <MudSwitch @bind-Checked="@bordered" Color="Color.Warning">Bordered</MudSwitch>
-                        <MudSpacer />
-                        <div style="min-width:200px;">
-                            <MudText Inline="true" Class="align-self-center">Selected1: @selectedItem1?.Type</MudText>
-                        </div>
-                    </div>
+                <!-- History -->
+                <MudItem xs="12" sm="12" md="6">
+                    <MudPaper Elevation="2" Class="rounded-xl" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">History</MudText>
+                        <MudChart 
+                            ChartType="ChartType.Line" 
+                            ChartSeries="@incomeHistory" 
+                            ChartOptions="incomeHistoryOptions"
+                            XAxisLabels="@incomeHistoryLabels"
+                            Class="ma-auto">
 
+                        </MudChart>
                     </MudPaper>
                 </MudItem>
 
-                <!--Variable expenses-->
+                <!--Sources-->
                 <MudItem xs="12" sm="12" md="6">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
-                        Variable expenses
-                    </MudPaper>
-                </MudItem>
-                <!--Categories-->
-                <MudItem xs="12" sm="12" md="6">
-                    <MudPaper Elevation="2" Class=" rounded-xl pa-3" Style="height: 300px;">
-                        <MudText Typo="Typo.h5">Categories</MudText>
+                    <MudPaper Elevation="2" Class=" rounded-xl" Style="height: 300px;">
+                        <MudText Typo="Typo.h5">Sources</MudText>
                         <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
                             InputData="@data" InputLabels="@labels">
                         </MudChart>
@@ -78,14 +113,14 @@
             <MudGrid>
                 <!-- User info -->
                 <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 250px;">
+                    <MudPaper Elevation="2" Class="rounded-xl" Style="height: 250px;">
                         <MudText Typo="Typo.h5">User information</MudText>
                     </MudPaper>
                 </MudItem>
 
                 <!-- Recent transactions -->
                 <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 499px;">
+                    <MudPaper Elevation="2" Class="rounded-xl" Style="height: 499px;">
                         
                     </MudPaper>
                 </MudItem>
@@ -97,22 +132,26 @@
 
 
 @code {
-    public double[] data = { 25, 77, 28, 5 };
-    public string[] labels = { "Oil", "Coal", "Gas", "Biomass" };
+    public double[] data = { 67, 21, 8, 4 };
+    public string[] labels = { "Novozymes", "Børnepenge", "Udbytte", "Fritidsjob" };
 
-    DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
+    DateRange _dateRange = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
 
+    /* Income table */
     private bool dense = false;
-    private bool hover = true;
     private bool striped = false;
-    private bool bordered = false;
     private string searchString1 = "";
     private Transaction selectedItem1 = null;
     private HashSet<Transaction> selectedItems = new HashSet<Transaction>();
 
+    private void HandleOnIncomeRowClicked()
+    {
+
+    }
+
     private IEnumerable<Transaction> Transactions = new List<Transaction>(){
         new Transaction() { CategoryId = 1, Description = "Icons.Material.Filled.Home", Id = 1, Value = -500, Source = "IKEA", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateTime.Today.Date },
-        new Transaction() { CategoryId = 4, Description = " ", Id = 2, Value = 500, Source = "F24", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateTime.Today.Date },
+        new Transaction() { CategoryId = 4, Description = " ", Id = 2, Value = 500, Source = "F24", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateTime.Today.Date},
         new Transaction() { CategoryId = 2, Description = " ", Id = 3, Value = -500, Source = "Danske Bank", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateTime.Today.Date },
         new Transaction() { CategoryId = 3, Description = " ", Id = 4, Value = -500, Source = "Zalando", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateTime.Today.Date }
     };
@@ -125,11 +164,31 @@
             return true;
         if (transaction.Type.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (transaction.Source.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (transaction.Source != null)
+        {
+            if (transaction.Source.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        }
+        if (transaction.Value.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if ($"{transaction.Description} {transaction.CategoryId} {transaction.MadeAt}".Contains(searchString))
             return true;
         return false;
     }
+
+    /* History */
+
+    private ChartOptions incomeHistoryOptions = new ChartOptions()
+        {
+            DisableLegend = true,
+            LineStrokeWidth = 10,
+            InterpolationOption = InterpolationOption.EndSlope,
+            YAxisFormat = "c2"
+    };
+    public List<ChartSeries> incomeHistory = new List<ChartSeries>()
+    {
+        new ChartSeries() { Data = new double[] { 35, 41, 35, 51, 49, 62, 69, 91, 148, 64, 39, 25 } },
+    };
+    public string[] incomeHistoryLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
 }

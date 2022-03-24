@@ -4,9 +4,9 @@
 <PageTitle>Overview</PageTitle>
 
 <!-- Container for the entire dashboard -->
-<MudContainer Class="mt-12 px-8" MaxWidth="MaxWidth.False">
+<MudContainer Class="mt-6 px-8" MaxWidth="MaxWidth.False">
 
-    <!-- Toolbar -->
+    <!-- Toolbar 
     <MudPaper Elevation="25" Class="rounded-xl">
         <MudToolBar>
             <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
@@ -21,8 +21,44 @@
             <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
         </MudToolBar>
     </MudPaper>
+    -->
 
     <MudGrid Spacing="4" Class="mt-6">
+
+        <!-- Title -->
+        <MudItem xs="12" sm="6" md="3">
+            <MudText Typo="Typo.h2" Class="ma-auto" Color="Color.Primary">Overview</MudText>
+        </MudItem>
+
+        <!-- Datepicker -->
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="25" Class="rounded-xl">
+                <MudToolBar>
+                    <MudDateRangePicker Class="ma-auto" StartMonth="@DateTime.Now.AddMonths(-1)" @bind-DateRange="_dateRange" Color="Color.Primary" AdornmentColor="Color.Primary" IconSize="Size.Medium" />
+                </MudToolBar>
+            </MudPaper>
+        </MudItem>
+
+         <!-- Search -->
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="25" Class="rounded-xl">
+                <MudToolBar>
+                    <MudProgressLinear Color="Color.Primary" Size="Size.Large" Value="75" />
+                </MudToolBar>
+            </MudPaper>
+        </MudItem>
+
+         <!-- Add expense -->
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="25" Class="rounded-xl">
+                <MudToolBar>
+                    <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit"/>
+                    <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
+                    <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" />
+                    <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
+                </MudToolBar>
+            </MudPaper>
+        </MudItem>
 
         <MudItem xs="12" sm="12" md="9">
             <MudGrid>
@@ -129,6 +165,9 @@
     /* User information */
 
     /* Income */
+
+    /* Date picker*/
+    DateRange _dateRange = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
 
     private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
 
