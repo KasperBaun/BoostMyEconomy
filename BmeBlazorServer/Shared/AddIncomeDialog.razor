@@ -27,14 +27,13 @@
         {
             Id = 1, // Get this from database but how?
             UserId = 1,
-            MadeAt = DateTime.Now.Date,
+            MadeAt = DateTime.Now.Date.ToString(),
             Value = 0,
             Type = "Income",
             CategoryId = 0,
             SubcategoryId = 0,
             Description = "",
             Source = "",
-            TransactionItems = new HashSet<TransactionItem>()
     };
 
     private void Cancel()

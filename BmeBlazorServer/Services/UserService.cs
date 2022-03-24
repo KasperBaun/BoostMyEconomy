@@ -13,23 +13,22 @@ namespace BmeBlazorServer.Services
         /* Get all users */
         public async Task<List<User>> GetUsers()
         {
-            return await httpClient.GetFromJsonAsync<List<User>>("api/Users");
+            return await httpClient.GetFromJsonAsync<List<User>>("api/User/all");
         }
 
         /* Add user */
         public async Task<HttpResponseMessage> RegisterUser(User user)
         {
-            /*
+            
             var response = await httpClient.PostAsJsonAsync("api/Users", user);
             return await response.Content.ReadFromJsonAsync<HttpResponseMessage>();
-            */
-            return await httpClient.PostAsJsonAsync("api/Users", user);
+        
         }
 
         /* Delete user */
         public async Task<HttpResponseMessage> DeleteUser(int userId)
         {
-            return await httpClient.DeleteAsync("api/Users" + userId);
+            return await httpClient.DeleteAsync("api/User/" + userId);
         }
 
         public async Task<HttpResponseMessage> UpdateUser(User user)
@@ -37,7 +36,7 @@ namespace BmeBlazorServer.Services
             var response = await httpClient.PutAsJsonAsync("api/Users", user);
             return await response.Content.ReadFromJsonAsync<HttpResponseMessage>();
             */
-            return await httpClient.PutAsJsonAsync("api/Users", user);
+            return await httpClient.PutAsJsonAsync("api/User/", user);
         }
     }
 }

@@ -113,10 +113,15 @@
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             Console.WriteLine("$Register.razor - User created succesfully");
+            _processing = false;
+            _nav.NavigateTo("login");
         }
-        _processing = false;
-        _nav.NavigateTo("overview");
-      
+        if(response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            Console.WriteLine(response.RequestMessage);
+            Console.WriteLine(response.Content);
+            Console.WriteLine(response.ReasonPhrase);
+        }
     }
 
     private async Task OnValidSubmit(EditContext context)
