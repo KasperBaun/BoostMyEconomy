@@ -18,12 +18,17 @@
     <PackageReference Include="MudBlazor" Version="6.0.7" />
   </ItemGroup>
 
+
   <ItemGroup>
     <Folder Include="wwwroot\css\" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="wwwroot\Mudblazor.min.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BmeWebAPI\BmeWebAPI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

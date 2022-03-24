@@ -1,0 +1,64 @@
+﻿@using MudBlazor
+@using System
+@using BmeWebAPI.Models
+@inject ISnackbar Snackbar
+
+<MudDialog Class="rounded-xl">
+    <DialogContent>
+        <MudTextField  T="string" Label="Name"></MudTextField>
+        <MudSelect  T="string" Label="Category" AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem Value="@("Cappuccino")" />
+            <MudSelectItem Value="@("Cafe Latte")" />
+            <MudSelectItem Value="@("Espresso")" />
+            <MudSelectItem Value="@("Irish Coffee")" />
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    Transaction NewTransaction = new Transaction()
+        {
+            Id = 1, // Get this from database but how?
+            UserId = 1,
+            MadeAt = DateTime.Now.Date,
+            Value = 0,
+            Type = "Income",
+            CategoryId = 0,
+            SubcategoryId = 0,
+            Description = "",
+            Source = "",
+            TransactionItems = new HashSet<TransactionItem>()
+    };
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void Submit()
+    {
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Configuration.VisibleStateDuration = 3000;
+        Random rand = new Random();
+        bool incomeAdded = rand.NextDouble() > 0.5;
+       
+        /* If user exists, reset password*/
+        if(incomeAdded){
+            Snackbar.Add("Income added succesfully.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }   
+        else
+        {
+            Snackbar.Add("Could not add income. Please try again.", Severity.Error);
+            MudDialog.Close(DialogResult.Cancel());
+        }
+    }
+}

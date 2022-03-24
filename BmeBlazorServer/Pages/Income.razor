@@ -1,5 +1,6 @@
 ﻿@page "/income"
 @using BmeBlazorServer.Models;
+@inject IDialogService DialogService
 
 <PageTitle>Income</PageTitle>
 
@@ -36,7 +37,11 @@
         <MudItem xs="12" sm="6" md="3">
             <MudPaper Elevation="25" Class="rounded-xl">
                 <MudToolBar Class="px-0">
-                <MudButton Variant="Variant.Filled"  Class="rounded-xl mud-height-full mud-button-full-width" StartIcon="@Icons.Material.Outlined.Add" Color="Color.Primary">
+                <MudButton Variant="Variant.Filled" 
+                    Class="rounded-xl mud-height-full mud-button-full-width" 
+                    StartIcon="@Icons.Material.Outlined.Add" 
+                    OnClick="OpenAddIncomeDialog"
+                    Color="Color.Primary">
                     Add income
                 </MudButton>
                 </MudToolBar>
@@ -136,6 +141,22 @@
     public string[] labels = { "Novozymes", "Børnepenge", "Udbytte", "Fritidsjob" };
 
     DateRange _dateRange = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
+
+    /* Add income */
+    async Task OpenAddIncomeDialog()
+    {
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<AddIncomeDialog>("Add income", options);
+        var result = await dialog.Result;
+
+        if (result.Cancelled)
+        {
+            // Snackbar with could not add income
+        }
+
+        // Snackbar with income added succesfully
+        dialog.Close();
+    }
 
     /* Income table */
     private bool dense = false;
