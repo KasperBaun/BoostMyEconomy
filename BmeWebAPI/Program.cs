@@ -1,6 +1,7 @@
 
 
 using Microsoft.EntityFrameworkCore;
+using BmeWebAPI.Models;
 using System.Configuration;
 using System.Text;
 
@@ -11,8 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 /* Setup DBContext and add configuration options */
-/*
-builder.Services.AddDbContext<bmeContext>(options =>
+
+builder.Services.AddDbContext<BmeDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -20,10 +21,10 @@ builder.Services.AddDbContext<bmeContext>(options =>
         connectionString,
         ServerVersion.AutoDetect(connectionString));
 });
-*/
 
 
-//builder.Services.AddControllers();
+
+builder.Services.AddControllers();
 
 /* After initial config, build the app */
 var app = builder.Build();
@@ -44,6 +45,6 @@ app.UseHttpsRedirection();
 
 //app.UseAuthorization();
 
-//app.MapControllers();
+app.MapControllers();
 
 app.Run();
