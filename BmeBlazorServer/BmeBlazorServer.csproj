@@ -28,11 +28,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BmeModels\BmeModels.csproj" />
     <ProjectReference Include="..\BmeWebAPI\BmeWebAPI.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Pages\CreateUser.razor">
+    <Content Update="Pages\Register.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
     <Content Update="Shared\DeleteTableRowDialog.razor">

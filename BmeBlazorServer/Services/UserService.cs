@@ -1,6 +1,43 @@
-﻿namespace BmeBlazorServer.Services
+﻿using BmeModels;
+
+namespace BmeBlazorServer.Services
 {
     public class UserService : IUserService
     {
+        private readonly HttpClient httpClient;
+
+        public UserService(HttpClient _httpClient)
+        {
+            httpClient = _httpClient;
+        }
+        /* Get all users */
+        public async Task<List<User>> GetUsers()
+        {
+            return await httpClient.GetFromJsonAsync<List<User>>("api/Users");
+        }
+
+        /* Add user */
+        public async Task<HttpResponseMessage> RegisterUser(User user)
+        {
+            /*
+            var response = await httpClient.PostAsJsonAsync("api/Users", user);
+            return await response.Content.ReadFromJsonAsync<HttpResponseMessage>();
+            */
+            return await httpClient.PostAsJsonAsync("api/Users", user);
+        }
+
+        /* Delete user */
+        public async Task<HttpResponseMessage> DeleteUser(int userId)
+        {
+            return await httpClient.DeleteAsync("api/Users" + userId);
+        }
+
+        public async Task<HttpResponseMessage> UpdateUser(User user)
+        {   /*
+            var response = await httpClient.PutAsJsonAsync("api/Users", user);
+            return await response.Content.ReadFromJsonAsync<HttpResponseMessage>();
+            */
+            return await httpClient.PutAsJsonAsync("api/Users", user);
+        }
     }
 }
