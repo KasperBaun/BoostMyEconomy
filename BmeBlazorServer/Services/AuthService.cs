@@ -16,10 +16,8 @@ namespace BmeBlazorServer.Services
         public async Task<HttpResponseMessage> RegisterUser(UserRegistrationDTO user)
         {
             // TODO : Setup these methods correctly so we dont have a possible null-reference
-            var response = await httpClient.PostAsJsonAsync("api/Auth/Register", user);
-            #pragma warning disable CS8603 // Possible null reference return.
-            return await response.Content.ReadFromJsonAsync<HttpResponseMessage>();
-            #pragma warning restore CS8603 // Possible null reference return.
+            var response = httpClient.PostAsJsonAsync<UserRegistrationDTO>("api/Auth/Register", user);
+            return await response;
         }
 
         public Task<HttpResponseMessage> Login(UserLoginDTO user)

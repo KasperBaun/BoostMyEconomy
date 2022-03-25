@@ -102,7 +102,7 @@
             var response = await authService.RegisterUser(user);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopRight;
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
                 Snackbar.Configuration.SnackbarVariant = Variant.Filled;
                 Snackbar.Configuration.VisibleStateDuration = 3000;
                 Snackbar.Add("User created succesfully. You can now login", Severity.Success);
@@ -111,10 +111,19 @@
             }
             if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
             {
-                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopRight;
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+                Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+                Snackbar.Configuration.VisibleStateDuration = 3000;
+                Snackbar.Add("User already exists. Please try again.", Severity.Error);
+                _processing = false;
+            }
+            if(response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
                 Snackbar.Configuration.SnackbarVariant = Variant.Filled;
                 Snackbar.Configuration.VisibleStateDuration = 3000;
                 Snackbar.Add("Failed to create user. Please try again.", Severity.Error);
+                _processing = false;
             }
         }
         catch (Exception ex)
