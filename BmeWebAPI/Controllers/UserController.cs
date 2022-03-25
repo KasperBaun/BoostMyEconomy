@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BmeWebAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BmeWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly BmeDbContext _context;
@@ -71,46 +73,6 @@ namespace BmeWebAPI.Controllers
 
             return NoContent();
         }
-        /*
-        // POST: api/User
-        [HttpPost("Register")]
-        public async Task<ActionResult<BmeModels.UserRegistrationDTO>> PostUser(BmeModels.UserRegistrationDTO userDTO)
-        {
-            //Console.WriteLine(_context.Users.Count());
-            // Add the missing properties for the user before posting
-            User newUser = new User()
-            {
-                Id = _context.Users.Count() + 1,
-                RoleId = 2,
-                FirstName = userDTO.FirstName,
-                LastName = userDTO.LastName,
-                Email = userDTO.Email,
-                PasswordHash = userDTO.Password,
-                CreatedAt = DateTime.Now.Date.ToString(),
-                Age = null,
-                Gender = null
-            };
-
-            _context.Users.Add(newUser);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (UserExists(newUser.Email))
-                {
-                    return Conflict("User already exists!");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return Ok(userDTO);//CreatedAtAction("GetUser", new { id = user.Id }, user);
-        }
-        */
 
         // DELETE: api/User/5
         [HttpDelete("{id}")]

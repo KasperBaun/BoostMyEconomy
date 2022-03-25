@@ -1,12 +1,15 @@
 ﻿using BmeModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
+using BmeWebAPI.Models;
 
-namespace BmeWebAPI.Models
+namespace BmeWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -40,11 +43,11 @@ namespace BmeWebAPI.Models
         [HttpPost("Login")]
         public async Task<ActionResult<string>> Login(UserLoginDTO request)
         {
-            var dbUser =  await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
+            Models.User dbUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
             // Lookup user in DB so we can compare hash and salt
             if (dbUser == null)
             {
-                return BadRequest("Something went wrong");
+                return BadRequest("User not found");
             }
 
             if (!VerifyPasswordHash(request.Password, dbUser.PasswordHash, dbUser.PasswordSalt))
@@ -58,12 +61,12 @@ namespace BmeWebAPI.Models
         }
 
         [HttpPost("Register")]
-        public async Task<ActionResult<User>> Register(UserRegistrationDTO newUser)
+        public async Task<ActionResult<Models.User>> Register(UserRegistrationDTO newUser)
         {
             var userExists = await _context.Users.AnyAsync(e => e.Email == newUser.Email);
             if (!userExists) 
             {
-                User user = new();
+                Models.User user = new();
                 user.Id = _context.Users.Count() + 1;
                 user.RoleId = 2;
                 user.FirstName = newUser.FirstName;
@@ -94,20 +97,22 @@ namespace BmeWebAPI.Models
             }
         }
 
-        private static string CreateToken(User user)
+        private string CreateToken(Models.User user)
         {
             List<Claim> claims = new()
             {
                 new Claim(ClaimTypes.Name, user.FirstName+" "+user.LastName),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.RoleId.ToString())
+                new Claim(ClaimTypes.Role, user.RoleId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                //_configuration.GetSection("AppSettings:").Value));
-                "toptoptopsecretdonttellanyoneyouveeverknownkeynotevenyourdad"));
+            //Console.WriteLine("$AuthController.cs - _configuration.GetSection: "+ _configuration.GetSection("AppSettings:Token").Value);
 
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings:Token").Value));
+
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
             
             var token = new JwtSecurityToken(
                 claims: claims,
@@ -121,17 +126,21 @@ namespace BmeWebAPI.Models
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            using var hmac = new HMACSHA512();
-            passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
         }
       
 
         private static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            using var hmac = new HMACSHA512(passwordSalt);  
-            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            return computedHash.SequenceEqual(passwordHash);
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
         }
     }
 }

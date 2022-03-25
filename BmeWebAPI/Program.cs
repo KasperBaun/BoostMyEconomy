@@ -2,14 +2,16 @@
 
 using Microsoft.EntityFrameworkCore;
 using BmeWebAPI.Models;
-using System.Configuration;
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-/* Setup Swagger/OpenAPI UI for debugging purposes - Learn more about configuring at https://aka.ms/aspnetcore/swashbuckle */
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+/* Add services to the container */
+builder.Services.AddControllers();
 
 /* Setup DBContext and add configuration options */
 
@@ -22,9 +24,35 @@ builder.Services.AddDbContext<BmeDbContext>(options =>
         ServerVersion.AutoDetect(connectionString));
 });
 
+/* Setup Swagger/OpenAPI UI for debugging purposes */
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options => {
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
+
+//Console.WriteLine(builder.Configuration.GetSection("AppSettings:Token").Value);
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
+                .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 
 
-builder.Services.AddControllers();
 
 /* After initial config, build the app */
 var app = builder.Build();
@@ -37,13 +65,13 @@ if (app.Environment.IsDevelopment())
 }
 
 /* CORS */
-app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+//app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.UseHttpsRedirection();
 
-//app.UseAuthentication();
+app.UseAuthentication();
 
-//app.UseAuthorization();
+app.UseAuthorization();
 
 app.MapControllers();
 
