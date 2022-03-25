@@ -30,7 +30,7 @@ namespace BmeWebAPI.Controllers
         }
 
         // GET: api/User/5
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {

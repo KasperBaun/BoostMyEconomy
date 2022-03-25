@@ -199,14 +199,14 @@ namespace BmeWebAPI.Models
                     .HasColumnName("lastName");
 
                 entity.Property(e => e.PasswordHash)
-                    .HasMaxLength(200)
-                    .HasColumnName("passwordHash")
-                    .HasConversion<string>();
+                    .HasMaxLength(400)
+                    .HasColumnName("passwordHash");
+                    
 
                 entity.Property(e => e.PasswordSalt)
-                    .HasMaxLength(200)
-                    .HasColumnName("passwordSalt")
-                    .HasConversion<string>();
+                    .HasMaxLength(400)
+                    .HasColumnName("passwordSalt");
+                    
 
                 entity.Property(e => e.RoleId).HasColumnName("roleId");
 

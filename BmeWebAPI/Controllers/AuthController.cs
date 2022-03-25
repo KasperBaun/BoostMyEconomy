@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using BmeWebAPI.Models;
+using System.Text;
 
 namespace BmeWebAPI.Controllers
 {
@@ -48,12 +49,12 @@ namespace BmeWebAPI.Controllers
                 return BadRequest("User not found");
             }
 
-            if (!VerifyPasswordHash(request.Password, dbUser.PasswordHash, dbUser.PasswordSalt))
+            if (!VerifyPasswordHash(request.Password, Encoding.UTF8.GetBytes(dbUser.PasswordHash), Encoding.UTF8.GetBytes(dbUser.PasswordSalt)))
             {
                 return BadRequest("Wrong password");
             }
 
-            string token = CreateToken(dbUser);
+            string token = CreateToken(dbUser).Result;
             return Ok(token);
            
         }
@@ -74,8 +75,8 @@ namespace BmeWebAPI.Controllers
                 user.Age = null;
                 user.Gender = null;
                 CreatePasswordHash(newUser.Password, out byte[] passwordHash, out byte[] passwordSalt);
-                user.PasswordHash = passwordHash;
-                user.PasswordSalt = passwordSalt;
+                user.PasswordHash = Convert.ToBase64String(passwordHash);
+                user.PasswordSalt = Convert.ToBase64String(passwordSalt);
 
                 _context.Users.Add(user);
                 try
@@ -95,13 +96,14 @@ namespace BmeWebAPI.Controllers
             }
         }
 
-        private string CreateToken(Models.User user)
+        private async Task<string> CreateToken(Models.User user)
         {
+            Models.Role userRole = await _context.Roles.FindAsync(user.RoleId);
             List<Claim> claims = new()
             {
                 new Claim(ClaimTypes.Name, user.FirstName+" "+user.LastName),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.RoleId.ToString()),
+                new Claim(ClaimTypes.Role, userRole.Title),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
