@@ -18,21 +18,53 @@ namespace BmeWebAPI.Models
             _context = context;
         }
 
+        [HttpPost("UserExists")]
+        public async Task<ActionResult<bool>> UserExists(string email)
+        {
+            bool exists = UserExistsEmail(email);
+            if (! exists)
+            {
+                return BadRequest("User not found");
+            }
+            else
+            {
+                // TODO : Handle a way for the user to reset password
+                return Ok(true);
+            }
+        }
+
         [HttpPost("Login")]
         public async Task<ActionResult<string>> Login(UserLoginDTO request)
         {
-            if (!UserExists(request.Email))
+            try
             {
-                return BadRequest("User not found.");
-            }
+                User dbUser = _context.Users.FirstOrDefault(x => x.Email == request.Email);
+                 // Lookup user in DB so we can compare hash and salt
+                if (dbUser == null)
+                {
+                    return BadRequest("Something went wrong");
+                }
 
-            return Ok("My crazy token");
+                if (!VerifyPasswordHash(request.Password, dbUser.PasswordHash, dbUser.PasswordSalt))
+                {
+                    return BadRequest("Wrong password");
+                }
+
+                return Ok("My crazy token");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
+            return BadRequest("Something went wrong");
+            
         }
 
         [HttpPost("Register")]
         public async Task<ActionResult<User>> Register(UserRegistrationDTO newUser)
         {
-            if (!UserExists(newUser.Email)) 
+            if (!UserExistsEmail(newUser.Email)) 
             {
                 User user = new();
                 user.Id = _context.Users.Count() + 1;
@@ -71,9 +103,16 @@ namespace BmeWebAPI.Models
             passwordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
-        private bool UserExists(string email)
+        private bool UserExistsEmail(string email)
         {
             return _context.Users.Any(e => e.Email == email);
+        }
+
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using var hmac = new HMACSHA512(passwordSalt);  
+            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            return computedHash.SequenceEqual(passwordHash);
         }
     }
 }

@@ -12,12 +12,10 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddHttpClient<IUserService, UserService>(client =>
 {
-    Console.WriteLine(builder.Configuration.GetConnectionString("WebAPI_URL"));
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
 });
 builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
 {
-    Console.WriteLine(builder.Configuration.GetConnectionString("WebAPI_URL"));
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
 });
 builder.Services.AddMudServices();

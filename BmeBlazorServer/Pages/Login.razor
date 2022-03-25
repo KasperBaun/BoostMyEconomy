@@ -5,7 +5,11 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @inject IDialogService DialogService
-@inject NavigationManager _nav
+@using BmeModels;
+@using BmeBlazorServer.Services;
+@inject IAuthService authService;
+@inject NavigationManager _nav;
+@inject ISnackbar Snackbar;
 
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
@@ -22,7 +26,8 @@
             <!-- Email Field -->
             <MudItem xs="12">
                 <MudTextField 
-                        T="string" 
+                        T="string"
+                        @bind-Value = "user.Email" 
                         Label="E-mail" 
                         Variant="Variant.Outlined"
                         Required="false" 
@@ -38,7 +43,7 @@
             <MudItem xs="12">
                 <MudPaper>
                 <MudTextField  
-                        T="string" @bind-Value="Password"
+                        T="string" @bind-Value="user.Password"
                         IconSize="Size.Large"
                         Label="Password"
                         Variant="Variant.Outlined" 
@@ -84,20 +89,42 @@
 @code {
     /* This block of code is used to handle user-login when pressing the Login button */ 
     private bool _processing = false;
+    UserLoginDTO user = new();
 
     async Task OnLoginClicked()
     {
         _processing = true;
-        await Task.Delay(2000);
-        _processing = false;
-        _nav.NavigateTo("overview");
+        try
+        {
+            HttpResponseMessage response = await authService.Login(user);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+                Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+                Snackbar.Configuration.VisibleStateDuration = 3000;
+                Snackbar.Add("Login successfull", Severity.Success);
+                _processing = false;
+                _nav.NavigateTo("overview");
+            }
+
+            if(response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+                Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+                Snackbar.Configuration.VisibleStateDuration = 3000;
+                var responseMessage = await response.Content.ReadAsStringAsync();
+                Snackbar.Add(responseMessage, Severity.Error);
+                _processing = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("$Login.razor: Exception caught - " + ex.Message);
+        }
     }
 
 
-    public double? Amount { get; set; }
-    public int? Weight { get; set; }
-    public string Password { get; set;} = "";
-
+    /* Hide/show password functionality */
     bool isShow = false;
     InputType PasswordInput = InputType.Password;
     string PasswordInputIcon = Icons.Material.Outlined.Lock;

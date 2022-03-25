@@ -15,14 +15,20 @@ namespace BmeBlazorServer.Services
         /* Add user */
         public async Task<HttpResponseMessage> RegisterUser(UserRegistrationDTO user)
         {
-            // TODO : Setup these methods correctly so we dont have a possible null-reference
             var response = httpClient.PostAsJsonAsync<UserRegistrationDTO>("api/Auth/Register", user);
             return await response;
         }
 
-        public Task<HttpResponseMessage> Login(UserLoginDTO user)
+        public async Task<HttpResponseMessage> Login(UserLoginDTO user)
         {
-            throw new NotImplementedException();
+            var response = httpClient.PostAsJsonAsync<UserLoginDTO>("api/Auth/Login", user);
+            return await response;
+        }
+
+        public async Task<HttpResponseMessage> UserExists(string email)
+        {   
+            var response = httpClient.PostAsJsonAsync<string>("api/Auth/UserExists", email);
+            return await response;
         }
     }
 }
