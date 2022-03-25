@@ -1,3 +1,4 @@
+global using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using BmeBlazorServer.Models;
@@ -19,6 +20,8 @@ builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
 });
 builder.Services.AddMudServices();
+builder.Services.AddScoped<AuthenticationStateProvider, BmeBlazorServer.CustomAuthStateProvider>();
+builder.Services.AddAuthorizationCore();
 
 var app = builder.Build();
 
