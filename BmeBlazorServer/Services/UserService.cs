@@ -17,10 +17,10 @@ namespace BmeBlazorServer.Services
         }
 
         /* Add user */
-        public async Task<HttpResponseMessage> RegisterUser(User user)
+        public async Task<HttpResponseMessage> RegisterUser(UserRegistrationDTO user)
         {
             
-            var response = await httpClient.PostAsJsonAsync("api/Users", user);
+            var response = await httpClient.PostAsJsonAsync("api/User", user);
             return await response.Content.ReadFromJsonAsync<HttpResponseMessage>();
         
         }

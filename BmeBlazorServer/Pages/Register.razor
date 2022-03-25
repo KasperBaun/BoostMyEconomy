@@ -76,7 +76,7 @@
 </MudContainer>
 
 @code {
-    private User user = new User();
+    private UserRegistrationDTO user = new UserRegistrationDTO();
     /*
     RegisterAccountForm model = new RegisterAccountForm();
     public class RegisterAccountForm
@@ -106,8 +106,6 @@
 
     private async Task OnRegisterClicked()
     {
-        user.CreatedAt = DateOnly.FromDateTime(DateTime.Now).ToString();
-
         _processing = true;
         var response = await userService.RegisterUser(user);
         if (response.StatusCode == System.Net.HttpStatusCode.OK)

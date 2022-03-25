@@ -74,19 +74,31 @@ namespace BmeWebAPI.Controllers
 
         // POST: api/User
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {   /* Add the missing properties for the user before posting */
-            user.RoleId = 2;
-            Console.WriteLine(_context.Users.Count());
-            user.Id = _context.Users.Count() + 1;
-            _context.Users.Add(user);
+        public async Task<ActionResult<BmeModels.UserRegistrationDTO>> PostUser(BmeModels.UserRegistrationDTO userDTO)
+        {
+            //Console.WriteLine(_context.Users.Count());
+            /* Add the missing properties for the user before posting */
+            User newUser = new User()
+            {
+                Id = _context.Users.Count() + 1,
+                RoleId = 2,
+                FirstName = userDTO.FirstName,
+                LastName = userDTO.LastName,
+                Email = userDTO.Email,
+                Password = userDTO.Password,
+                CreatedAt = DateTime.Now.Date.ToString(),
+                Age = null,
+                Gender = null
+            };
+
+            _context.Users.Add(newUser);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (UserExists(user.Id))
+                if (UserExists(newUser.Id))
                 {
                     return Conflict();
                 }
@@ -96,7 +108,7 @@ namespace BmeWebAPI.Controllers
                 }
             }
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            return Ok();//CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
         // DELETE: api/User/5

@@ -6,7 +6,7 @@ namespace BmeBlazorServer.Services
     {
         Task<List<User>> GetUsers();
 
-        Task<HttpResponseMessage> RegisterUser(User user);
+        Task<HttpResponseMessage> RegisterUser(UserRegistrationDTO user);
 
         Task<HttpResponseMessage> UpdateUser(User user);
 
