@@ -22,36 +22,44 @@ namespace BmeWebAPI.Models
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserRegistrationDTO newUser)
         {
-            user.Id = _context.Users.Count() + 1;
-            user.RoleId = 2;
-            user.FirstName = newUser.FirstName;
-            user.LastName = newUser.LastName;   
-            user.Email = newUser.Email;
-            user.CreatedAt = DateTime.Now.Date.ToString();
-            user.Age = null;
-            user.Gender = null;
-            CreatePasswordHash(newUser.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
-
-            _context.Users.Add(user);
-            try
+            if (!UserExists(newUser.Email)) 
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (UserExists(newUser.Email))
-                {
-                    return Conflict("User already exists!");
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                user.Id = _context.Users.Count() + 1;
+                user.RoleId = 2;
+                user.FirstName = newUser.FirstName;
+                user.LastName = newUser.LastName;
+                user.Email = newUser.Email;
+                user.CreatedAt = DateOnly.FromDateTime(DateTime.Now).ToString();
+                user.Age = null;
+                user.Gender = null;
+                CreatePasswordHash(newUser.Password, out byte[] passwordHash, out byte[] passwordSalt);
+                user.PasswordHash = passwordHash;
+                user.PasswordSalt = passwordSalt;
 
-            return Ok(user);
+                _context.Users.Add(user);
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException)
+                {
+                    if (UserExists(newUser.Email))
+                    {
+                        return Conflict("User already exists!");
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return Ok(user);
+            }
+            else
+            {
+                return BadRequest("User already exists!");
+            }
+            
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
