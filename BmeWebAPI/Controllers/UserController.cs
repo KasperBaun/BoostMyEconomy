@@ -127,12 +127,6 @@ namespace BmeWebAPI.Controllers
 
             return NoContent();
         }
-
-        private bool UserExists(string email)
-        {
-            return _context.Users.Any(e => e.Email == email);
-        }
-
         private bool UserIdExists(int id)
         {
             return _context.Users.Any(e => e.Id == id);

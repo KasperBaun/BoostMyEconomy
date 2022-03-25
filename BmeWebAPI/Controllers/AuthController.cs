@@ -1,7 +1,9 @@
 ﻿using BmeModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace BmeWebAPI.Models
@@ -12,16 +14,18 @@ namespace BmeWebAPI.Models
     {
 
         private readonly BmeDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public AuthController(BmeDbContext context)
+        public AuthController(BmeDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         [HttpPost("UserExists")]
         public async Task<ActionResult<bool>> UserExists(string email)
         {
-            bool exists = UserExistsEmail(email);
+            var exists = await _context.Users.AnyAsync(e => e.Email == email);
             if (! exists)
             {
                 return BadRequest("User not found");
@@ -36,10 +40,9 @@ namespace BmeWebAPI.Models
         [HttpPost("Login")]
         public async Task<ActionResult<string>> Login(UserLoginDTO request)
         {
-            try
-            {
-                User dbUser = _context.Users.FirstOrDefault(x => x.Email == request.Email);
-                 // Lookup user in DB so we can compare hash and salt
+            
+                var dbUser =  await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
+                    // Lookup user in DB so we can compare hash and salt
                 if (dbUser == null)
                 {
                     return BadRequest("Something went wrong");
@@ -50,21 +53,16 @@ namespace BmeWebAPI.Models
                     return BadRequest("Wrong password");
                 }
 
-                return Ok("My crazy token");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            
-            return BadRequest("Something went wrong");
-            
+                string token = CreateToken(dbUser);
+                return Ok(token);
+           
         }
 
         [HttpPost("Register")]
         public async Task<ActionResult<User>> Register(UserRegistrationDTO newUser)
         {
-            if (!UserExistsEmail(newUser.Email)) 
+            var userExists = await _context.Users.AnyAsync(e => e.Email == newUser.Email);
+            if (!userExists) 
             {
                 User user = new();
                 user.Id = _context.Users.Count() + 1;
@@ -97,18 +95,39 @@ namespace BmeWebAPI.Models
             }
         }
 
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        private string CreateToken(User user)
+        {
+            List<Claim> claims = new()
+            {
+                new Claim(ClaimTypes.Name, user.FirstName+user.LastName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.RoleId.ToString())
+            };
+
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings:VerySecretKey").Value));
+
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: credentials);
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
+        }
+
+        private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using var hmac = new HMACSHA512();
             passwordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
-        private bool UserExistsEmail(string email)
-        {
-            return _context.Users.Any(e => e.Email == email);
-        }
+      
 
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        private static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using var hmac = new HMACSHA512(passwordSalt);  
             var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
