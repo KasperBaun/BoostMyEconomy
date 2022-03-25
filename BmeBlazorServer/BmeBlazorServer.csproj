@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BmeModels\BmeModels.csproj" />
-    <ProjectReference Include="..\BmeWebAPI\BmeWebAPI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

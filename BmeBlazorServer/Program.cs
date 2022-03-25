@@ -12,7 +12,8 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddHttpClient<IUserService, UserService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3600");
+    Console.WriteLine(builder.Configuration.GetConnectionString("WebAPI_URL"));
+    client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
 });
 builder.Services.AddMudServices();
 

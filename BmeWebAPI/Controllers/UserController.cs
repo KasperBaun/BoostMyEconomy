@@ -22,7 +22,7 @@ namespace BmeWebAPI.Controllers
         }
 
         // GET: api/Users
-        [HttpGet("all")]
+        [HttpGet("All")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
@@ -59,7 +59,7 @@ namespace BmeWebAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(id))
+                if (!UserIdExists(id))
                 {
                     return NotFound();
                 }
@@ -73,7 +73,7 @@ namespace BmeWebAPI.Controllers
         }
 
         // POST: api/User
-        [HttpPost]
+        [HttpPost("Register")]
         public async Task<ActionResult<BmeModels.UserRegistrationDTO>> PostUser(BmeModels.UserRegistrationDTO userDTO)
         {
             //Console.WriteLine(_context.Users.Count());
@@ -85,7 +85,7 @@ namespace BmeWebAPI.Controllers
                 FirstName = userDTO.FirstName,
                 LastName = userDTO.LastName,
                 Email = userDTO.Email,
-                Password = userDTO.Password,
+                PasswordHash = userDTO.Password,
                 CreatedAt = DateTime.Now.Date.ToString(),
                 Age = null,
                 Gender = null
@@ -98,9 +98,9 @@ namespace BmeWebAPI.Controllers
             }
             catch (DbUpdateException)
             {
-                if (UserExists(newUser.Id))
+                if (UserExists(newUser.Email))
                 {
-                    return Conflict();
+                    return Conflict("User already exists!");
                 }
                 else
                 {
@@ -108,7 +108,7 @@ namespace BmeWebAPI.Controllers
                 }
             }
 
-            return Ok();//CreatedAtAction("GetUser", new { id = user.Id }, user);
+            return Ok(userDTO);//CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
         // DELETE: api/User/5
@@ -127,7 +127,12 @@ namespace BmeWebAPI.Controllers
             return NoContent();
         }
 
-        private bool UserExists(int id)
+        private bool UserExists(string email)
+        {
+            return _context.Users.Any(e => e.Email == email);
+        }
+
+        private bool UserIdExists(int id)
         {
             return _context.Users.Any(e => e.Id == id);
         }
