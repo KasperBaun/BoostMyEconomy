@@ -48,8 +48,7 @@ namespace BmeWebAPI.Controllers
             {
                 return BadRequest("User not found");
             }
-
-            if (!VerifyPasswordHash(request.Password, Encoding.UTF8.GetBytes(dbUser.PasswordHash), Encoding.UTF8.GetBytes(dbUser.PasswordSalt)))
+            if (!VerifyPasswordHash(request.Password, dbUser.PasswordHash, dbUser.PasswordSalt))
             {
                 return BadRequest("Wrong password");
             }
@@ -75,8 +74,8 @@ namespace BmeWebAPI.Controllers
                 user.Age = null;
                 user.Gender = null;
                 CreatePasswordHash(newUser.Password, out byte[] passwordHash, out byte[] passwordSalt);
-                user.PasswordHash = Convert.ToBase64String(passwordHash);
-                user.PasswordSalt = Convert.ToBase64String(passwordSalt);
+                user.PasswordHash = passwordHash;
+                user.PasswordSalt = passwordSalt;
 
                 _context.Users.Add(user);
                 try
@@ -107,12 +106,10 @@ namespace BmeWebAPI.Controllers
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
-            //Console.WriteLine("$AuthController.cs - _configuration.GetSection: "+ _configuration.GetSection("AppSettings:Token").Value);
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 _configuration.GetSection("AppSettings:Token").Value));
 
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             
             var token = new JwtSecurityToken(
                 claims: claims,
@@ -129,7 +126,7 @@ namespace BmeWebAPI.Controllers
             using (var hmac = new HMACSHA512())
             {
                 passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
         }
       
@@ -138,7 +135,7 @@ namespace BmeWebAPI.Controllers
         {
             using (var hmac = new HMACSHA512(passwordSalt))
             {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
         }

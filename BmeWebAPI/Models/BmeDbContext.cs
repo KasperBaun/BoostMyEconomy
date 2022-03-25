@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -200,12 +200,14 @@ namespace BmeWebAPI.Models
 
                 entity.Property(e => e.PasswordHash)
                     .HasMaxLength(400)
-                    .HasColumnName("passwordHash");
-                    
+                    .HasColumnName("passwordHash")
+                    .HasConversion<string>();
+
 
                 entity.Property(e => e.PasswordSalt)
                     .HasMaxLength(400)
-                    .HasColumnName("passwordSalt");
+                    .HasColumnName("passwordSalt")
+                    .HasConversion<string>();
                     
 
                 entity.Property(e => e.RoleId).HasColumnName("roleId");
