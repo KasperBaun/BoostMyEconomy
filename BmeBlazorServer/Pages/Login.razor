@@ -113,7 +113,9 @@
                 Snackbar.Configuration.SnackbarVariant = Variant.Filled;
                 Snackbar.Configuration.VisibleStateDuration = 3000;
                 var responseMessage = await response.Content.ReadAsStringAsync();
-                Snackbar.Add(responseMessage, Severity.Error);
+                var responseToken = await response.RequestMessage.Content.ReadAsStringAsync();
+                Snackbar.Add(responseMessage+responseToken, Severity.Error);
+                Console.WriteLine(await response.Content.ReadAsStringAsync());
                 _processing = false;
             }
         }

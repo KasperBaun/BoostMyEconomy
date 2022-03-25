@@ -40,21 +40,20 @@ namespace BmeWebAPI.Models
         [HttpPost("Login")]
         public async Task<ActionResult<string>> Login(UserLoginDTO request)
         {
-            
-                var dbUser =  await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
-                    // Lookup user in DB so we can compare hash and salt
-                if (dbUser == null)
-                {
-                    return BadRequest("Something went wrong");
-                }
+            var dbUser =  await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
+            // Lookup user in DB so we can compare hash and salt
+            if (dbUser == null)
+            {
+                return BadRequest("Something went wrong");
+            }
 
-                if (!VerifyPasswordHash(request.Password, dbUser.PasswordHash, dbUser.PasswordSalt))
-                {
-                    return BadRequest("Wrong password");
-                }
+            if (!VerifyPasswordHash(request.Password, dbUser.PasswordHash, dbUser.PasswordSalt))
+            {
+                return BadRequest("Wrong password");
+            }
 
-                string token = CreateToken(dbUser);
-                return Ok(token);
+            string token = CreateToken(dbUser);
+            return Ok(token);
            
         }
 
@@ -95,17 +94,18 @@ namespace BmeWebAPI.Models
             }
         }
 
-        private string CreateToken(User user)
+        private static string CreateToken(User user)
         {
             List<Claim> claims = new()
             {
-                new Claim(ClaimTypes.Name, user.FirstName+user.LastName),
+                new Claim(ClaimTypes.Name, user.FirstName+" "+user.LastName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.RoleId.ToString())
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:VerySecretKey").Value));
+                //_configuration.GetSection("AppSettings:").Value));
+                "toptoptopsecretdonttellanyoneyouveeverknownkeynotevenyourdad"));
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             
