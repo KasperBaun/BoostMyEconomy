@@ -10,7 +10,6 @@ namespace BmeWebAPI.Models
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private static User user = new();
 
         private readonly BmeDbContext _context;
 
@@ -19,11 +18,23 @@ namespace BmeWebAPI.Models
             _context = context;
         }
 
-        [HttpPost("register")]
+        [HttpPost("Login")]
+        public async Task<ActionResult<string>> Login(UserLoginDTO request)
+        {
+            if (!UserExists(request.Email))
+            {
+                return BadRequest("User not found.");
+            }
+
+            return Ok("My crazy token");
+        }
+
+        [HttpPost("Register")]
         public async Task<ActionResult<User>> Register(UserRegistrationDTO newUser)
         {
             if (!UserExists(newUser.Email)) 
             {
+                User user = new();
                 user.Id = _context.Users.Count() + 1;
                 user.RoleId = 2;
                 user.FirstName = newUser.FirstName;
