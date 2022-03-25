@@ -21,7 +21,7 @@
 
 @code {
 
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
 
     Transaction NewTransaction = new Transaction()
         {
@@ -38,7 +38,7 @@
 
     private void Cancel()
     {
-        MudDialog.Cancel();
+        MudDialog?.Cancel();
     }
 
     private void Submit()
@@ -52,12 +52,12 @@
         /* If user exists, reset password*/
         if(incomeAdded){
             Snackbar.Add("Income added succesfully.", Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
+            MudDialog?.Close(DialogResult.Ok(true));
         }   
         else
         {
             Snackbar.Add("Could not add income. Please try again.", Severity.Error);
-            MudDialog.Close(DialogResult.Cancel());
+            MudDialog?.Close(DialogResult.Cancel());
         }
     }
 }

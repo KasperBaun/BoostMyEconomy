@@ -200,11 +200,13 @@ namespace BmeWebAPI.Models
 
                 entity.Property(e => e.PasswordHash)
                     .HasMaxLength(200)
-                    .HasColumnName("passwordHash");
+                    .HasColumnName("passwordHash")
+                    .HasConversion<string>();
 
                 entity.Property(e => e.PasswordSalt)
                     .HasMaxLength(200)
-                    .HasColumnName("passwordSalt");
+                    .HasColumnName("passwordSalt")
+                    .HasConversion<string>();
 
                 entity.Property(e => e.RoleId).HasColumnName("roleId");
 

@@ -10,7 +10,7 @@ namespace BmeWebAPI.Models
     [ApiController]
     public class AuthController : ControllerBase
     {
-        public static User user = new User();
+        private static User user = new();
 
         private readonly BmeDbContext _context;
 
@@ -56,11 +56,9 @@ namespace BmeWebAPI.Models
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            using(var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
+            using var hmac = new HMACSHA512();
+            passwordSalt = hmac.Key;
+            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
         private bool UserExists(string email)
         {

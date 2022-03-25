@@ -71,13 +71,13 @@ namespace BmeWebAPI.Controllers
 
             return NoContent();
         }
-
+        /*
         // POST: api/User
         [HttpPost("Register")]
         public async Task<ActionResult<BmeModels.UserRegistrationDTO>> PostUser(BmeModels.UserRegistrationDTO userDTO)
         {
             //Console.WriteLine(_context.Users.Count());
-            /* Add the missing properties for the user before posting */
+            // Add the missing properties for the user before posting
             User newUser = new User()
             {
                 Id = _context.Users.Count() + 1,
@@ -110,6 +110,7 @@ namespace BmeWebAPI.Controllers
 
             return Ok(userDTO);//CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
+        */
 
         // DELETE: api/User/5
         [HttpDelete("{id}")]
