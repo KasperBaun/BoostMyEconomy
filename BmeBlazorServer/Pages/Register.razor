@@ -6,7 +6,8 @@
 @using BmeModels;
 @using BmeBlazorServer.Services;
 @inject IAuthService authService;
-@inject NavigationManager _nav
+@inject NavigationManager _nav;
+@inject ISnackbar Snackbar;
 
 
 <MudContainer Class="mt-16" MaxWidth="MaxWidth.Small">
@@ -29,7 +30,13 @@
                         <DataAnnotationsValidator/>
                         <!-- First name field-->
                         <MudItem xs=12 md="6" lg="6" xl="6">
-                            <MudTextField Label="First name" @bind-Value="user.FirstName" Placeholder="John" For="@(() => user.FirstName)"Variant="Variant.Outlined"/>
+                            <MudTextField 
+                                Label="First name" 
+                                @bind-Value="user.FirstName" 
+                                Placeholder="John" 
+                                For="@(() => user.FirstName)"
+                                Variant="Variant.Outlined"
+                            />
                         </MudItem>
                         <!-- Last name field-->
                         <MudItem xs=12 md="6" lg="6" xl="6">
@@ -43,8 +50,8 @@
                         <MudItem xs=12>
                             <MudTextField   Label="Password" @bind-Value="user.Password" 
                                             Placeholder="Create a password" 
-                                            For="@(() => user.Password)" 
-                                            HelperText="Use 8 or more characters with a mix of letters, numbers & symbols" 
+                                            For="@(() => user.Password)"
+                                            HelperText="Use 8-30 characters with a mix of letters, numbers & symbols" 
                                             InputType="@PasswordInput"
                                             Variant="Variant.Outlined"
                                             Adornment="Adornment.End" 
@@ -77,56 +84,46 @@
 
 @code {
     private UserRegistrationDTO user = new UserRegistrationDTO();
-    /*
-    RegisterAccountForm model = new RegisterAccountForm();
-    public class RegisterAccountForm
-    {
-    [Required]
-    [StringLength(20, ErrorMessage = "Name length can't be more than 20.")]
-    public string? FirstName { get; set; }
-
-    [Required]
-    [StringLength(20, ErrorMessage = "Name length can't be more than 20.")]
-    public string? LastName { get; set; }
-
-    [Required]
-    [EmailAddress]
-    public string? Email { get; set; }
-
-    [Required]
-    [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
-    public string? Password { get; set; }
-        }
-        */
-
-
 
     /* This block of code is used to handle user registrering when pressing the register button */ 
     private bool _processing = false;
-
-    private async Task OnRegisterClicked()
-    {
-        _processing = true;
-        var response = await authService.RegisterUser(user);
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
-        {
-            Console.WriteLine("$Register.razor - User created succesfully");
-            _processing = false;
-            _nav.NavigateTo("login");
-        }
-        if(response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-        {
-            Console.WriteLine(response.RequestMessage);
-            Console.WriteLine(response.Content);
-            Console.WriteLine(response.ReasonPhrase);
-        }
-    }
 
     private async Task OnValidSubmit(EditContext context)
     {
         StateHasChanged();
         await OnRegisterClicked();
     }
+
+    private async Task OnRegisterClicked()
+    {
+        _processing = true;
+        try
+        {
+            var response = await authService.RegisterUser(user);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopRight;
+                Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+                Snackbar.Configuration.VisibleStateDuration = 3000;
+                Snackbar.Add("User created succesfully. You can now login", Severity.Success);
+                _processing = false;
+                _nav.NavigateTo("login");
+            }
+            if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopRight;
+                Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+                Snackbar.Configuration.VisibleStateDuration = 3000;
+                Snackbar.Add("Failed to create user. Please try again.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("$Register.razor: Exception caught - " + ex.Message);
+        }
+    }
+
+    
 
     /* Hide/show password functionality */
     bool isShow;

@@ -54,23 +54,15 @@ namespace BmeWebAPI.Models
                 }
                 catch (DbUpdateException)
                 {
-                    if (UserExists(newUser.Email))
-                    {
-                        return Conflict("User already exists!");
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
 
                 return Ok(user);
             }
             else
             {
-                return BadRequest("User already exists!");
+                return Conflict("User already exists!");
             }
-            
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
