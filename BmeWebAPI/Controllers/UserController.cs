@@ -13,7 +13,6 @@ namespace BmeWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly BmeDbContext _context;
@@ -31,6 +30,7 @@ namespace BmeWebAPI.Controllers
         }
 
         // GET: api/User/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {

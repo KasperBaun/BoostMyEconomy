@@ -25,9 +25,9 @@ namespace BmeBlazorServer.Services
             return await response;
         }
 
-        public async Task<HttpResponseMessage> UserExists(string email)
+        public async Task<HttpResponseMessage> UserExists(UserLoginDTO user)
         {   
-            var response = httpClient.PostAsJsonAsync<string>("api/Auth/UserExists", email);
+            var response = httpClient.PostAsJsonAsync<string>("api/Auth/UserExists", user.Email);
             return await response;
         }
     }

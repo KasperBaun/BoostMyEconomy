@@ -1,5 +1,5 @@
 ﻿@page "/income"
-@using BmeBlazorServer.Models;
+@using BmeModels;
 @inject IDialogService DialogService
 
 <PageTitle>Income</PageTitle>
@@ -171,10 +171,10 @@
     }
 
     private IEnumerable<Transaction> Transactions = new List<Transaction>(){
-        new Transaction() { CategoryId = 1, Description = "Icons.Material.Filled.Home", Id = 1, Value = -500, Source = "IKEA", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateTime.Today.Date },
-        new Transaction() { CategoryId = 4, Description = " ", Id = 2, Value = 500, Source = "F24", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateTime.Today.Date},
-        new Transaction() { CategoryId = 2, Description = " ", Id = 3, Value = -500, Source = "Danske Bank", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateTime.Today.Date },
-        new Transaction() { CategoryId = 3, Description = " ", Id = 4, Value = -500, Source = "Zalando", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateTime.Today.Date }
+        new Transaction() { CategoryId = 1, Description = "Icons.Material.Filled.Home", Id = 1, Value = -500, Source = "IKEA", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() },
+        new Transaction() { CategoryId = 4, Description = " ", Id = 2, Value = 500, Source = "F24", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString()},
+        new Transaction() { CategoryId = 2, Description = " ", Id = 3, Value = -500, Source = "Danske Bank", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() },
+        new Transaction() { CategoryId = 3, Description = " ", Id = 4, Value = -500, Source = "Zalando", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() }
     };
 
     public bool FilterFunc1(Transaction transaction) => FilterFunc(transaction, searchString1);

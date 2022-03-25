@@ -28,16 +28,14 @@ namespace BmeWebAPI.Controllers
         [HttpPost("UserExists")]
         public async Task<ActionResult<bool>> UserExists(string email)
         {
-            var exists = await _context.Users.AnyAsync(e => e.Email == email);
-            if (! exists)
+            bool exists = await _context.Users.AnyAsync(e => e.Email == email);
+            if (!exists)
             {
                 return BadRequest("User not found");
             }
-            else
-            {
-                // TODO : Handle a way for the user to reset password
-                return Ok(true);
-            }
+            
+            // TODO : Handle a way for the user to reset password
+            return Ok(true);
         }
 
         [HttpPost("Login")]

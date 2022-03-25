@@ -113,8 +113,7 @@
                 Snackbar.Configuration.SnackbarVariant = Variant.Filled;
                 Snackbar.Configuration.VisibleStateDuration = 3000;
                 var responseMessage = await response.Content.ReadAsStringAsync();
-                var responseToken = await response.RequestMessage.Content.ReadAsStringAsync();
-                Snackbar.Add(responseMessage+responseToken, Severity.Error);
+                Snackbar.Add(responseMessage, Severity.Error);
                 Console.WriteLine(await response.Content.ReadAsStringAsync());
                 _processing = false;
             }
@@ -148,15 +147,15 @@
 
     async Task OpenForgottenPasswordDialog()
     {
-        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, CloseOnEscapeKey = true };
-        var dialog = DialogService.Show<ForgottenPasswordDialog>("Forgotten Password Dialog", options);
-        var result = await dialog.Result;
-
-        if (!result.Cancelled)
+        try
         {
-            // Snackbar with could not find user
+            var options = new DialogOptions() { MaxWidth = MaxWidth.Large, CloseOnEscapeKey = true };
+            var dialog = DialogService.Show<ForgottenPasswordDialog>("Forgotten Password Dialog", options);
         }
-        dialog.Close();
+        catch (Exception ex)
+        {
+            Console.WriteLine("$Login.razor: Exception caught - " + ex.Message);
+        }
     }
 
 }

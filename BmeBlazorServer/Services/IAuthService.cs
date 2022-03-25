@@ -8,7 +8,7 @@ namespace BmeBlazorServer.Services
 
         Task<HttpResponseMessage> Login(UserLoginDTO user);
 
-        Task<HttpResponseMessage> UserExists(string email);
+        Task<HttpResponseMessage> UserExists(UserLoginDTO user);
 
     }
 }
