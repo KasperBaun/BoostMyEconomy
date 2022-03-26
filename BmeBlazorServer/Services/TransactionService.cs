@@ -3,36 +3,18 @@ using Newtonsoft.Json;
 
 namespace BmeBlazorServer.Services
 {
-    public class UserService : IUserService
+    public class TransactionService : ITransactionService
     {
         private readonly HttpClient httpClient;
 
         private ILocalStorageService localStorageService;
 
-        public UserService(HttpClient _httpClient, ILocalStorageService _localStorageService)
+        public TransactionService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
         }
 
-        /* Get all users */
-        public async Task<List<User>> GetUsers()
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/User/All");
-            var token =  await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            
-            var response = await httpClient.SendAsync(requestMessage);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                var responseBody = await response.Content.ReadAsStringAsync();
-                return await Task.FromResult(JsonConvert.DeserializeObject<List<User>>(responseBody));
-            }
-            else
-                return null;
-        }
 
         /* Delete user */
         public async Task<HttpResponseMessage> DeleteUser(int userId)
@@ -54,5 +36,22 @@ namespace BmeBlazorServer.Services
             return await httpClient.PutAsJsonAsync("api/User/", user);
         }
 
+        public async Task<List<Transaction>> GetAllUserTransactions()
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Transaction/All");
+            var token = await localStorageService.GetItemAsync<string>("token");
+            requestMessage.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await httpClient.SendAsync(requestMessage);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                return await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
+            }
+            else
+                return null;
+        }
     }
 }

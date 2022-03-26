@@ -3,6 +3,7 @@
 @using BmeBlazorServer.Services
 @inject ISnackbar Snackbar
 @inject IUserService userService
+@inject ITransactionService transactionService
 
 <PageTitle>Overview</PageTitle>
 
@@ -272,7 +273,8 @@
     /* Recent transactions */
     private bool LoadingTransactions { get; set; } = false;
 
-
+    public IEnumerable<Transaction> RecentTransactions = transactionService.GetAllUserTransactions();
+    /*
     public IEnumerable<Transaction> RecentTransactions = new List<Transaction>()
     {
         new Transaction() { CategoryId = 1, Description = "Icons.Material.Filled.Home", Id = 1, Value = -500, Source = "IKEA", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() },
@@ -280,6 +282,7 @@
         new Transaction() { CategoryId = 2, Description = " ", Id = 3, Value = -500, Source = "Danske Bank", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() },
         new Transaction() { CategoryId = 3, Description = " ", Id = 4, Value = -500, Source = "Zalando", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() }
     };
+    */
 
     private void RowClickEvent(TableRowClickEventArgs<Transaction> tableRowClickEventArgs)
     {

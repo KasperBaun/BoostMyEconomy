@@ -10,10 +10,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddTransient<ValidateHeaderHandler>();
+
 builder.Services.AddHttpClient<IUserService, UserService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
 }).AddHttpMessageHandler<ValidateHeaderHandler>();
+
+builder.Services.AddHttpClient<ITransactionService, TransactionService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
+}).AddHttpMessageHandler<ValidateHeaderHandler>();
+
 builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
