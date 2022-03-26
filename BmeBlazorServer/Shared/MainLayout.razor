@@ -2,31 +2,36 @@
 @using MudBlazor.Services;
 @using BmeBlazorServer.Theme;
 @using BmeBlazorServer.Models;
+@inject AuthenticationStateProvider AuthStateProvider;
+
 <PageTitle>BoostMyEconomy</PageTitle>
 
 <MudThemeProvider Theme="RallyGreenDarkTheme"/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
-<MudLayout>
+<AuthorizeView>
+    <Authorized>
+        <MudLayout>
+            <MudDrawer Elevation="4" Open="true">
+                <NavMenu />
+            </MudDrawer>
 
-    <MudDrawer Elevation="4" Open="true">
-        <NavMenu />
-    </MudDrawer>
+            <MudMainContent>
+            <!-- <MudButton OnClick="@(() => UserConfigController.ToggleDrawer())">Åben</MudButton> -->
+                @Body
+            </MudMainContent>
+        </MudLayout>
+    </Authorized>
+    <NotAuthorized>
+        <BmeBlazorServer.Pages.Login>
+        </BmeBlazorServer.Pages.Login>
+    </NotAuthorized>
+</AuthorizeView>
 
-    <MudMainContent>
-    <!-- <MudButton OnClick="@(() => UserConfigController.ToggleDrawer())">Åben</MudButton> -->
-        @Body
-    </MudMainContent>
 
-</MudLayout>
 
 @code {
-    UserConfigController uConfig = UserConfigController.GetInstance("Singleton uConfig er instantieret");
-    
-    
-
-
 
     MudTheme RallyGreenDarkTheme = new MudTheme()
         {

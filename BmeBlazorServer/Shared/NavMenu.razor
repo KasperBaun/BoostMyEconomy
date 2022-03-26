@@ -1,11 +1,12 @@
-﻿
+﻿@inject ILocalStorageService LocalStorage;
+@inject AuthenticationStateProvider AuthStateProvider;
 
 <MudNavMenu Style="margin:auto;">
 
     <!--<MudIcon Icon="@Icons.Material.Filled.InsertChart" Color="Color.Primary" Size="Size.Large" Class="mt-10 mb-16 center" />-->
 
-    <MudTooltip Text="Home" Color="Color.Primary" Placement="Placement.Right" Inline="false" Arrow="true" Style="margin:auto;" >
-        <MudNavLink Class="my-5 mt-12 pa-auto" Href="/overview" Match="NavLinkMatch.Prefix">
+    <MudTooltip Text="Overview" Color="Color.Primary" Placement="Placement.Right" Inline="false" Arrow="true" Style="margin:auto;" >
+        <MudNavLink Class="my-5 mt-12 pa-auto" Href="/" Match="NavLinkMatch.Prefix">
             <MudIcon Icon="@Icons.Material.Filled.Home" Color="Color.Primary" Size="Size.Large" Class="navimg center"/>
         </MudNavLink>
     </MudTooltip>
@@ -58,6 +59,8 @@
         bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "This will log you out of the system. \n Are you sure?"); // Confirm
             if(confirmed){
                 /* TODO:: Logout function logic */
+                await LocalStorage.RemoveItemAsync("token");
+                await AuthStateProvider.GetAuthenticationStateAsync();
             }
     }
 }

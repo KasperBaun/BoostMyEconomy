@@ -1,5 +1,4 @@
-﻿@page "/"
-@page "/login"
+﻿@page "/login"
 <PageTitle>Login</PageTitle>
 
 @using System.Text.RegularExpressions
@@ -92,6 +91,7 @@
     /* This block of code is used to handle user-login when pressing the Login button */ 
     private bool _processing = false;
     UserLoginDTO user = new();
+    private string token = "";
 
     async Task OnLoginClicked()
     {
@@ -101,16 +101,16 @@
             HttpResponseMessage response = await authService.Login(user);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                var token = await response.Content.ReadAsStringAsync();
+                token = await response.Content.ReadAsStringAsync();
                 //Console.WriteLine(token);
                 await LocalStorage.SetItemAsStringAsync("token", token);
-                //await AuthStateProvider.GetAuthenticationStateAsync();
+                await AuthStateProvider.GetAuthenticationStateAsync();
                 Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
                 Snackbar.Configuration.SnackbarVariant = Variant.Filled;
                 Snackbar.Configuration.VisibleStateDuration = 3000;
                 Snackbar.Add("Login successfull", Severity.Success);
                 _processing = false;
-                _nav.NavigateTo("overview");
+                //_nav.NavigateTo("/");
             }
 
             if(response.StatusCode == System.Net.HttpStatusCode.BadRequest)
