@@ -18,14 +18,14 @@
             </MudDrawer>
 
             <MudMainContent>
-            <!-- <MudButton OnClick="@(() => UserConfigController.ToggleDrawer())">Åben</MudButton> -->
                 @Body
             </MudMainContent>
         </MudLayout>
     </Authorized>
     <NotAuthorized>
-        <BmeBlazorServer.Pages.Login>
-        </BmeBlazorServer.Pages.Login>
+        <MudMainContent>
+                @Body
+        </MudMainContent>
     </NotAuthorized>
 </AuthorizeView>
 

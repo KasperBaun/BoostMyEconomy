@@ -4,136 +4,143 @@
 
 <PageTitle>Income</PageTitle>
 
+<AuthorizeView>
+    <Authorized>
+    <!-- Container for the entire dashboard -->
+    <MudContainer Class="mt-6 px-8" MaxWidth="MaxWidth.False">
 
-<!-- Container for the entire dashboard -->
-<MudContainer Class="mt-6 px-8" MaxWidth="MaxWidth.False">
+        <MudGrid Spacing="4" Class="mt-6">
 
-    <MudGrid Spacing="4" Class="mt-6">
+             <!-- Title -->
+            <MudItem xs="12" sm="6" md="3" >
+                <MudText Typo="Typo.h2" Class="ma-auto" Color="Color.Primary">Income</MudText>
+            </MudItem>
 
-         <!-- Title -->
-        <MudItem xs="12" sm="6" md="3" >
-            <MudText Typo="Typo.h2" Class="ma-auto" Color="Color.Primary">Income</MudText>
-        </MudItem>
+            <!-- Datepicker -->
+            <MudItem xs="12" sm="6" md="3">
+                <MudPaper Elevation="25" Class="rounded-xl">
+                    <MudToolBar>
+                        <MudDateRangePicker Class="ma-auto" StartMonth="@DateTime.Now.AddMonths(-1)" @bind-DateRange="_dateRange" Color="Color.Primary" AdornmentColor="Color.Primary" IconSize="Size.Medium" />
+                    </MudToolBar>
+                </MudPaper>
+            </MudItem>
 
-        <!-- Datepicker -->
-        <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="25" Class="rounded-xl">
-                <MudToolBar>
-                    <MudDateRangePicker Class="ma-auto" StartMonth="@DateTime.Now.AddMonths(-1)" @bind-DateRange="_dateRange" Color="Color.Primary" AdornmentColor="Color.Primary" IconSize="Size.Medium" />
-                </MudToolBar>
-            </MudPaper>
-        </MudItem>
+             <!-- Search -->
+            <MudItem xs="12" sm="6" md="3" >
+                <MudPaper Elevation="25" Class="rounded-xl">
+                    <MudToolBar>
+                        <MudTextField Class="ma-auto" @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
+                    </MudToolBar>
+                </MudPaper>
+            </MudItem>
 
-         <!-- Search -->
-        <MudItem xs="12" sm="6" md="3" >
-            <MudPaper Elevation="25" Class="rounded-xl">
-                <MudToolBar>
-                    <MudTextField Class="ma-auto" @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
-                </MudToolBar>
-            </MudPaper>
-        </MudItem>
+             <!-- Add expense -->
+            <MudItem xs="12" sm="6" md="3">
+                <MudPaper Elevation="25" Class="rounded-xl">
+                    <MudToolBar Class="px-0">
+                    <MudButton Variant="Variant.Filled" 
+                        Class="rounded-xl mud-height-full mud-button-full-width" 
+                        StartIcon="@Icons.Material.Outlined.Add" 
+                        OnClick="OpenAddIncomeDialog"
+                        Color="Color.Primary">
+                        Add income
+                    </MudButton>
+                    </MudToolBar>
+                </MudPaper>
+            </MudItem>
 
-         <!-- Add expense -->
-        <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="25" Class="rounded-xl">
-                <MudToolBar Class="px-0">
-                <MudButton Variant="Variant.Filled" 
-                    Class="rounded-xl mud-height-full mud-button-full-width" 
-                    StartIcon="@Icons.Material.Outlined.Add" 
-                    OnClick="OpenAddIncomeDialog"
-                    Color="Color.Primary">
-                    Add income
-                </MudButton>
-                </MudToolBar>
-            </MudPaper>
-        </MudItem>
+            <!-- Income table -->
+            <MudItem xs="12" sm="12" md="9">
+                <MudGrid>
+                    <MudItem xs="12" sm="12" md="12">
+                            <MudTable
+                                Height="360px"
+                                Items="@Transactions" 
+                                Elevation="25"
+                                Class="rounded-xl"
+                                Style="margin:auto; overflow-y:hidden" 
+                                Dense="@dense" 
+                                Hover="true" 
+                                Bordered="false" 
+                                Striped="@striped"
+                                Filter="new Func<Transaction,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                                >
+                            <HeaderContent>
+                                <MudTh>Date</MudTh>
+                                <MudTh>Source</MudTh>
+                                <MudTh>Value</MudTh>
+                            </HeaderContent>
 
-        <!-- Income table -->
-        <MudItem xs="12" sm="12" md="9">
-            <MudGrid>
-                <MudItem xs="12" sm="12" md="12">
-                        <MudTable
-                            Height="360px"
-                            Items="@Transactions" 
-                            Elevation="25"
-                            Class="rounded-xl"
-                            Style="margin:auto; overflow-y:hidden" 
-                            Dense="@dense" 
-                            Hover="true" 
-                            Bordered="false" 
-                            Striped="@striped"
-                            Filter="new Func<Transaction,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                            <RowTemplate
+                                Context="IncomeTable"
                             >
-                        <HeaderContent>
-                            <MudTh>Date</MudTh>
-                            <MudTh>Source</MudTh>
-                            <MudTh>Value</MudTh>
-                        </HeaderContent>
+                                <MudTd DataLabel="Date">@IncomeTable.MadeAt</MudTd>
+                                <MudTd DataLabel="Source">@IncomeTable.Source</MudTd>
+                                <MudTd DataLabel="Value">@IncomeTable.Value</MudTd>
+                            </RowTemplate>
 
-                        <RowTemplate
-                            
-                        >
-                            <MudTd DataLabel="Date">@context.MadeAt</MudTd>
-                            <MudTd DataLabel="Source">@context.Source</MudTd>
-                            <MudTd DataLabel="Value">@context.Value</MudTd>
-                        </RowTemplate>
+                            <PagerContent >
+                                <MudSwitch @bind-Checked="@dense" Color="Color.Primary" Class="ml-1">Fold/unfold</MudSwitch>
+                                <MudSwitch @bind-Checked="@striped" Color="Color.Primary" Class="ml-1">Striped</MudSwitch>
+                                <MudTablePager />
+                            </PagerContent>
 
-                        <PagerContent >
-                            <MudSwitch @bind-Checked="@dense" Color="Color.Primary" Class="ml-1">Fold/unfold</MudSwitch>
-                            <MudSwitch @bind-Checked="@striped" Color="Color.Primary" Class="ml-1">Striped</MudSwitch>
-                            <MudTablePager />
-                        </PagerContent>
+                        </MudTable>
+                    </MudItem>
 
-                    </MudTable>
-                </MudItem>
+                    <!-- History -->
+                    <MudItem xs="12" sm="12" md="6">
+                        <MudPaper Elevation="2" Class="rounded-xl" Style="height: 300px;">
+                            <MudText Typo="Typo.h5">History</MudText>
+                            <MudChart 
+                                ChartType="ChartType.Line" 
+                                ChartSeries="@incomeHistory" 
+                                ChartOptions="incomeHistoryOptions"
+                                XAxisLabels="@incomeHistoryLabels"
+                                Class="ma-auto">
 
-                <!-- History -->
-                <MudItem xs="12" sm="12" md="6">
-                    <MudPaper Elevation="2" Class="rounded-xl" Style="height: 300px;">
-                        <MudText Typo="Typo.h5">History</MudText>
-                        <MudChart 
-                            ChartType="ChartType.Line" 
-                            ChartSeries="@incomeHistory" 
-                            ChartOptions="incomeHistoryOptions"
-                            XAxisLabels="@incomeHistoryLabels"
-                            Class="ma-auto">
+                            </MudChart>
+                        </MudPaper>
+                    </MudItem>
 
-                        </MudChart>
-                    </MudPaper>
-                </MudItem>
+                    <!--Sources-->
+                    <MudItem xs="12" sm="12" md="6">
+                        <MudPaper Elevation="2" Class=" rounded-xl" Style="height: 300px;">
+                            <MudText Typo="Typo.h5">Sources</MudText>
+                            <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
+                                InputData="@data" InputLabels="@labels">
+                            </MudChart>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
 
-                <!--Sources-->
-                <MudItem xs="12" sm="12" md="6">
-                    <MudPaper Elevation="2" Class=" rounded-xl" Style="height: 300px;">
-                        <MudText Typo="Typo.h5">Sources</MudText>
-                        <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
-                            InputData="@data" InputLabels="@labels">
-                        </MudChart>
-                    </MudPaper>
-                </MudItem>
-            </MudGrid>
-        </MudItem>
+            <MudItem xs="12" sm="12" md="3">
+                <MudGrid>
+                    <!-- User info -->
+                    <MudItem xs="12">
+                        <MudPaper Elevation="2" Class="rounded-xl" Style="height: 250px;">
+                            <MudText Typo="Typo.h5">User information</MudText>
+                        </MudPaper>
+                    </MudItem>
 
-        <MudItem xs="12" sm="12" md="3">
-            <MudGrid>
-                <!-- User info -->
-                <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="rounded-xl" Style="height: 250px;">
-                        <MudText Typo="Typo.h5">User information</MudText>
-                    </MudPaper>
-                </MudItem>
-
-                <!-- Recent transactions -->
-                <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="rounded-xl" Style="height: 499px;">
+                    <!-- Recent transactions -->
+                    <MudItem xs="12">
+                        <MudPaper Elevation="2" Class="rounded-xl" Style="height: 499px;">
                         
-                    </MudPaper>
-                </MudItem>
-            </MudGrid>
-        </MudItem>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
          
-    </MudGrid>
-</MudContainer>
+        </MudGrid>
+    </MudContainer>
+   </Authorized>
+    <NotAuthorized>
+        <img width="600" class="center" src="https://i.kym-cdn.com/entries/icons/original/000/002/144/You_Shall_Not_Pass!_0-1_screenshot.jpg" />
+        <Login/>
+    </NotAuthorized>
+</AuthorizeView>
 
 
 @code {

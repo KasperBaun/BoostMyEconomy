@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/overview"
 @using BmeModels;
 
 <PageTitle>Overview</PageTitle>
@@ -162,7 +162,8 @@
         </MudContainer>
     </Authorized>
     <NotAuthorized>
-    <span>You're not authorized, buddy.</span>
+        <img width="600" class="center" src="https://i.kym-cdn.com/entries/icons/original/000/002/144/You_Shall_Not_Pass!_0-1_screenshot.jpg" />
+        <Login/>
     </NotAuthorized>
 </AuthorizeView>
 

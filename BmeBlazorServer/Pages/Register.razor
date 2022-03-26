@@ -8,79 +8,87 @@
 @inject IAuthService authService;
 @inject NavigationManager _nav;
 @inject ISnackbar Snackbar;
+@inject AuthenticationStateProvider AuthStateProvider
 
+<AuthorizeView>
+    <Authorized>
+        <Overview>
 
-<MudContainer Class="mt-16" MaxWidth="MaxWidth.Small">
-    
+        </Overview>
+    </Authorized>
+
+    <NotAuthorized>
+    <MudContainer Class="mt-16" MaxWidth="MaxWidth.Small">
   
-  
-    <EditForm Model="@user" OnValidSubmit="OnValidSubmit">
-        <MudPaper Class="center rounded-xl pa-12 mt-1" Elevation="4">
-            <div class="d-flex justify-center">
-                <MudIcon Icon="@Icons.Material.Filled.AreaChart" Color="Color.Primary" Style="height:50%; width:50%;"/>
-            </div>
-            <MudText Class="mud-typography-h3" Align="Align.Center">
-                   Sign up and get to
-            </MudText>
-            <MudText Class="mud-typography-h3" Color="Color.Primary" Align="Align.Center">boosting.</MudText>
+        <EditForm Model="@user" Context="RegisterContext" OnValidSubmit="OnValidSubmit">
+            <MudPaper Class="center rounded-xl pa-12 mt-1" Elevation="4">
+                <div class="d-flex justify-center">
+                    <MudIcon Icon="@Icons.Material.Filled.AreaChart" Color="Color.Primary" Style="height:50%; width:50%;"/>
+                </div>
+                <MudText Class="mud-typography-h3" Align="Align.Center">
+                       Sign up and get to
+                </MudText>
+                <MudText Class="mud-typography-h3" Color="Color.Primary" Align="Align.Center">boosting.</MudText>
 
-            <MudGrid Spacing="6">
-                <MudItem xs="12">
-                    <MudGrid Class="mt-10">
-                        <DataAnnotationsValidator/>
-                        <!-- First name field-->
-                        <MudItem xs=12 md="6" lg="6" xl="6">
-                            <MudTextField 
-                                Label="First name" 
-                                @bind-Value="user.FirstName" 
-                                Placeholder="John" 
-                                For="@(() => user.FirstName)"
-                                Variant="Variant.Outlined"
-                            />
-                        </MudItem>
-                        <!-- Last name field-->
-                        <MudItem xs=12 md="6" lg="6" xl="6">
-                            <MudTextField Label="Last name" @bind-Value="user.LastName" Placeholder="Doe" For="@(() => user.LastName)"Variant="Variant.Outlined"/>
-                        </MudItem>
-                        <!-- Email field-->    
-                        <MudItem xs=12>
-                            <MudTextField Label="Email" @bind-Value="user.Email" Placeholder="Your email adress" For="@(() => user.Email)" Variant="Variant.Outlined"/>
-                        </MudItem>
-                        <!-- Password field-->
-                        <MudItem xs=12>
-                            <MudTextField   Label="Password" @bind-Value="user.Password" 
-                                            Placeholder="Create a password" 
-                                            For="@(() => user.Password)"
-                                            HelperText="Use 8-30 characters with a mix of letters, numbers & symbols" 
-                                            InputType="@PasswordInput"
-                                            Variant="Variant.Outlined"
-                                            Adornment="Adornment.End" 
-                                            AdornmentColor="Color.Primary" 
-                                            AdornmentIcon="@PasswordInputIcon"
-                                            OnAdornmentClick="TogglePasswordHidden"
-                                            /> 
-                        </MudItem>
+                <MudGrid Spacing="6">
+                    <MudItem xs="12">
+                        <MudGrid Class="mt-10">
+                            <DataAnnotationsValidator/>
+                            <!-- First name field-->
+                            <MudItem xs=12 md="6" lg="6" xl="6">
+                                <MudTextField 
+                                    Label="First name" 
+                                    @bind-Value="user.FirstName" 
+                                    Placeholder="John" 
+                                    For="@(() => user.FirstName)"
+                                    Variant="Variant.Outlined"
+                                />
+                            </MudItem>
+                            <!-- Last name field-->
+                            <MudItem xs=12 md="6" lg="6" xl="6">
+                                <MudTextField Label="Last name" @bind-Value="user.LastName" Placeholder="Doe" For="@(() => user.LastName)"Variant="Variant.Outlined"/>
+                            </MudItem>
+                            <!-- Email field-->    
+                            <MudItem xs=12>
+                                <MudTextField Label="Email" @bind-Value="user.Email" Placeholder="Your email adress" For="@(() => user.Email)" Variant="Variant.Outlined"/>
+                            </MudItem>
+                            <!-- Password field-->
+                            <MudItem xs=12>
+                                <MudTextField   Label="Password" @bind-Value="user.Password" 
+                                                Placeholder="Create a password" 
+                                                For="@(() => user.Password)"
+                                                HelperText="Use 8-30 characters with a mix of letters, numbers & symbols" 
+                                                InputType="@PasswordInput"
+                                                Variant="Variant.Outlined"
+                                                Adornment="Adornment.End" 
+                                                AdornmentColor="Color.Primary" 
+                                                AdornmentIcon="@PasswordInputIcon"
+                                                OnAdornmentClick="TogglePasswordHidden"
+                                                /> 
+                            </MudItem>
 
-                        <!-- Register button -->
-                        <MudItem xs="12" Class="d-flex justify-center">
-                            <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="rounded-lg" Style="width: 100%; height: 50px;">
-                                @if (_processing)
-                                {
-                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-                                    <MudText Class="ms-2">Processing</MudText>
-                                }
-                                else
-                                {
-                                    <MudText>Register</MudText>
-                                }
-                            </MudButton>
-                        </MudItem>
-                    </MudGrid>
-                </MudItem>
-            </MudGrid>
-        </MudPaper>
-    </EditForm>
-</MudContainer>
+                            <!-- Register button -->
+                            <MudItem xs="12" Class="d-flex justify-center">
+                                <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="rounded-lg" Style="width: 100%; height: 50px;">
+                                    @if (_processing)
+                                    {
+                                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                                        <MudText Class="ms-2">Processing</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText>Register</MudText>
+                                    }
+                                </MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </EditForm>
+    </MudContainer>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private UserRegistrationDTO user = new UserRegistrationDTO();
@@ -88,7 +96,7 @@
     /* This block of code is used to handle user registrering when pressing the register button */ 
     private bool _processing = false;
 
-    private async Task OnValidSubmit(EditContext context)
+    private async Task OnValidSubmit(EditContext RegisterContext)
     {
         StateHasChanged();
         await OnRegisterClicked();
