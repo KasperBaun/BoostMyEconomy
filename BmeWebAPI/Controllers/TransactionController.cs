@@ -28,8 +28,9 @@ namespace BmeWebAPI.Controllers
         [HttpGet("All")]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
         {
-            int requestUserId = (await _context.Users.FindAsync(ClaimTypes.NameIdentifier)).Id;
-            List<Transaction> transactions = _context.Transactions.Where(t => t.UserId == requestUserId).ToList();
+            //int requestUserId = (await _context.Users.FindAsync(ClaimTypes.NameIdentifier)).Id;
+            //List<Transaction> transactions = _context.Transactions.Where(t => t.UserId == requestUserId).ToList();
+            List<Transaction> transactions = _context.Transactions.ToList();
             return transactions;
         }
 

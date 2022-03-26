@@ -60,7 +60,7 @@
                         <MudToolBar>
                             <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" OnClick="TestList"/>
                             <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
-                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" OnClick="LoadData" />
                             <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
                         </MudToolBar>
                     </MudPaper>
@@ -149,12 +149,12 @@
                                     <MudTh>Date</MudTh>
                                     <MudTh>Value</MudTh>
                                 </HeaderContent>
-                                <RowTemplate Context="hejsa">
-                                    <MudTd DataLabel="Nr">@hejsa.Id</MudTd>
-                                    <MudTd DataLabel="Sign">@hejsa.Description</MudTd>
-                                    <MudTd DataLabel="Name">@hejsa.Source</MudTd>
-                                    <MudTd DataLabel="Position">@hejsa.MadeAt</MudTd>
-                                    <MudTd DataLabel="Molar mass">@hejsa.Value</MudTd>
+                                <RowTemplate Context="RecentTransactions">
+                                    <MudTd DataLabel="Nr">@RecentTransactions.Id</MudTd>
+                                    <MudTd DataLabel="Sign">@RecentTransactions.Description</MudTd>
+                                    <MudTd DataLabel="Name">@RecentTransactions.Source</MudTd>
+                                    <MudTd DataLabel="Position">@RecentTransactions.MadeAt</MudTd>
+                                    <MudTd DataLabel="Molar mass">@RecentTransactions.Value</MudTd>
                                 </RowTemplate>
                             </MudTable>
                             </MudPaper>
@@ -172,7 +172,6 @@
 </AuthorizeView>
 
 @code {
-
     private async void TestList()
     {
         Console.WriteLine("Clicking!!");
@@ -180,11 +179,11 @@
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
         Snackbar.Configuration.VisibleStateDuration = 3000;
-        if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
             Console.WriteLine("Not found");
         }
-        if(response.StatusCode == System.Net.HttpStatusCode.NoContent)
+        if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
         {
             Console.WriteLine("User deleted");
         }
@@ -239,7 +238,8 @@
         public int Position { get; set; }
         public int Value { get; set; }
 
-    }
+    };
+
     private IEnumerable<Result> Results = new List<Result>()
     {
         new Result() { Position = 1, Month="Jan", Value = 4500 },
@@ -272,22 +272,13 @@
 
     /* Recent transactions */
     private bool LoadingTransactions { get; set; } = true;
-    private List<Transaction> recentTransactions = new();
+    private List<Transaction> RecentTransactions = new();
 
     public async void LoadData()
     {
-        recentTransactions = await transactionService.GetAllUserTransactions();
-    }
-
-    /*
-    public IEnumerable<Transaction> RecentTransactions = new List<Transaction>()
-    {
-        new Transaction() { CategoryId = 1, Description = "Icons.Material.Filled.Home", Id = 1, Value = -500, Source = "IKEA", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() },
-        new Transaction() { CategoryId = 4, Description = " ", Id = 2, Value = 500, Source = "F24", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() },
-        new Transaction() { CategoryId = 2, Description = " ", Id = 3, Value = -500, Source = "Danske Bank", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() },
-        new Transaction() { CategoryId = 3, Description = " ", Id = 4, Value = -500, Source = "Zalando", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() }
-    };
-    */
+        RecentTransactions = await transactionService.GetAllUserTransactions(); 
+        LoadingTransactions = false;
+    }    
 
     private void RowClickEvent(TableRowClickEventArgs<Transaction> tableRowClickEventArgs)
     {
@@ -301,7 +292,7 @@
         }
 
     }
-   
+
 
     /* Variable expenses */
 
