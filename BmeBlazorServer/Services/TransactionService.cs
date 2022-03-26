@@ -7,33 +7,12 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
 
-        private ILocalStorageService localStorageService;
+        private readonly ILocalStorageService localStorageService;
 
         public TransactionService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
-        }
-
-
-        /* Delete user */
-        public async Task<HttpResponseMessage> DeleteUser(int userId)
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, requestUri: "api/User/"+userId);
-            var token = await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var response = await httpClient.SendAsync(requestMessage);
-            return response;
-        }
-
-        public async Task<HttpResponseMessage> UpdateUser(User user)
-        {   /*
-            var response = await httpClient.PutAsJsonAsync("api/Users", user);
-            return await response.Content.ReadFromJsonAsync<HttpResponseMessage>();
-            */
-            return await httpClient.PutAsJsonAsync("api/User/", user);
         }
 
         public async Task<List<Transaction>> GetAllUserTransactions()

@@ -7,7 +7,7 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
 
-        private ILocalStorageService localStorageService;
+        private readonly ILocalStorageService localStorageService;
 
         public UserService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {

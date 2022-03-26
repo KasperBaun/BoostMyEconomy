@@ -1,9 +1,9 @@
 ﻿@page "/overview"
-@using BmeModels
-@using BmeBlazorServer.Services
-@inject ISnackbar Snackbar
-@inject IUserService userService
-@inject ITransactionService transactionService
+@using BmeModels;
+@using BmeBlazorServer.Services;
+@inject ISnackbar Snackbar;
+@inject IUserService userService;
+@inject ITransactionService transactionService;
 
 <PageTitle>Overview</PageTitle>
 
@@ -271,9 +271,14 @@
 
 
     /* Recent transactions */
-    private bool LoadingTransactions { get; set; } = false;
+    private bool LoadingTransactions { get; set; } = true;
+    private List<Transaction> recentTransactions = new();
 
-    public IEnumerable<Transaction> RecentTransactions = transactionService.GetAllUserTransactions();
+    public async void LoadData()
+    {
+        recentTransactions = await transactionService.GetAllUserTransactions();
+    }
+
     /*
     public IEnumerable<Transaction> RecentTransactions = new List<Transaction>()
     {
