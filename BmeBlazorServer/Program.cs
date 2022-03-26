@@ -1,9 +1,8 @@
 global using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using BmeBlazorServer.Models;
+global using Blazored.LocalStorage;
 using MudBlazor.Services;
 using BmeBlazorServer.Services;
+using BmeBlazorServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +19,9 @@ builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
 });
 builder.Services.AddMudServices();
-builder.Services.AddScoped<AuthenticationStateProvider, BmeBlazorServer.CustomAuthStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddAuthorizationCore();
+builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
 

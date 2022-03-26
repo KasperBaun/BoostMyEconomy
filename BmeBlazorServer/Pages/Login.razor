@@ -1,15 +1,17 @@
 ﻿@page "/"
-<PageTitle>Login</PageTitle>
 @page "/login"
+<PageTitle>Login</PageTitle>
 
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @inject IDialogService DialogService
-@using BmeModels;
-@using BmeBlazorServer.Services;
-@inject IAuthService authService;
-@inject NavigationManager _nav;
-@inject ISnackbar Snackbar;
+@using BmeModels
+@using BmeBlazorServer.Services
+@inject IAuthService authService
+@inject NavigationManager _nav
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthStateProvider
 
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
@@ -99,6 +101,10 @@
             HttpResponseMessage response = await authService.Login(user);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
+                var token = await response.Content.ReadAsStringAsync();
+                //Console.WriteLine(token);
+                await LocalStorage.SetItemAsStringAsync("token", token);
+                //await AuthStateProvider.GetAuthenticationStateAsync();
                 Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
                 Snackbar.Configuration.SnackbarVariant = Variant.Filled;
                 Snackbar.Configuration.VisibleStateDuration = 3000;

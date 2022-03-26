@@ -1,16 +1,26 @@
 ﻿using System.Security.Claims;
 using System.Text.Json;
 
-namespace BmeBlazorServer
+namespace BmeBlazorServer.Services
 {
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
+        private readonly ILocalStorageService _localStorage;
+
+        public CustomAuthStateProvider (ILocalStorageService localStorage)
+        {
+            _localStorage = localStorage;
+        }
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            string token = "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiS2FzcGVyIEJhdW4iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJrYXNwZXJiYXVuQGhvdG1haWwuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiMyIsImV4cCI6MTY0ODMzNjM0MH0.4O0M6pLMNXkYWz7ajvoxReQetOSTboWn6FLcVnBkIjdCYD2vmwmfDmut6neqyudYVOKx9T9EcoYfU_AgZK2oZg";
+            string token = await _localStorage.GetItemAsStringAsync("token");
+            
+            var identity = new ClaimsIdentity();    
 
-            var identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
-            //var identity = new ClaimsIdentity();    
+            if (!string.IsNullOrEmpty(token))
+            { 
+                identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
+            }
 
             var user = new ClaimsPrincipal(identity);
 
