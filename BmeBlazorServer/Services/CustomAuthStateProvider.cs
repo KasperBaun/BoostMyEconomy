@@ -15,7 +15,8 @@ namespace BmeBlazorServer.Services
         {
             string token = await _localStorage.GetItemAsStringAsync("token");
             
-            var identity = new ClaimsIdentity();    
+            var identity = new ClaimsIdentity();
+            
 
             if (!string.IsNullOrEmpty(token))
             { 

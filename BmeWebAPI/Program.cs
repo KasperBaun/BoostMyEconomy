@@ -38,7 +38,7 @@ builder.Services.AddSwaggerGen(options => {
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
-//Console.WriteLine(builder.Configuration.GetSection("AppSettings:Token").Value);
+/* Add JWT-Auth to WebAPI*/
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

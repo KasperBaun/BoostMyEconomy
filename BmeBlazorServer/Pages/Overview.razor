@@ -1,5 +1,8 @@
 ﻿@page "/overview"
-@using BmeModels;
+@using BmeModels
+@using BmeBlazorServer.Services
+@inject ISnackbar Snackbar
+@inject IUserService userService
 
 <PageTitle>Overview</PageTitle>
 
@@ -50,11 +53,11 @@
                     </MudPaper>
                 </MudItem>
 
-                 <!-- Add expense -->
+                 <!-- Toolbar -->
                 <MudItem xs="12" sm="6" md="3">
                     <MudPaper Elevation="25" Class="rounded-xl">
                         <MudToolBar>
-                            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit"/>
+                            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" OnClick="TestList"/>
                             <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
                             <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" />
                             <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
@@ -168,6 +171,16 @@
 </AuthorizeView>
 
 @code {
+
+    private void TestList()
+    {
+        Console.WriteLine("Clicking!!");
+        var list = userService.GetUsers().Result;
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Configuration.VisibleStateDuration = 3000;
+        Snackbar.Add(list.First().Email, Severity.Success);
+    }
     /* Notifications */
 
     /* User information */

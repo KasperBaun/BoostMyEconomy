@@ -22,7 +22,8 @@ namespace BmeWebAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Users
+        // GET: api/Users/All
+        [Authorize(Roles ="Admin")]
         [HttpGet("All")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
@@ -45,6 +46,7 @@ namespace BmeWebAPI.Controllers
         }
 
         // PUT: api/Users/5
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
@@ -75,6 +77,7 @@ namespace BmeWebAPI.Controllers
         }
 
         // DELETE: api/User/5
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {

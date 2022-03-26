@@ -1,4 +1,5 @@
 ﻿using BmeModels;
+using Newtonsoft.Json;
 
 namespace BmeBlazorServer.Services
 {
@@ -6,18 +7,31 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
 
-        public UserService(HttpClient _httpClient)
+        private ILocalStorageService localStorageService;
+
+        public UserService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
+            localStorageService = _localStorageService;
         }
 
         /* Get all users */
         public async Task<List<User>> GetUsers()
         {
-            // TODO : Setup these methods correctly so we dont have a possible null-reference
-#pragma warning disable CS8603 // Possible null reference return.
-            return await httpClient.GetFromJsonAsync<List<User>>(requestUri: "api/User/All");
-#pragma warning restore CS8603 // Possible null reference return.
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/User/All");
+            var token =  await localStorageService.GetItemAsync<string>("token");
+            requestMessage.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            
+            var response = await httpClient.SendAsync(requestMessage);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                return await Task.FromResult(JsonConvert.DeserializeObject<List<User>>(responseBody));
+            }
+            else
+                return null;
         }
 
         /* Delete user */
@@ -33,5 +47,6 @@ namespace BmeBlazorServer.Services
             */
             return await httpClient.PutAsJsonAsync("api/User/", user);
         }
+
     }
 }
