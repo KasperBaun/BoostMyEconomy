@@ -29,8 +29,10 @@ namespace BmeWebAPI.Controllers
         [HttpPost("UserExists")]
         public async Task<ActionResult<bool>> UserExists(string email)
         {
-            bool exists = await _context.Users.AnyAsync(e => e.Email == email);
-            if (!exists)
+            Models.User response = await _context.Users.SingleOrDefaultAsync(e => e.Email == email);
+            Console.WriteLine(response.Email);
+            
+            if (response == null)
             {
                 return BadRequest("User not found");
             }

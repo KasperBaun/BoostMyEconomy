@@ -172,14 +172,22 @@
 
 @code {
 
-    private void TestList()
+    private async void TestList()
     {
         Console.WriteLine("Clicking!!");
-        var list = userService.GetUsers().Result;
+        var response = await userService.DeleteUser(0);
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
         Snackbar.Configuration.VisibleStateDuration = 3000;
-        Snackbar.Add(list.First().Email, Severity.Success);
+        if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            Console.WriteLine("Not found");
+        }
+        if(response.StatusCode == System.Net.HttpStatusCode.NoContent)
+        {
+            Console.WriteLine("User deleted");
+        }
+        Snackbar.Add(response.ReasonPhrase, Severity.Success);
     }
     /* Notifications */
 
