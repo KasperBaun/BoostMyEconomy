@@ -11,24 +11,6 @@
     <Authorized>
         <!-- Container for the entire dashboard -->
         <MudContainer Class="mt-6 px-8" MaxWidth="MaxWidth.False">
-
-            <!-- Toolbar 
-            <MudPaper Elevation="25" Class="rounded-xl">
-                <MudToolBar>
-                    <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Add" Color="Color.Inherit" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Edit" Color="Color.Inherit" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Settings" Color="Color.Inherit" />
-                    <MudSpacer />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit"/>
-                    <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
-                </MudToolBar>
-            </MudPaper>
-            -->
-
             <MudGrid Spacing="4" Class="mt-6">
 
                 <!-- Title -->
@@ -40,7 +22,7 @@
                 <MudItem xs="12" sm="6" md="3">
                     <MudPaper Elevation="25" Class="rounded-xl">
                         <MudToolBar>
-                            <MudDateRangePicker Class="ma-auto" StartMonth="@DateTime.Now.AddMonths(-1)" @bind-DateRange="_dateRange" Color="Color.Primary" AdornmentColor="Color.Primary" IconSize="Size.Medium" />
+                            <MudDateRangePicker Class="ma-auto" StartMonth="@DateTime.Now.AddMonths(-1)" @bind-DateRange="_dateRange" Color="Color.Primary" PickerActions="InitializeOverview" AdornmentColor="Color.Primary" IconSize="Size.Medium" />
                         </MudToolBar>
                     </MudPaper>
                 </MudItem>
@@ -58,10 +40,10 @@
                 <MudItem xs="12" sm="6" md="3">
                     <MudPaper Elevation="25" Class="rounded-xl">
                         <MudToolBar>
-                            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" OnClick="TestList"/>
+                            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" OnClick="InitializeOverview"/>
                             <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
-                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" OnClick="LoadData" />
-                            <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" OnClick="StateChanged" />
                         </MudToolBar>
                     </MudPaper>
                 </MudItem>
@@ -141,20 +123,16 @@
                         <MudItem xs="12">
                             <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 499px;">
                                 <MudText Typo="Typo.h5">Recent transactions</MudText>
-                                <MudTable Items="@RecentTransactions.Take(RecentTransactions.Count())" Hover="true" Dense="true" Striped="true" Loading="@LoadingTransactions" Breakpoint="Breakpoint.Sm"  OnRowClick="RowClickEvent" T="Transaction">
+                                <MudTable Items="@RecentTransactions.Take(RecentTransactions.Count())" Hover="true" Dense="true" Striped="true" Loading="@LoadingRecentTransactions" Breakpoint="Breakpoint.Sm"  OnRowClick="RowClickEvent" T="Transaction">
                                 <HeaderContent>
-                                    <MudTh>Nr</MudTh>
-                                    <MudTh>Icon</MudTh>
-                                    <MudTh>Source</MudTh>
                                     <MudTh>Date</MudTh>
+                                    <MudTh>Source</MudTh>
                                     <MudTh>Value</MudTh>
                                 </HeaderContent>
-                                <RowTemplate Context="RecentTransactions">
-                                    <MudTd DataLabel="Nr">@RecentTransactions.Id</MudTd>
-                                    <MudTd DataLabel="Sign">@RecentTransactions.Description</MudTd>
-                                    <MudTd DataLabel="Name">@RecentTransactions.Source</MudTd>
-                                    <MudTd DataLabel="Position">@RecentTransactions.MadeAt</MudTd>
-                                    <MudTd DataLabel="Molar mass">@RecentTransactions.Value</MudTd>
+                                <RowTemplate Context="recentTransactions">
+                                    <MudTd DataLabel="Date">@recentTransactions.MadeAt</MudTd>
+                                    <MudTd DataLabel="Name">@recentTransactions.Source</MudTd>
+                                    <MudTd DataLabel="Value">@recentTransactions.Value</MudTd>
                                 </RowTemplate>
                             </MudTable>
                             </MudPaper>
@@ -172,40 +150,40 @@
 </AuthorizeView>
 
 @code {
-    private async void TestList()
+    private List<Transaction> UserTransactions = new();
+
+    /* Date picker*/
+    DateRange _dateRange = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
+
+    private async void InitializeOverview()
     {
-        Console.WriteLine("Clicking!!");
-        var response = await userService.DeleteUser(0);
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
-        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
-        Snackbar.Configuration.VisibleStateDuration = 3000;
-        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            Console.WriteLine("Not found");
-        }
-        if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-        {
-            Console.WriteLine("User deleted");
-        }
-        Snackbar.Add(response.ReasonPhrase, Severity.Success);
+        UserTransactions = await transactionService.GetAllUserTransactions();
+        RecentTransactions = null;
+        LoadRecentTransactionsData();
+        StateHasChanged();
     }
+
+    private void StateChanged()
+    {
+        StateHasChanged();
+    }
+
+
     /* Notifications */
 
     /* User information */
 
     /* Income */
 
-    /* Date picker*/
-    DateRange _dateRange = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
 
     private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
 
     private ChartOptions IncomeOptions = new ChartOptions()
-        {
-            DisableLegend = true,
-            LineStrokeWidth = 5,
-            InterpolationOption = InterpolationOption.EndSlope,
-            YAxisFormat = "c2"
+    {
+        DisableLegend = true,
+        LineStrokeWidth = 5,
+        InterpolationOption = InterpolationOption.EndSlope,
+        YAxisFormat = "c2"
     };
 
     public List<ChartSeries> Income = new List<ChartSeries>()
@@ -218,11 +196,11 @@
     /* Income & total expenses */
 
     private ChartOptions IncomeExpensesOptions = new ChartOptions()
-        {
-            DisableLegend = true,
-            LineStrokeWidth = 5,
-            InterpolationOption = InterpolationOption.EndSlope,
-            YAxisFormat = "c2"
+    {
+        DisableLegend = true,
+        LineStrokeWidth = 5,
+        InterpolationOption = InterpolationOption.EndSlope,
+        YAxisFormat = "c2"
     };
     public List<ChartSeries> IncomeExpense = new List<ChartSeries>()
     {
@@ -255,6 +233,7 @@
         new Result() { Position = 11, Month="Nov", Value = -1500 },
         new Result() { Position = 12, Month="Dec", Value = -1500 }
     };
+
     // Style the cells according to a positive or negative result
     private Func<Result, string> _cellStyleFunc => x =>
     {
@@ -271,24 +250,30 @@
 
 
     /* Recent transactions */
-    private bool LoadingTransactions { get; set; } = true;
+    private bool LoadingRecentTransactions { get; set; } = true;
     private List<Transaction> RecentTransactions = new();
 
-    public async void LoadData()
+    public async void LoadRecentTransactionsData()
     {
-        RecentTransactions = await transactionService.GetAllUserTransactions(); 
-        LoadingTransactions = false;
+        RecentTransactions = UserTransactions.FindAll(e => 
+            DateOnly.FromDateTime(DateTime.Parse(e.MadeAt)) >= DateOnly.FromDateTime(_dateRange.Start.Value) 
+            && 
+           DateOnly.FromDateTime(DateTime.Parse(e.MadeAt)) <= DateOnly.FromDateTime(_dateRange.End.Value)); 
+        
+        //RecentTransactions = UserTransactions;
+        LoadingRecentTransactions = false;
+        StateHasChanged();
     }    
 
     private void RowClickEvent(TableRowClickEventArgs<Transaction> tableRowClickEventArgs)
     {
         /* TODO Implement navigation-logic*/
-        if (LoadingTransactions)
+        if (LoadingRecentTransactions)
         {
-            LoadingTransactions = false;
+            LoadingRecentTransactions = false;
         } else
         {
-            LoadingTransactions = true;
+            LoadingRecentTransactions = true;
         }
 
     }
@@ -304,7 +289,7 @@
     };
     public List<ChartSeries> VarExpenses = new List<ChartSeries>()
     {
-        new ChartSeries() { Data = new double[] { 35, 41, 35, 51, 49, 62, 69, 91, 148, 64, 39, 25 } },
+        new ChartSeries() { Data = new double[] { 35, 41, 35, 51, 49, 62, 69, 91, 148, 64, 39, 25 } }
     };
     public string[] VarExpensesLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
