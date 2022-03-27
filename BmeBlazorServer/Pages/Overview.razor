@@ -31,7 +31,7 @@
                                 ShowWeekNumbers = "true" 
                                 Color="Color.Primary" 
                                 PickerVariant="PickerVariant.Dialog"
-                                PickerClosed="TransactionService.DateRangeChanged"
+                                PickerClosed="TransactionService.PeriodChanged"
                                 AdornmentColor="Color.Primary" 
                                 IconSize="Size.Medium" />
                         </MudToolBar>
@@ -43,7 +43,7 @@
                     <MudPaper Elevation="25" Class="rounded-xl">
                         <MudToolBar>
                             <MudText Style="margin-right:10px">Balance</MudText>
-                            <MudProgressLinear Color="Color.Primary" Size="Size.Large" Value="75" />
+                            <MudProgressLinear Color="Color.Primary" Size="Size.Large" Value="TransactionService.Balance" />
                         </MudToolBar>
                     </MudPaper>
                 </MudItem>

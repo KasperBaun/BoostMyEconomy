@@ -11,6 +11,8 @@ namespace BmeBlazorServer.Services
         private List<Transaction> _UserTransactions { get; set; }
         public DateRange DateRange { get; set; } = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
         public List<Transaction> UserTransactions { get; set; } = new List<Transaction>();
+        public int Balance { get; set; } = 1;
+
         public event Action OnChange;
 
         public TransactionService(HttpClient _httpClient, ILocalStorageService _localStorageService)
@@ -49,6 +51,7 @@ namespace BmeBlazorServer.Services
             }
             UserTransactions = _UserTransactions;
             FilterTransactionsFromDateRange(DateRange);
+            CalculateBalanceForPeriod();
             return true;
         }
         private void FilterTransactionsFromDateRange(DateRange range)
@@ -61,10 +64,32 @@ namespace BmeBlazorServer.Services
             OnChange?.Invoke();
         }
 
-        public void DateRangeChanged()
+        public void PeriodChanged()
         {
             FilterTransactionsFromDateRange(DateRange);
+            CalculateBalanceForPeriod();
             OnChange?.Invoke();
+        }
+
+        private void CalculateBalanceForPeriod()
+        {
+            List<Transaction> incomeForPeriod =
+                UserTransactions.Where(x => x.Type == "Income").ToList();
+            int income = incomeForPeriod.Sum(x => x.Value);
+
+            List<Transaction> expensesForPeriod =
+                UserTransactions.Where(x => x.Type == "Expense").ToList();
+            int expenses = expensesForPeriod.Sum(x => x.Value);
+            int result = (((income+expenses)*100/income));
+            //Console.WriteLine("$TransactionService.cs - Income: {0}, Expenses: {1}, Income+Expenses: {2}, Balance: {3}", income, expenses, (income+expenses), result);   
+            if(expenses == 0)
+            {
+                Balance = 0;
+            }
+            else
+            {
+                Balance = (income + expenses) * 100 / income;
+            }
         }
     }
 }
