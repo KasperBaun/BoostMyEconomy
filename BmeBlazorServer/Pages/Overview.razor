@@ -31,7 +31,8 @@
                                 @bind-DateRange="TransactionService.DateRange" 
                                 ShowWeekNumbers = "true" 
                                 Color="Color.Primary" 
-                                PickerVariant="PickerVariant.Dialog" 
+                                PickerVariant="PickerVariant.Dialog"
+                                PickerClosed="TransactionService.DateRangeChanged"
                                 AdornmentColor="Color.Primary" 
                                 IconSize="Size.Medium" />
                         </MudToolBar>
@@ -53,8 +54,8 @@
                         <MudToolBar>
                             <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" />
                             <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
-                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" />
-                            <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit"  />
+                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" OnClick = "TransactionService.GetAllUserTransactions"/>
+                            <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" OnClick="StateHasChanged"  />
                         </MudToolBar>
                     </MudPaper>
                 </MudItem>
@@ -187,8 +188,6 @@
     /* User information */
 
     /* Income */
-
-
     private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
 
     private ChartOptions IncomeOptions = new ChartOptions()

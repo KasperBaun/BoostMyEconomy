@@ -11,7 +11,7 @@ namespace BmeBlazorServer.Services
         Task<List<Transaction>> FetchUserTransactionsFromAPI();
         Task<bool> GetAllUserTransactions();
         DateRange DateRange { get; set; }
-        void SetDateRange(DateRange dateRange);
+        void DateRangeChanged();
 
 
     }

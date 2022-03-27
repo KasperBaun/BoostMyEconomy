@@ -47,22 +47,22 @@ namespace BmeBlazorServer.Services
             {
                 _UserTransactions = await FetchUserTransactionsFromAPI();
             }
-            FilterTransactionsFromDateRange(DateRange);
             UserTransactions = _UserTransactions;
+            FilterTransactionsFromDateRange(DateRange);
             return true;
         }
         private void FilterTransactionsFromDateRange(DateRange range)
         {
-            UserTransactions =  _UserTransactions.FindAll(e =>
-            DateOnly.FromDateTime(DateTime.Parse(e.MadeAt)) >= DateOnly.FromDateTime(range.Start.Value)
+            UserTransactions = _UserTransactions.Where(x =>
+            DateOnly.Parse(s: x.MadeAt) >= DateOnly.FromDateTime(range.Start.Value) 
             &&
-            DateOnly.FromDateTime(DateTime.Parse(e.MadeAt)) <= DateOnly.FromDateTime(range.End.Value)
-            );
+            DateOnly.Parse(s: x.MadeAt) <= DateOnly.FromDateTime(range.End.Value)
+            ).ToList();
+            OnChange?.Invoke();
         }
 
-        public void SetDateRange(DateRange dateRange)
+        public void DateRangeChanged()
         {
-            DateRange = dateRange;
             FilterTransactionsFromDateRange(DateRange);
             OnChange?.Invoke();
         }
