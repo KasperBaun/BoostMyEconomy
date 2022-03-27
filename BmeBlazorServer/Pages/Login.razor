@@ -7,8 +7,8 @@
 @inject IDialogService DialogService
 @using BmeModels
 @using BmeBlazorServer.Services
-@inject IAuthService authService
-@inject NavigationManager _nav
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 @inject ILocalStorageService LocalStorage
 @inject AuthenticationStateProvider AuthStateProvider
@@ -104,7 +104,7 @@
         _processing = true;
         try
         {
-            HttpResponseMessage response = await authService.Login(user);
+            HttpResponseMessage response = await AuthService.Login(user);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 token = await response.Content.ReadAsStringAsync();
@@ -116,7 +116,7 @@
                 Snackbar.Configuration.VisibleStateDuration = 3000;
                 Snackbar.Add("Login successfull", Severity.Success);
                 _processing = false;
-                _nav.NavigateTo("/overview");
+                NavigationManager.NavigateTo("/overview");
             }
 
             if(response.StatusCode == System.Net.HttpStatusCode.BadRequest)

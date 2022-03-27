@@ -21,6 +21,8 @@ builder.Services.AddHttpClient<ITransactionService, TransactionService>(client =
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
 }).AddHttpMessageHandler<ValidateHeaderHandler>();
 
+/* AuthService as Singleton - inject WebAPI_URL */
+builder.Services.AddSingleton<IAuthService, AuthService>();
 builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
