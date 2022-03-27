@@ -4,6 +4,7 @@
 @inject ISnackbar Snackbar;
 @inject IUserService UserService;
 @inject ITransactionService TransactionService;
+@implements IDisposable
 
 <PageTitle>Overview</PageTitle>
 
@@ -22,7 +23,17 @@
                 <MudItem xs="12" sm="6" md="3">
                     <MudPaper Elevation="25" Class="rounded-xl">
                         <MudToolBar>
-                            <MudDateRangePicker Class="ma-auto" StartMonth="@DateTime.Now.AddMonths(-1)" @bind-DateRange="_dateRange" Color="Color.Primary" AdornmentColor="Color.Primary" IconSize="Size.Medium" />
+                            <MudDateRangePicker 
+                                Class="ma-auto"
+                                Rounded ="true"
+                                Elevation="25"
+                                StartMonth="TransactionService.DateRange.Start" 
+                                @bind-DateRange="TransactionService.DateRange" 
+                                ShowWeekNumbers = "true" 
+                                Color="Color.Primary" 
+                                PickerVariant="PickerVariant.Dialog" 
+                                AdornmentColor="Color.Primary" 
+                                IconSize="Size.Medium" />
                         </MudToolBar>
                     </MudPaper>
                 </MudItem>
@@ -40,10 +51,10 @@
                 <MudItem xs="12" sm="6" md="3">
                     <MudPaper Elevation="25" Class="rounded-xl">
                         <MudToolBar>
-                            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" OnClick="InitializeOverview"/>
+                            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" />
                             <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
                             <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" />
-                            <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" OnClick="StateChanged" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit"  />
                         </MudToolBar>
                     </MudPaper>
                 </MudItem>
@@ -123,7 +134,7 @@
                         <MudItem xs="12">
                             <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 499px;">
                                 <MudText Typo="Typo.h5">Recent transactions</MudText>
-                                <MudTable Items="@RecentTransactions.Take(RecentTransactions.Count())" Hover="true" Dense="true" Striped="true" Loading="@LoadingRecentTransactions" Breakpoint="Breakpoint.Sm"  OnRowClick="RowClickEvent" T="Transaction">
+                                <MudTable Items="TransactionService.UserTransactions.Take(TransactionService.UserTransactions.Count())" Hover="true" Dense="true" Striped="true" Loading="@LoadingRecentTransactions" Breakpoint="Breakpoint.Sm"  OnRowClick="RowClickEvent" T="Transaction">
                                 <HeaderContent>
                                     <MudTh>Date</MudTh>
                                     <MudTh>Source</MudTh>
@@ -150,31 +161,25 @@
 </AuthorizeView>
 
 @code {
-    private List<Transaction> UserTransactions = new();
 
     /* Date picker*/
-    DateRange _dateRange = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
 
     protected override async Task OnInitializedAsync()
     {
-    UserTransactions = await TransactionService.FetchUserTransactionsFromAPI();
-        RecentTransactions = null;
-        LoadRecentTransactionsData();
-        StateChanged();
+        TransactionService.OnChange += StateHasChanged;
+        bool dataReady = await TransactionService.GetAllUserTransactions();
+        if (dataReady)
+        {
+            LoadingRecentTransactions = false;
+        }
+
     }
 
-    private async void InitializeOverview()
+    public void Dispose()
     {
-        UserTransactions = await TransactionService.FetchUserTransactionsFromAPI();
-        RecentTransactions = null;
-        LoadRecentTransactionsData();
-        StateChanged();
+        TransactionService.OnChange -= StateHasChanged;
     }
 
-    private void StateChanged()
-    {
-        StateHasChanged();
-    }
 
 
     /* Notifications */
@@ -259,19 +264,7 @@
 
     /* Recent transactions */
     private bool LoadingRecentTransactions { get; set; } = true;
-    private List<Transaction> RecentTransactions = new();
 
-    public async void LoadRecentTransactionsData()
-    {
-        RecentTransactions = UserTransactions.FindAll(e => 
-            DateOnly.FromDateTime(DateTime.Parse(e.MadeAt)) >= DateOnly.FromDateTime(_dateRange.Start.Value) 
-            && 
-           DateOnly.FromDateTime(DateTime.Parse(e.MadeAt)) <= DateOnly.FromDateTime(_dateRange.End.Value)); 
-        
-        //RecentTransactions = UserTransactions;
-        LoadingRecentTransactions = false;
-        StateHasChanged();
-    }    
 
     private void RowClickEvent(TableRowClickEventArgs<Transaction> tableRowClickEventArgs)
     {
@@ -283,7 +276,6 @@
         {
             LoadingRecentTransactions = true;
         }
-
     }
 
 

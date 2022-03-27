@@ -8,19 +8,15 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
-        private List<Transaction> _UserTransactions;
-        private DateRange _dateRange { get; set; }
-        public List<Transaction> UserTransactions { get => _UserTransactions; set => _UserTransactions = value; }
+        private List<Transaction> _UserTransactions { get; set; }
+        public DateRange DateRange { get; set; } = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
+        public List<Transaction> UserTransactions { get; set; } = new List<Transaction>();
         public event Action OnChange;
 
         public TransactionService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
-            //UserTransactions = FetchUserTransactionsFromAPI().Result;
-            //_dateRange = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
-            //FilterTransactionsFromDateRange(_dateRange, UserTransactions);
-            //OnChange?.Invoke();
         }
 
  
@@ -45,26 +41,30 @@ namespace BmeBlazorServer.Services
                 return null;
         }
 
-        public async Task<List<Transaction>> GetAllUserTransactions()
+        public async Task<bool> GetAllUserTransactions()
         {
-            return null;
+            while(_UserTransactions == null)
+            {
+                _UserTransactions = await FetchUserTransactionsFromAPI();
+            }
+            FilterTransactionsFromDateRange(DateRange);
+            UserTransactions = _UserTransactions;
+            return true;
         }
-        private void FilterTransactionsFromDateRange(DateRange range, List<Transaction> list)
+        private void FilterTransactionsFromDateRange(DateRange range)
         {
-            list = UserTransactions.FindAll(e =>
+            UserTransactions =  _UserTransactions.FindAll(e =>
             DateOnly.FromDateTime(DateTime.Parse(e.MadeAt)) >= DateOnly.FromDateTime(range.Start.Value)
             &&
-            DateOnly.FromDateTime(DateTime.Parse(e.MadeAt)) <= DateOnly.FromDateTime(range.End.Value));
-        }
-
-        public DateRange GetDateRange()
-        {
-            return _dateRange;
+            DateOnly.FromDateTime(DateTime.Parse(e.MadeAt)) <= DateOnly.FromDateTime(range.End.Value)
+            );
         }
 
         public void SetDateRange(DateRange dateRange)
         {
-            _dateRange = dateRange;
+            DateRange = dateRange;
+            FilterTransactionsFromDateRange(DateRange);
+            OnChange?.Invoke();
         }
     }
 }
