@@ -1,9 +1,9 @@
 ﻿@page "/overview"
 @using BmeModels;
-@using BmeBlazorServer.Services;
-@inject ISnackbar Snackbar;
-@inject IUserService UserService;
-@inject ITransactionService TransactionService;
+@using BmeBlazorServer.Services
+@inject ISnackbar Snackbar
+@inject IUserService UserService
+@inject ITransactionService TransactionService
 @implements IDisposable
 
 <PageTitle>Overview</PageTitle>
@@ -161,7 +161,7 @@
 </AuthorizeView>
 
 @code {
-
+    
     /* Date picker*/
 
     protected override async Task OnInitializedAsync()
