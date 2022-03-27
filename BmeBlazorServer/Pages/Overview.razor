@@ -3,6 +3,7 @@
 @using BmeBlazorServer.Services
 @inject ISnackbar Snackbar
 @inject IUserService UserService
+@inject AuthenticationStateProvider AuthStateProvider
 @inject ITransactionService TransactionService
 @implements IDisposable
 
@@ -24,8 +25,6 @@
                     <MudPaper Elevation="25" Class="rounded-xl">
                         <MudToolBar>
                             <MudDateRangePicker 
-                                Class="ma-auto"
-                                Rounded ="true"
                                 Elevation="25"
                                 StartMonth="TransactionService.DateRange.Start" 
                                 @bind-DateRange="TransactionService.DateRange" 
@@ -39,10 +38,11 @@
                     </MudPaper>
                 </MudItem>
 
-                 <!-- Search -->
+                 <!-- Balance -->
                 <MudItem xs="12" sm="6" md="3">
                     <MudPaper Elevation="25" Class="rounded-xl">
                         <MudToolBar>
+                            <MudText Style="margin-right:10px">Balance</MudText>
                             <MudProgressLinear Color="Color.Primary" Size="Size.Large" Value="75" />
                         </MudToolBar>
                     </MudPaper>
@@ -66,7 +66,7 @@
                         <MudItem xs="12" sm="12" md="12">
                             <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 125px;">
                                 <MudText Typo="Typo.h5">Notifications</MudText>
-                                <MudText Typo="Typo.body1">Welcome Kasper Baun !</MudText>
+                                <MudText Typo="Typo.body1">Welcome @UserService.UserName !</MudText>
                                 <MudText Typo="Typo.body1">Last time you logged on was 17th feb. 15:36</MudText>
                             </MudPaper>
                         </MudItem>
@@ -162,18 +162,18 @@
 </AuthorizeView>
 
 @code {
-    
+
     /* Date picker*/
 
     protected override async Task OnInitializedAsync()
     {
+        UserService.ParseLoggedInUserName();
         TransactionService.OnChange += StateHasChanged;
         bool dataReady = await TransactionService.GetAllUserTransactions();
         if (dataReady)
         {
             LoadingRecentTransactions = false;
         }
-
     }
 
     public void Dispose()
@@ -201,7 +201,6 @@
     public List<ChartSeries> Income = new List<ChartSeries>()
     {
         new ChartSeries() { Name = "Income", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15, 99, 83, 96 } },
-        new ChartSeries() { Name = "Expense", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31, 60, 37, 49 } },
     };
     public string[] IncomeLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 

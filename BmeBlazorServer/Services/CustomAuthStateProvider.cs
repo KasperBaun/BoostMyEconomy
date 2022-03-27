@@ -6,7 +6,6 @@ namespace BmeBlazorServer.Services
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
         private readonly ILocalStorageService _localStorage;
-
         public CustomAuthStateProvider (ILocalStorageService localStorage)
         {
             _localStorage = localStorage;
@@ -23,7 +22,6 @@ namespace BmeBlazorServer.Services
                 // TODO: Handle when the token expires
                 IEnumerable<Claim> claimsList = ParseClaimsFromJwt(token);
                 identity = new ClaimsIdentity(claimsList, "jwt");
-                
             }
 
             var user = new ClaimsPrincipal(identity);
@@ -34,6 +32,7 @@ namespace BmeBlazorServer.Services
 
             return state;
         }
+
         public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
             var payload = jwt.Split('.')[1];

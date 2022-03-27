@@ -1,18 +1,34 @@
 ﻿using BmeModels;
 using Newtonsoft.Json;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace BmeBlazorServer.Services
 {
     public class UserService : IUserService
     {
         private readonly HttpClient httpClient;
-
         private readonly ILocalStorageService localStorageService;
+        public string UserName { get; set; }
+        public event Action OnChange;
 
         public UserService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
+        }
+
+        public async void ParseLoggedInUserName()
+        {
+            var token = await localStorageService.GetItemAsync<string>("token");
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token);
+            var tokenS = jsonToken as JwtSecurityToken;
+            var nameClaim = tokenS.Claims.Where(x => x.Type == ClaimTypes.Name).FirstOrDefault();
+            var username = nameClaim.Value;
+            Console.WriteLine("$UserService.cs - Username: "+ username);
+            UserName = username;
+            OnChange?.Invoke();
         }
 
         /* Get all users */
