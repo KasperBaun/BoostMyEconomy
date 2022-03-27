@@ -157,7 +157,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-    UserTransactions = await TransactionService.GetAllUserTransactions();
+    UserTransactions = await TransactionService.FetchUserTransactionsFromAPI();
         RecentTransactions = null;
         LoadRecentTransactionsData();
         StateChanged();
@@ -165,7 +165,7 @@
 
     private async void InitializeOverview()
     {
-        UserTransactions = await TransactionService.GetAllUserTransactions();
+        UserTransactions = await TransactionService.FetchUserTransactionsFromAPI();
         RecentTransactions = null;
         LoadRecentTransactionsData();
         StateChanged();

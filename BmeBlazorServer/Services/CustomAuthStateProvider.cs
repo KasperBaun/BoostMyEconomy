@@ -20,7 +20,10 @@ namespace BmeBlazorServer.Services
 
             if (!string.IsNullOrEmpty(token))
             { 
-                identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
+                // TODO: Handle when the token expires
+                IEnumerable<Claim> claimsList = ParseClaimsFromJwt(token);
+                identity = new ClaimsIdentity(claimsList, "jwt");
+                
             }
 
             var user = new ClaimsPrincipal(identity);
