@@ -72,7 +72,7 @@
                         <MudToolBar>
                             <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" />
                             <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
-                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" OnClick = "OverviewService.GetAllUserTransactions"/>
+                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" OnClick = "OverviewService.InitializeOverviewService"/>
                             <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" OnClick="StateHasChanged"  />
                         </MudToolBar>
                     </MudPaper>
@@ -92,13 +92,12 @@
                         <!--Income-->
                         <MudItem xs="12" sm="12" md="5">
                             <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 300px;">
-                                <div class="d-flex"><MudText Typo="Typo.h5" Style="margin-left:0px;">Income</MudText> <MudText Color="Color.Primary"Typo="Typo.h5" Style="margin-left:auto;">Sum: @OverviewService.SumIncomeForYear</MudText></div>
+                                <div class="d-flex"><MudText Typo="Typo.h5" Style="margin-left:0px;">Income</MudText> <MudText Color="Color.Primary"Typo="Typo.h5" Style="margin-left:auto;">Sum: @OverviewService.SumIncomeForYear.000</MudText></div>
                                 <MudChart 
                                     LegendPosition ="Position.Bottom"
                                     ChartType="ChartType.Bar" 
                                     ChartSeries="OverviewService.IncomeForYear" 
                                     XAxisLabels="@IncomeLabels"
-                           
                                     ChartOptions="@IncomeOptions"
                                     />
                             </MudPaper>
@@ -209,7 +208,7 @@
         {
             UserService.ParseLoggedInUserName();
             OverviewService.OnChange += StateHasChanged;
-            bool dataReady = await OverviewService.GetAllUserTransactions();
+            bool dataReady = await OverviewService.InitializeOverviewService();
             if (dataReady)
             {
                 LoadingRecentTransactions = false;
@@ -237,10 +236,8 @@
 
     private ChartOptions IncomeOptions = new ChartOptions()
     {
-        //DisableLegend = true,
-        LineStrokeWidth = 30,
-        InterpolationOption = InterpolationOption.EndSlope,
-        YAxisFormat = "c2"
+        DisableLegend = true,
+        LineStrokeWidth = 5
     };
     public string[] IncomeLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
   
@@ -257,7 +254,7 @@
     };
     public List<ChartSeries> IncomeExpense = new List<ChartSeries>()
     {
-        new ChartSeries() { Name = "Income", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70, 86,93,79 } },
+        new ChartSeries() { Name = "Income", Data = new double[] { 0, 0, 90100, 0, 0, 0, 0, 0, 0, 0,0,0 } },
         new ChartSeries() { Name = "Expense", Data = new double[] { 10, 41, 35, 51, 49, 62, 69, 91, 148, 89, 86, 99 } },
     };
     public string[] IncomeExpenseLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };

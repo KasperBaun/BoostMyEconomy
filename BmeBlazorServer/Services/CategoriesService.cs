@@ -1,7 +1,5 @@
 ﻿using BmeModels;
 using Newtonsoft.Json;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace BmeBlazorServer.Services
 {
@@ -18,21 +16,11 @@ namespace BmeBlazorServer.Services
             localStorageService = _localStorageService;
         }
 
-        public async void ParseLoggedInUserName()
-        {
-            var token = await localStorageService.GetItemAsync<string>("token");
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token);
-            var tokenS = jsonToken as JwtSecurityToken;
-            var nameClaim = tokenS.Claims.Where(x => x.Type == ClaimTypes.Name).FirstOrDefault();
-            var username = nameClaim.Value;
-            OnChange?.Invoke();
-        }
 
-        /* Get all users */
-        public async Task<List<User>> GetUsers()
+        /* Get all categories */
+        public async Task<List<Category>> GetCategories()
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/User/All");
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Categories/All");
             var token =  await localStorageService.GetItemAsync<string>("token");
             requestMessage.Headers.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -42,16 +30,16 @@ namespace BmeBlazorServer.Services
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                return await Task.FromResult(JsonConvert.DeserializeObject<List<User>>(responseBody));
+                return await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(responseBody));
             }
             else
                 return null;
         }
 
-        /* Delete user */
-        public async Task<HttpResponseMessage> DeleteUser(int userId)
+        /* Delete category */
+        public async Task<HttpResponseMessage> DeleteCategory(int categoryId)
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, requestUri: "api/User/"+userId);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, requestUri: "api/Categories/"+ categoryId);
             var token = await localStorageService.GetItemAsync<string>("token");
             requestMessage.Headers.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -60,12 +48,13 @@ namespace BmeBlazorServer.Services
             return response;
         }
 
-        public async Task<HttpResponseMessage> UpdateUser(User user)
+        /* Update category */
+        public async Task<HttpResponseMessage> UpdateCategory(Category category)
         {   /*
             var response = await httpClient.PutAsJsonAsync("api/Users", user);
             return await response.Content.ReadFromJsonAsync<HttpResponseMessage>();
             */
-            return await httpClient.PutAsJsonAsync("api/User/", user);
+            return await httpClient.PutAsJsonAsync("api/Categories/", category);
         }
 
     }
