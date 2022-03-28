@@ -16,7 +16,12 @@ builder.Services.AddHttpClient<IUserService, UserService>(client =>
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
 }).AddHttpMessageHandler<ValidateHeaderHandler>();
 
-builder.Services.AddHttpClient<ITransactionService, TransactionService>(client =>
+builder.Services.AddHttpClient<ICategoriesService, CategoriesService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
+}).AddHttpMessageHandler<ValidateHeaderHandler>();
+
+builder.Services.AddHttpClient<IOverviewService, OverviewService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
 }).AddHttpMessageHandler<ValidateHeaderHandler>();

@@ -3,17 +3,16 @@ using MudBlazor;
 
 namespace BmeBlazorServer.Services
 {
-    public interface ITransactionService
+    public interface IOverviewService
     {
-        
+        public double SumIncomeForYear { get; set; }
         int Balance { get; set; }
         event Action OnChange;
         List<Transaction> UserTransactionsForPeriod { get; set; }
-        List<Transaction> IncomeTransactionsForPeriod { get; set; }
+        List<ChartSeries> IncomeForYear { get; set; }
         List<Transaction> ExpenseTransactionsForPeriod { get; set; }
-        Task<List<Transaction>> FetchUserTransactionsFromAPI();
-        Task<bool> GetAllUserTransactions();
-        DateRange DateRange { get; set; }
+        Task<bool> InitializeOverviewService();
+        DateTime? YearSelected { get; set; }
         void PeriodChanged();
 
 

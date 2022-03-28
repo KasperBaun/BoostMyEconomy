@@ -4,7 +4,7 @@
 @inject ISnackbar Snackbar
 @inject IUserService UserService
 @inject AuthenticationStateProvider AuthStateProvider
-@inject ITransactionService TransactionService
+@inject IOverviewService OverviewService
 @implements IDisposable
 
 <PageTitle>Overview</PageTitle>
@@ -27,25 +27,31 @@
                             <!--
                             <MudDateRangePicker 
                                 Elevation="25"
-                                StartMonth="TransactionService.DateRange.Start" 
-                                @bind-DateRange="TransactionService.DateRange"
+                                StartMonth="OverviewService.DateRange.Start" 
+                                @bind-DateRange="OverviewService.DateRange"
                                 OpenTo="OpenTo.Year"
                                 FixDay="1"
                                 FixMonth="1"
                                 ShowWeekNumbers = "true" 
                                 Color="Color.Primary" 
                                 PickerVariant="PickerVariant.Dialog"
-                                PickerClosed="TransactionService.PeriodChanged"
+                                PickerClosed="OverviewService.PeriodChanged"
                                 AdornmentColor="Color.Primary" 
                                 IconSize="Size.Medium" />
                             -->
                             <MudDatePicker  
-                                @bind-Date="_year"
+                                @bind-Date="OverviewService.YearSelected"
                                 OpenTo="OpenTo.Year" 
                                 FixMonth="@DateTime.Today.Month" 
                                 FixDay="@DateTime.Today.Day" 
                                 DateFormat="yyyy"
-                                TitleDateFormat="yyyy"/>
+                                TitleDateFormat="yyyy"
+                                Color="Color.Primary" 
+                                PickerVariant="PickerVariant.Dialog"
+                                PickerClosed="OverviewService.PeriodChanged"
+                                AdornmentColor="Color.Primary" 
+                                IconSize="Size.Medium"
+                                />
                         </MudToolBar>
                     </MudPaper>
                 </MudItem>
@@ -55,7 +61,7 @@
                     <MudPaper Elevation="25" Class="rounded-xl">
                         <MudToolBar>
                             <MudText Style="margin-right:10px">Balance</MudText>
-                            <MudProgressLinear Color="Color.Primary" Size="Size.Large" Value="TransactionService.Balance" />
+                            <MudProgressLinear Color="Color.Primary" Size="Size.Large" Value="OverviewService.Balance" />
                         </MudToolBar>
                     </MudPaper>
                 </MudItem>
@@ -66,7 +72,7 @@
                         <MudToolBar>
                             <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" />
                             <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
-                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" OnClick = "TransactionService.GetAllUserTransactions"/>
+                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" OnClick = "OverviewService.GetAllUserTransactions"/>
                             <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" OnClick="StateHasChanged"  />
                         </MudToolBar>
                     </MudPaper>
@@ -86,9 +92,15 @@
                         <!--Income-->
                         <MudItem xs="12" sm="12" md="5">
                             <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 300px;">
-                                <div class="d-flex"><MudText Typo="Typo.h5" Style="margin-left:0px;">Income</MudText> <MudText Color="Color.Primary"Typo="Typo.h5" Style="margin-left:auto;">Sum: 254.000</MudText></div>
-                                <MudChart ChartType="ChartType.Bar" ChartSeries="@Income" @bind-SelectedIndex="Index"
-                                    XAxisLabels="@IncomeLabels" Width="100%" Height="100%" ChartOptions="@IncomeOptions"></MudChart>
+                                <div class="d-flex"><MudText Typo="Typo.h5" Style="margin-left:0px;">Income</MudText> <MudText Color="Color.Primary"Typo="Typo.h5" Style="margin-left:auto;">Sum: @OverviewService.SumIncomeForYear</MudText></div>
+                                <MudChart 
+                                    LegendPosition ="Position.Bottom"
+                                    ChartType="ChartType.Bar" 
+                                    ChartSeries="OverviewService.IncomeForYear" 
+                                    XAxisLabels="@IncomeLabels"
+                           
+                                    ChartOptions="@IncomeOptions"
+                                    />
                             </MudPaper>
                         </MudItem>
 
@@ -151,7 +163,7 @@
                                 <MudSwitch @bind-Checked="@striped" Color="Color.Primary" Class="ml-1">Striped</MudSwitch>
                                 </div>
                                 <MudTable 
-                                    Items="TransactionService.UserTransactionsForPeriod.Take(12)"
+                                    Items="OverviewService.UserTransactionsForPeriod.Take(12)"
                                     Height="411px"
                                     Hover="true" 
                                     Dense="@dense"
@@ -190,15 +202,14 @@
 
 @code {
     /* Date picker*/
-    DateTime? _year = DateTime.Now;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             UserService.ParseLoggedInUserName();
-            TransactionService.OnChange += StateHasChanged;
-            bool dataReady = await TransactionService.GetAllUserTransactions();
+            OverviewService.OnChange += StateHasChanged;
+            bool dataReady = await OverviewService.GetAllUserTransactions();
             if (dataReady)
             {
                 LoadingRecentTransactions = false;
@@ -212,7 +223,7 @@
 
     public void Dispose()
     {
-        TransactionService.OnChange -= StateHasChanged;
+        OverviewService.OnChange -= StateHasChanged;
     }
 
 
@@ -226,17 +237,14 @@
 
     private ChartOptions IncomeOptions = new ChartOptions()
     {
-        DisableLegend = true,
-        LineStrokeWidth = 5,
+        //DisableLegend = true,
+        LineStrokeWidth = 30,
         InterpolationOption = InterpolationOption.EndSlope,
         YAxisFormat = "c2"
     };
-
-    public List<ChartSeries> Income = new List<ChartSeries>()
-    {
-        new ChartSeries() { Name = "Income", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15, 99, 83, 96 } },
-    };
     public string[] IncomeLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+  
+
 
     /* Income & total expenses */
 

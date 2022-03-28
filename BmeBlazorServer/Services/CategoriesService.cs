@@ -5,14 +5,14 @@ using System.Security.Claims;
 
 namespace BmeBlazorServer.Services
 {
-    public class UserService : IUserService
+    public class CategoriesService : ICategoriesService
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
-        public string UserName { get; set; }
+        public List<Category> Categories { get; set; }
         public event Action OnChange;
 
-        public UserService(HttpClient _httpClient, ILocalStorageService _localStorageService)
+        public CategoriesService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
@@ -26,8 +26,6 @@ namespace BmeBlazorServer.Services
             var tokenS = jsonToken as JwtSecurityToken;
             var nameClaim = tokenS.Claims.Where(x => x.Type == ClaimTypes.Name).FirstOrDefault();
             var username = nameClaim.Value;
-            //Console.WriteLine("$UserService.cs - Username: "+ username);
-            UserName = username;
             OnChange?.Invoke();
         }
 

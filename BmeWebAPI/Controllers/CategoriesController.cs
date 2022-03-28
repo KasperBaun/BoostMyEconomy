@@ -7,49 +7,48 @@ namespace BmeWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class CategoriesController : ControllerBase
     {
         private readonly BmeDbContext _context;
 
-        public UserController(BmeDbContext context)
+        public CategoriesController(BmeDbContext context)
         {
             _context = context;
         }
-
-        // GET: api/Users/All
-        [Authorize(Roles ="Admin")]
+        // GET: api/Categories
+        [Authorize(Roles = "Admin,User")]
         [HttpGet("All")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<Category>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Categories.ToListAsync();
         }
 
-        // GET: api/User/5
+        // GET: api/Categories/5
         [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<Category>> GetCategory(int categoryId)
         {
-            var user = await _context.Users.FindAsync(id);
+            var category = await _context.Categories.FindAsync(categoryId);
 
-            if (user == null)
+            if (category == null)
             {
                 return NotFound();
             }
 
-            return user;
+            return category;
         }
 
-        // PUT: api/Users/5
+        // PUT: api/Categories/5
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutCategory(int categoryId, Category category)
         {
-            if (id != user.Id)
+            if (categoryId != category.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            _context.Entry(categoryId).State = EntityState.Modified;
 
             try
             {
@@ -57,7 +56,7 @@ namespace BmeWebAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserIdExists(id))
+                if (!CategoryIdExists(categoryId))
                 {
                     return NotFound();
                 }
@@ -70,25 +69,25 @@ namespace BmeWebAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/User/5
+        // DELETE: api/Categories/5
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteCategory(int categoryId)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var category = await _context.Categories.FindAsync(categoryId);
+            if (category == null)
             {
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
+            _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
-        private bool UserIdExists(int id)
+        private bool CategoryIdExists(int categoryId)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _context.Categories.Any(e => e.Id == categoryId);
         }
     }
 }

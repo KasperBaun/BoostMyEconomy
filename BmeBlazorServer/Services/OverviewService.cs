@@ -4,27 +4,28 @@ using Newtonsoft.Json;
 
 namespace BmeBlazorServer.Services
 {
-    public class TransactionService : ITransactionService
+    public class OverviewService : IOverviewService
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
-        private List<Transaction> _AllUserTransactions { get; set; }
-        public DateRange DateRange { get; set; } = new DateRange(new DateTime(DateTime.Now.Year, 1, 1), DateTime.Now.Date);
+        private List<Transaction> AllUserTransactions { get; set; }
+        private List<Category> AllCategories { get; set; }
+        public DateTime? YearSelected { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
         public List<Transaction> UserTransactionsForPeriod { get; set; } = new List<Transaction>();
-        public List<Transaction> IncomeTransactionsForPeriod { get; set; } = new List<Transaction>();
+        public List<ChartSeries> IncomeForYear { get; set; }
+        public double SumIncomeForYear { get; set; }
         public List <Transaction> ExpenseTransactionsForPeriod { get; set; } = new List<Transaction>();
         public int Balance { get; set; } = 1;
 
         public event Action OnChange;
 
-        public TransactionService(HttpClient _httpClient, ILocalStorageService _localStorageService)
+        public OverviewService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
         }
- 
-        // StartMonth="@DateTime.Now.AddMonths(-1)"
-        public async Task<List<Transaction>> FetchUserTransactionsFromAPI()
+
+        private async void FetchUserTransactionsFromAPI()
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Transaction/All");
             var token = await localStorageService.GetItemAsync<string>("token");
@@ -36,22 +37,41 @@ namespace BmeBlazorServer.Services
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                return await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
+                AllUserTransactions = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
             }
-            else
-                return null;
         }
-        public async Task<bool> GetAllUserTransactions()
+
+        private async void FetchCategoriesFromAPI()
         {
-            while(_AllUserTransactions == null)
+            /*
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Transaction/All");
+            var token = await localStorageService.GetItemAsync<string>("token");
+            requestMessage.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await httpClient.SendAsync(requestMessage);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                _AllUserTransactions = await FetchUserTransactionsFromAPI();
+                var responseBody = await response.Content.ReadAsStringAsync();
+                AllUserTransactions = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
             }
-            UserTransactionsForPeriod = FilterTransactionsFromDateRange(DateRange);
+            */
+        }
+
+
+        public async Task<bool> InitializeOverviewService()
+        {
+            while(AllUserTransactions == null)
+            {
+                FetchUserTransactionsFromAPI();
+            }
+            UserTransactionsForPeriod = FilterTransactionsFromSelectedYear(YearSelected.Value);
             CalculateBalanceForPeriod();
+            SumIncomeForYear = CalculateSumForYear(IncomeForYear);
             return true;
         }
-        private List<Transaction> FilterTransactionsFromDateRange(DateRange range)
+        private List<Transaction> FilterTransactionsFromSelectedYear(DateTime yearSelected)
         {
             /*
             foreach(var transaction in _UserTransactions)
@@ -63,18 +83,14 @@ namespace BmeBlazorServer.Services
                     );
             }
             */
-            List<Transaction> list = new List<Transaction>();
-            list = _AllUserTransactions.Where(x =>
-            DateOnly.Parse(s: x.MadeAt) >= DateOnly.FromDateTime(range.Start.Value) 
-            &&
-            DateOnly.Parse(s: x.MadeAt) <= DateOnly.FromDateTime(range.End.Value)
-            ).ToList();
+            List<Transaction> list = new();
+            list = AllUserTransactions.Where(x => DateOnly.Parse(s: x.MadeAt).Year == yearSelected.Year).ToList();
             OnChange?.Invoke();
             return list;
         }
         public void PeriodChanged()
         {
-            UserTransactionsForPeriod = FilterTransactionsFromDateRange(DateRange);
+            UserTransactionsForPeriod = FilterTransactionsFromSelectedYear(YearSelected.Value);
             CalculateBalanceForPeriod();
             OnChange?.Invoke();
         }
@@ -101,9 +117,9 @@ namespace BmeBlazorServer.Services
         }
         private void IncomeForPeriod()
         {
-            IncomeTransactionsForPeriod = UserTransactionsForPeriod.Where(x =>
-            x.Type=="Income"
-            ).ToList();
+            List<Transaction> list = UserTransactionsForPeriod.Where(x => x.Type=="Income").ToList();
+            //for(int i = 0; i<)
+
         }
         private void ExpensesCurrentYear()
         {
@@ -111,5 +127,20 @@ namespace BmeBlazorServer.Services
             x.Type == "Expense"
             ).ToList();
         }
+
+        private double CalculateSumForYear(List<ChartSeries> list)
+        {
+            double sum = 0;
+            foreach(ChartSeries series in list)
+            {
+                sum = series.Data.ToList().Sum();
+            }
+            return sum;
+        }
     }
 }
+
+
+
+
+
