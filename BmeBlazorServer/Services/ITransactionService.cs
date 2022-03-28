@@ -8,7 +8,9 @@ namespace BmeBlazorServer.Services
         
         int Balance { get; set; }
         event Action OnChange;
-        List<Transaction> UserTransactions { get; set; }
+        List<Transaction> UserTransactionsForPeriod { get; set; }
+        List<Transaction> IncomeTransactionsForPeriod { get; set; }
+        List<Transaction> ExpenseTransactionsForPeriod { get; set; }
         Task<List<Transaction>> FetchUserTransactionsFromAPI();
         Task<bool> GetAllUserTransactions();
         DateRange DateRange { get; set; }

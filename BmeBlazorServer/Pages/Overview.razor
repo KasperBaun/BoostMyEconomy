@@ -24,16 +24,28 @@
                 <MudItem xs="12" sm="6" md="3">
                     <MudPaper Elevation="25" Class="rounded-xl">
                         <MudToolBar>
+                            <!--
                             <MudDateRangePicker 
                                 Elevation="25"
                                 StartMonth="TransactionService.DateRange.Start" 
-                                @bind-DateRange="TransactionService.DateRange" 
+                                @bind-DateRange="TransactionService.DateRange"
+                                OpenTo="OpenTo.Year"
+                                FixDay="1"
+                                FixMonth="1"
                                 ShowWeekNumbers = "true" 
                                 Color="Color.Primary" 
                                 PickerVariant="PickerVariant.Dialog"
                                 PickerClosed="TransactionService.PeriodChanged"
                                 AdornmentColor="Color.Primary" 
                                 IconSize="Size.Medium" />
+                            -->
+                            <MudDatePicker  
+                                @bind-Date="_year"
+                                OpenTo="OpenTo.Year" 
+                                FixMonth="@DateTime.Today.Month" 
+                                FixDay="@DateTime.Today.Day" 
+                                DateFormat="yyyy"
+                                TitleDateFormat="yyyy"/>
                         </MudToolBar>
                     </MudPaper>
                 </MudItem>
@@ -139,7 +151,7 @@
                                 <MudSwitch @bind-Checked="@striped" Color="Color.Primary" Class="ml-1">Striped</MudSwitch>
                                 </div>
                                 <MudTable 
-                                    Items="TransactionService.UserTransactions.Take(12)"
+                                    Items="TransactionService.UserTransactionsForPeriod.Take(12)"
                                     Height="411px"
                                     Hover="true" 
                                     Dense="@dense"
@@ -177,8 +189,8 @@
 </AuthorizeView>
 
 @code {
-
     /* Date picker*/
+    DateTime? _year = DateTime.Now;
 
     protected override async Task OnInitializedAsync()
     {

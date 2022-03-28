@@ -8,13 +8,11 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
-        private List<Transaction> _UserTransactions { get; set; }
-        private List<Transaction> _IncomeTransactions { get; set; } 
-        private List<Transaction> _ExpenseTransactions { get; set; } 
+        private List<Transaction> _AllUserTransactions { get; set; }
         public DateRange DateRange { get; set; } = new DateRange(new DateTime(DateTime.Now.Year, 1, 1), DateTime.Now.Date);
-        public List<Transaction> UserTransactions { get; set; } = new List<Transaction>();
-        public List<Transaction> IncomeTransactions { get; set; } = new List<Transaction>();
-        public List <Transaction> ExpenseTransactions { get; set; } = new List<Transaction>();
+        public List<Transaction> UserTransactionsForPeriod { get; set; } = new List<Transaction>();
+        public List<Transaction> IncomeTransactionsForPeriod { get; set; } = new List<Transaction>();
+        public List <Transaction> ExpenseTransactionsForPeriod { get; set; } = new List<Transaction>();
         public int Balance { get; set; } = 1;
 
         public event Action OnChange;
@@ -45,16 +43,15 @@ namespace BmeBlazorServer.Services
         }
         public async Task<bool> GetAllUserTransactions()
         {
-            while(_UserTransactions == null)
+            while(_AllUserTransactions == null)
             {
-                _UserTransactions = await FetchUserTransactionsFromAPI();
+                _AllUserTransactions = await FetchUserTransactionsFromAPI();
             }
-            UserTransactions = _UserTransactions;
-            FilterTransactionsFromDateRange(DateRange);
+            UserTransactionsForPeriod = FilterTransactionsFromDateRange(DateRange);
             CalculateBalanceForPeriod();
             return true;
         }
-        private void FilterTransactionsFromDateRange(DateRange range)
+        private List<Transaction> FilterTransactionsFromDateRange(DateRange range)
         {
             /*
             foreach(var transaction in _UserTransactions)
@@ -66,27 +63,29 @@ namespace BmeBlazorServer.Services
                     );
             }
             */
-            UserTransactions = _UserTransactions.Where(x =>
+            List<Transaction> list = new List<Transaction>();
+            list = _AllUserTransactions.Where(x =>
             DateOnly.Parse(s: x.MadeAt) >= DateOnly.FromDateTime(range.Start.Value) 
             &&
             DateOnly.Parse(s: x.MadeAt) <= DateOnly.FromDateTime(range.End.Value)
             ).ToList();
             OnChange?.Invoke();
+            return list;
         }
         public void PeriodChanged()
         {
-            FilterTransactionsFromDateRange(DateRange);
+            UserTransactionsForPeriod = FilterTransactionsFromDateRange(DateRange);
             CalculateBalanceForPeriod();
             OnChange?.Invoke();
         }
         private void CalculateBalanceForPeriod()
         {
             List<Transaction> incomeForPeriod =
-                UserTransactions.Where(x => x.Type == "Income").ToList();
+                UserTransactionsForPeriod.Where(x => x.Type == "Income").ToList();
             int income = incomeForPeriod.Sum(x => x.Value);
 
             List<Transaction> expensesForPeriod =
-                UserTransactions.Where(x => x.Type == "Expense").ToList();
+                UserTransactionsForPeriod.Where(x => x.Type == "Expense").ToList();
             int expenses = expensesForPeriod.Sum(x => x.Value);
           
             //int result = (((income+expenses)*100/income));
@@ -99,6 +98,18 @@ namespace BmeBlazorServer.Services
             {
                 Balance = (income + expenses) * 100 / income;
             }
+        }
+        private void IncomeForPeriod()
+        {
+            IncomeTransactionsForPeriod = UserTransactionsForPeriod.Where(x =>
+            x.Type=="Income"
+            ).ToList();
+        }
+        private void ExpensesCurrentYear()
+        {
+            ExpenseTransactionsForPeriod = UserTransactionsForPeriod.Where(x =>
+            x.Type == "Expense"
+            ).ToList();
         }
     }
 }
