@@ -8,9 +8,13 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
-        private List<Transaction> _UserTransactions { get; set; }
-        public DateRange DateRange { get; set; } = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
+        private List<Transaction> _UserTransactions { get; set; } = new List<Transaction>();
+        private List<Transaction> _IncomeTransactions { get; set; } = new List<Transaction>();
+        private List<Transaction> _ExpenseTransactions { get; set; } = new List<Transaction>();
+        public DateRange DateRange { get; set; } = new DateRange(new DateTime(DateTime.Now.Year, 1, 1), DateTime.Now.Date);
         public List<Transaction> UserTransactions { get; set; } = new List<Transaction>();
+        public List<Transaction> IncomeTransactions { get; set; } = new List<Transaction>();
+        public List <Transaction> ExpenseTransactions { get; set; } = new List<Transaction>();
         public int Balance { get; set; } = 1;
 
         public event Action OnChange;
@@ -20,11 +24,8 @@ namespace BmeBlazorServer.Services
             httpClient = _httpClient;
             localStorageService = _localStorageService;
         }
-
  
         // StartMonth="@DateTime.Now.AddMonths(-1)"
-
-
         public async Task<List<Transaction>> FetchUserTransactionsFromAPI()
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Transaction/All");
@@ -42,7 +43,6 @@ namespace BmeBlazorServer.Services
             else
                 return null;
         }
-
         public async Task<bool> GetAllUserTransactions()
         {
             while(_UserTransactions == null)
@@ -63,14 +63,12 @@ namespace BmeBlazorServer.Services
             ).ToList();
             OnChange?.Invoke();
         }
-
         public void PeriodChanged()
         {
             FilterTransactionsFromDateRange(DateRange);
             CalculateBalanceForPeriod();
             OnChange?.Invoke();
         }
-
         private void CalculateBalanceForPeriod()
         {
             List<Transaction> incomeForPeriod =
@@ -80,9 +78,10 @@ namespace BmeBlazorServer.Services
             List<Transaction> expensesForPeriod =
                 UserTransactions.Where(x => x.Type == "Expense").ToList();
             int expenses = expensesForPeriod.Sum(x => x.Value);
-            int result = (((income+expenses)*100/income));
+          
+            //int result = (((income+expenses)*100/income));
             //Console.WriteLine("$TransactionService.cs - Income: {0}, Expenses: {1}, Income+Expenses: {2}, Balance: {3}", income, expenses, (income+expenses), result);   
-            if(expenses == 0)
+            if (income == 0)
             {
                 Balance = 0;
             }

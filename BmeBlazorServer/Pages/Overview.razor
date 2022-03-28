@@ -64,7 +64,7 @@
                     <MudGrid>
                          <!-- Notifications -->
                         <MudItem xs="12" sm="12" md="12">
-                            <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 125px;">
+                            <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 125px;">
                                 <MudText Typo="Typo.h5">Notifications</MudText>
                                 <MudText Typo="Typo.body1">Welcome @UserService.UserName !</MudText>
                                 <MudText Typo="Typo.body1">Last time you logged on was 17th feb. 15:36</MudText>
@@ -73,8 +73,8 @@
 
                         <!--Income-->
                         <MudItem xs="12" sm="12" md="5">
-                            <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
-                                <MudText Typo="Typo.h5">Income</MudText>
+                            <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 300px;">
+                                <div class="d-flex"><MudText Typo="Typo.h5" Style="margin-left:0px;">Income</MudText> <MudText Color="Color.Primary"Typo="Typo.h5" Style="margin-left:auto;">Sum: 254.000</MudText></div>
                                 <MudChart ChartType="ChartType.Bar" ChartSeries="@Income" @bind-SelectedIndex="Index"
                                     XAxisLabels="@IncomeLabels" Width="100%" Height="100%" ChartOptions="@IncomeOptions"></MudChart>
                             </MudPaper>
@@ -82,7 +82,7 @@
 
                         <!--Income & total expenses-->
                        <MudItem xs="12" sm="12" md="4" >
-                            <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
+                            <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 300px;">
                                 <MudText Typo="Typo.h5">Income & total expenses</MudText>
                                 <MudChart ChartType="ChartType.Line" ChartSeries="@IncomeExpense" @bind-SelectedIndex="Index" 
                                     LegendPosition="Position.Right" XAxisLabels="@IncomeExpenseLabels" Width="100%" Height="100%" ChartOptions="@IncomeExpensesOptions"></MudChart>
@@ -91,7 +91,7 @@
 
                         <!--Result-->
                         <MudItem xs="12" sm="12" md="3" >
-                            <MudPaper Elevation="2" Class="rounded-xl pa-3 overflow-y-scroll" Style="height: 300px;" >
+                            <MudPaper Elevation="25" Class="rounded-xl pa-3 overflow-y-scroll" Style="height: 300px;" >
                                 <MudText Typo="Typo.h5">Result</MudText>
                                 <MudDataGrid Items="@Results.Take(Results.Count())" Bordered="true" Dense="true" Class="overflow-y-scroll">
                                     <Columns>
@@ -105,14 +105,14 @@
 
                         <!--Variable expenses-->
                         <MudItem xs="12" sm="12" md="6">
-                            <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 300px;">
+                            <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 300px;">
                                 <MudText Typo="Typo.h5">Variable expenses</MudText>
                                 <MudChart ChartType="ChartType.Line" ChartSeries="@VarExpenses" XAxisLabels="@VarExpensesLabels" Height="250px" ChartOptions="varExpensesOptions"></MudChart>
                             </MudPaper>
                         </MudItem>
                         <!--Categories-->
                         <MudItem xs="12" sm="12" md="6">
-                            <MudPaper Elevation="2" Class=" rounded-xl pa-3" Style="height: 300px;">
+                            <MudPaper Elevation="25" Class=" rounded-xl pa-3" Style="height: 300px;">
                                 <MudText Typo="Typo.h5">Categories</MudText>
                                 <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
                                     InputData="@data" InputLabels="@labels">
@@ -126,16 +126,28 @@
                     <MudGrid>
                         <!-- User info -->
                         <MudItem xs="12">
-                            <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 250px;">
+                            <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 250px;">
                                 <MudText Typo="Typo.h5">User information</MudText>
                             </MudPaper>
                         </MudItem>
 
                         <!-- Recent transactions -->
                         <MudItem xs="12">
-                            <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 499px;">
-                                <MudText Typo="Typo.h5">Recent transactions</MudText>
-                                <MudTable Items="TransactionService.UserTransactions.Take(TransactionService.UserTransactions.Count())" Hover="true" Dense="true" Striped="true" Loading="@LoadingRecentTransactions" Breakpoint="Breakpoint.Sm"  OnRowClick="RowClickEvent" T="Transaction">
+                            <MudPaper Elevation="25" Class="rounded-xl" Style="height: 499px;">
+                                <MudText Class="pa-3" Typo="Typo.h5">Recent transactions</MudText>
+                                <MudTable 
+                                    Items="TransactionService.UserTransactions.Take(15)"
+                                    Height="443px"
+                                    Hover="true" 
+                                    Dense="true"
+                                    Class="rounded-xl"
+                                    Striped="true" 
+                                    Elevation="25"
+                                    Style="margin:auto; overflow-y:hidden" 
+                                    Loading="@LoadingRecentTransactions" 
+                                    Breakpoint="Breakpoint.Sm"  
+                                    OnRowClick="RowClickEvent" 
+                                    T="Transaction">
                                 <HeaderContent>
                                     <MudTh>Date</MudTh>
                                     <MudTh>Source</MudTh>
