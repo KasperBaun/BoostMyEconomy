@@ -13,7 +13,7 @@ namespace BmeBlazorServer.Services
         public DateTime? YearSelected { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
         public List<Transaction> UserTransactionsForPeriod { get; set; } = new List<Transaction>();
         public List<ChartSeries> IncomeForYear { get; set; } = new();
-        public double SumIncomeForYear { get; set; }
+        public string SumIncomeForYear { get; set; }
         public List <Transaction> ExpenseTransactionsForPeriod { get; set; } = new List<Transaction>();
         public int Balance { get; set; } = 1;
 
@@ -130,14 +130,19 @@ namespace BmeBlazorServer.Services
             ).ToList();
         }
 
-        private double CalculateSumForYear(List<ChartSeries> list)
+        private string CalculateSumForYear(List<ChartSeries> list)
         {
             double sum = 0;
             foreach(ChartSeries series in list)
             {
                 sum = series.Data.ToList().Sum();
             }
-            return sum*1000;
+            //Console.WriteLine(sum);
+            int thousands = (int)sum;
+            int hundreds = (int)sum %10;
+            string result = thousands+"."+hundreds;
+
+            return result;
         }
     }
 }

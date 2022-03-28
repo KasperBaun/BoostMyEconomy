@@ -5,7 +5,7 @@ namespace BmeBlazorServer.Services
 {
     public interface IOverviewService
     {
-        public double SumIncomeForYear { get; set; }
+        public string SumIncomeForYear { get; set; }
         int Balance { get; set; }
         event Action OnChange;
         List<Transaction> UserTransactionsForPeriod { get; set; }
