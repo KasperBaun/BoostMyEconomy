@@ -134,14 +134,17 @@
                         <!-- Recent transactions -->
                         <MudItem xs="12">
                             <MudPaper Elevation="25" Class="rounded-xl" Style="height: 499px;">
-                                <MudText Class="pa-3" Typo="Typo.h5">Recent transactions</MudText>
+                                <div class="d-flex"><MudText Class="pa-3" Typo="Typo.h5">Recent transactions</MudText>
+                                <MudSwitch @bind-Checked="@dense" Color="Color.Primary" Class="ml-1">Fold</MudSwitch>
+                                <MudSwitch @bind-Checked="@striped" Color="Color.Primary" Class="ml-1">Striped</MudSwitch>
+                                </div>
                                 <MudTable 
-                                    Items="TransactionService.UserTransactions.Take(15)"
-                                    Height="443px"
+                                    Items="TransactionService.UserTransactions.Take(12)"
+                                    Height="411px"
                                     Hover="true" 
-                                    Dense="true"
+                                    Dense="@dense"
                                     Class="rounded-xl"
-                                    Striped="true" 
+                                    Striped="@striped" 
                                     Elevation="25"
                                     Style="margin:auto; overflow-y:hidden" 
                                     Loading="@LoadingRecentTransactions" 
@@ -179,12 +182,19 @@
 
     protected override async Task OnInitializedAsync()
     {
-        UserService.ParseLoggedInUserName();
-        TransactionService.OnChange += StateHasChanged;
-        bool dataReady = await TransactionService.GetAllUserTransactions();
-        if (dataReady)
+        try
         {
-            LoadingRecentTransactions = false;
+            UserService.ParseLoggedInUserName();
+            TransactionService.OnChange += StateHasChanged;
+            bool dataReady = await TransactionService.GetAllUserTransactions();
+            if (dataReady)
+            {
+                LoadingRecentTransactions = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
         }
     }
 
@@ -274,6 +284,8 @@
 
     /* Recent transactions */
     private bool LoadingRecentTransactions { get; set; } = true;
+    private bool dense = false;
+    private bool striped = false;
 
 
     private void RowClickEvent(TableRowClickEventArgs<Transaction> tableRowClickEventArgs)
