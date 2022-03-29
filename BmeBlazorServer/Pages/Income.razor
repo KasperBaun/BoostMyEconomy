@@ -1,6 +1,9 @@
 ﻿@page "/income"
 @using BmeModels;
 @inject IDialogService DialogService
+@inject IIncomeService IncomeService
+@inject IUserService UserService
+@implements IDisposable
 
 <PageTitle>Income</PageTitle>
 
@@ -158,6 +161,30 @@
 
 
 @code {
+    User currentUser = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            currentUser = await UserService.GetCurrentUser();
+            IncomeService.OnChange += StateHasChanged;
+            bool dataReady = await IncomeService.InitializeService();
+            if (dataReady)
+            {
+                // Loading = done
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public void Dispose()
+    {
+        IncomeService.OnChange -= StateHasChanged;
+    }
     public double[] data = { 67, 21, 8, 4 };
     public string[] labels = { "Novozymes", "Børnepenge", "Udbytte", "Fritidsjob" };
 

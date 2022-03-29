@@ -119,6 +119,7 @@ namespace BmeBlazorServer.Services
         private void IncomeForPeriod()
         {
             IncomePrMonth = new();
+            IncomeAndExpense = new();
             List<Transaction> list = TransactionsForPeriod.Where(x => x.Type=="Income").ToList();
             ChartSeries series = new();
             double[] chartData = new double[12];

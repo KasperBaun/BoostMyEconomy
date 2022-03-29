@@ -9,6 +9,7 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
+        private User currentUser { get; set; }
         public string UserName { get; set; }
         public event Action OnChange;
 
@@ -70,5 +71,13 @@ namespace BmeBlazorServer.Services
             return await httpClient.PutAsJsonAsync("api/User/", user);
         }
 
+        public async Task<User> GetCurrentUser()
+        {
+            if(currentUser == null)
+            {
+                ParseLoggedInUserName();
+            }
+            return currentUser;
+        }
     }
 }
