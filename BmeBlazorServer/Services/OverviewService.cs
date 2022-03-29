@@ -88,8 +88,9 @@ namespace BmeBlazorServer.Services
         }
         public async void PeriodChanged()
         {
-            TransactionsForPeriod = FilterTransactionsFromSelectedYear(YearSelected.Value);
-            CalculateBalanceForPeriod();
+            //TransactionsForPeriod = FilterTransactionsFromSelectedYear(YearSelected.Value);
+            //CalculateBalanceForPeriod();
+            await InitializeOverviewService();
             OnChange?.Invoke();
         }
         private void CalculateBalanceForPeriod()
@@ -115,6 +116,7 @@ namespace BmeBlazorServer.Services
         }
         private void IncomeForPeriod()
         {
+            IncomePrMonth = new();
             List<Transaction> list = TransactionsForPeriod.Where(x => x.Type=="Income").ToList();
             ChartSeries series = new();
             double[] chartData = new double[12];
@@ -132,6 +134,7 @@ namespace BmeBlazorServer.Services
         }
         private void ExpensesForPeriod()
         {
+            ExpensesPrMonth = new();
             List<Transaction> list = TransactionsForPeriod.Where(x => x.Type == "Expense").ToList();
             double[] chartData = new double[12];
             for (int i = 0; i < 12; i++)
@@ -147,6 +150,7 @@ namespace BmeBlazorServer.Services
         }
         private void ResultForPeriod()
         {
+            ResultPrMonth = new();
             for(int i = 0; i< IncomePrMonth.ToArray().Length; i++)
             {   double result = IncomePrMonth.ToArray()[i] - ExpensesPrMonth.ToArray()[i];
                 ResultPrMonth.Insert(i, result );
@@ -154,6 +158,7 @@ namespace BmeBlazorServer.Services
         }
         private void ResultForPeriodAcc()
         {
+            ResultPrMonthAcc = new();
             double[] resultPrMonth = ResultPrMonth.ToArray();
             for(int i=0; i< resultPrMonth.Length; i++)
             {
