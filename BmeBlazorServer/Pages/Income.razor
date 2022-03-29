@@ -160,6 +160,7 @@
         try
         {
             currentUser = await UserService.GetCurrentUser();
+            //Console.WriteLine(currentUser.Email);
             IncomeService.OnChange += StateHasChanged;
             bool dataReady = await IncomeService.InitializeService();
             if (dataReady)

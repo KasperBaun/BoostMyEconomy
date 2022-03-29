@@ -10,10 +10,12 @@ namespace BmeWebAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly BmeDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserController(BmeDbContext context)
+        public UserController(BmeDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: api/Users/All
@@ -24,20 +26,35 @@ namespace BmeWebAPI.Controllers
             return await _context.Users.ToListAsync();
         }
 
-        // GET: api/User/5
-        [Authorize(Roles = "Admin")]
+        // GET: api/User/LoggedIn
+        [Authorize(Roles = "Admin, User")]
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
+            var response = _context.Users.Find(id);
+            if(response != null)
             {
-                return NotFound();
-            }
+                BmeModels.User userObject = new()
+                {
+                    FirstName = response.FirstName,
+                    LastName = response.LastName,
+                    Email = response.Email,
+                    Age = response.Age,
+                    CreatedAt = response.CreatedAt,
+                    Gender = response.Gender,
+                    Id = response.Id,
+                    RoleId = response.RoleId,
+                    Password = ""
+                };
 
-            return user;
+                return Ok(userObject);
+            }
+            else
+            {
+                return BadRequest("Something went wrong");
+            }
         }
+
 
         // PUT: api/Users/5
         [Authorize(Roles = "Admin")]

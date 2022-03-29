@@ -7,7 +7,7 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
-        public List<Category> Categories { get; set; }
+        private List<Category> Categories { get; set; } = new();
         public event Action OnChange;
 
         public CategoriesService(HttpClient _httpClient, ILocalStorageService _localStorageService)
@@ -15,7 +15,6 @@ namespace BmeBlazorServer.Services
             httpClient = _httpClient;
             localStorageService = _localStorageService;
         }
-
 
         /* Get all categories */
         public async Task<List<Category>> GetCategories()

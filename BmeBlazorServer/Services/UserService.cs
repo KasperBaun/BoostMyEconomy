@@ -32,6 +32,16 @@ namespace BmeBlazorServer.Services
             OnChange?.Invoke();
         }
 
+        public async Task<int> ParseLoggedInUserId()
+        {
+            var token = await localStorageService.GetItemAsync<string>("token");
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token);
+            var tokenS = jsonToken as JwtSecurityToken;
+            var nameClaim = tokenS.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault();
+            int userId = int.Parse(nameClaim.Value);
+            return userId;
+        }
         /* Get all users */
         public async Task<List<User>> GetUsers()
         {
@@ -64,10 +74,7 @@ namespace BmeBlazorServer.Services
         }
 
         public async Task<HttpResponseMessage> UpdateUser(User user)
-        {   /*
-            var response = await httpClient.PutAsJsonAsync("api/Users", user);
-            return await response.Content.ReadFromJsonAsync<HttpResponseMessage>();
-            */
+        {  
             return await httpClient.PutAsJsonAsync("api/User/", user);
         }
 
@@ -75,9 +82,35 @@ namespace BmeBlazorServer.Services
         {
             if(currentUser == null)
             {
-                ParseLoggedInUserName();
+                try
+                {   
+                    int userId = await ParseLoggedInUserId();
+                    var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/User/"+userId);
+                    var token = await localStorageService.GetItemAsync<string>("token");
+                    requestMessage.Headers.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    var response = await httpClient.SendAsync(requestMessage);
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        var responseBody = await response.Content.ReadAsStringAsync();
+                        return currentUser = await Task.FromResult(JsonConvert.DeserializeObject<User>(responseBody));
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    return null;
+                }
             }
-            return currentUser;
+            else
+            {
+                return currentUser;
+            }
         }
     }
 }
