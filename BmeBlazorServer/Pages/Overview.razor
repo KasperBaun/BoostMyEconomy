@@ -92,11 +92,11 @@
                         <!--Income-->
                         <MudItem xs="12" sm="12" md="5">
                             <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 300px;">
-                                <div class="d-flex"><MudText Typo="Typo.h5" Style="margin-left:0px;">Income</MudText> <MudText Color="Color.Primary"Typo="Typo.h5" Style="margin-left:auto;">Sum: @OverviewService.SumIncomeForYear</MudText></div>
+                                <div class="d-flex"><MudText Typo="Typo.h5" Style="margin-left:0px;">Income</MudText> <MudText Color="Color.Primary"Typo="Typo.h5" Style="margin-left:auto;">Sum: @OverviewService.SumIncome</MudText></div>
                                 <MudChart 
                                     LegendPosition ="Position.Bottom"
                                     ChartType="ChartType.Bar" 
-                                    ChartSeries="OverviewService.IncomeForYear" 
+                                    ChartSeries="OverviewService.Income" 
                                     XAxisLabels="@IncomeLabels"
                                     ChartOptions="@IncomeOptions"
                                     />
@@ -162,7 +162,7 @@
                                 <MudSwitch @bind-Checked="@striped" Color="Color.Primary" Class="ml-1">Striped</MudSwitch>
                                 </div>
                                 <MudTable 
-                                    Items="OverviewService.UserTransactionsForPeriod.Take(12)"
+                                    Items="OverviewService.TransactionsForPeriod.Take(12)"
                                     Height="411px"
                                     Hover="true" 
                                     Dense="@dense"
