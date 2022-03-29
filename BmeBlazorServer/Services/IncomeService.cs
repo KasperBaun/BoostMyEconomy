@@ -33,29 +33,61 @@ namespace BmeBlazorServer.Services
                 AllUserTransactions = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
             }
         }
+        private async Task FetchCategoriesFromAPI()
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Categories/All");
+            var token = await localStorageService.GetItemAsync<string>("token");
+            requestMessage.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
+            var response = await httpClient.SendAsync(requestMessage);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                Categories = await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(responseBody));
+            }
+        }
+        private List<Transaction> FilterTransactionsFromSelectedPeriod(DateRange periodSelected)
+        {
+            List<Transaction> list = new();
+            list = AllUserTransactions.Where(x => 
+            DateOnly.Parse(s: x.MadeAt) >= DateOnly.FromDateTime(periodSelected.Start.Value) &&
+            DateOnly.Parse(s: x.MadeAt) <= DateOnly.FromDateTime(periodSelected.End.Value) &&
+            x.Type=="Income"
+            ).ToList();
+            OnChange?.Invoke();
+            return list;
+        }
         public Task<bool> AddIncomeTransaction(Transaction transaction)
         {
             throw new NotImplementedException();
         }
-
-        public Task<List<Transaction>> GetAllIncomeTransactions()
+        public async Task<List<Transaction>> GetAllIncomeTransactions()
         {
-            throw new NotImplementedException();
-        }
+            IncomeForPeriod.Clear();
+            if(AllUserTransactions == null)
+            {
+                await FetchUserTransactionsFromAPI();
+                IncomeForPeriod = FilterTransactionsFromSelectedPeriod(PeriodSelected);
+                return IncomeForPeriod;
+            }
 
+            IncomeForPeriod = FilterTransactionsFromSelectedPeriod(PeriodSelected);
+            return IncomeForPeriod;
+        }
         public async Task<bool> InitializeService()
         {
-            
+            await FetchCategoriesFromAPI();
+            await FetchUserTransactionsFromAPI();
+            await GetAllIncomeTransactions();
             return true;
         }
-
-        public void PeriodChanged()
+        public async void PeriodChanged()
         {
-            InitializeService();
+            await InitializeService();
             OnChange?.Invoke();
         }
-
         public Task<bool> RemoveIncomeTransaction(Transaction transaction)
         {
             throw new NotImplementedException();

@@ -23,7 +23,8 @@
                     <MudToolBar>
                         <MudDateRangePicker 
                             Class="ma-auto" 
-                            @bind-DateRange="IncomeService.PeriodSelected" 
+                            @bind-DateRange="IncomeService.PeriodSelected"
+                            PickerClosed="IncomeService.PeriodChanged"
                             Color="Color.Primary" 
                             AdornmentColor="Color.Primary" 
                             IconSize="Size.Medium" 
@@ -66,7 +67,7 @@
                     <MudItem xs="12" sm="12" md="12">
                             <MudTable
                                 Height="360px"
-                                Items="@Transactions" 
+                                Items="IncomeService.IncomeForPeriod" 
                                 Elevation="25"
                                 Class="rounded-xl"
                                 Style="margin:auto; overflow-y:hidden" 
@@ -205,21 +206,8 @@
     private string searchString1 = "";
     private Transaction selectedItem1 = null;
     private HashSet<Transaction> selectedItems = new HashSet<Transaction>();
-
-    private void HandleOnIncomeRowClicked()
-    {
-
-    }
-
-    private IEnumerable<Transaction> Transactions = new List<Transaction>(){
-        new Transaction() { CategoryId = 1, Description = "Icons.Material.Filled.Home", Id = 1, Value = -500, Source = "IKEA", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() },
-        new Transaction() { CategoryId = 4, Description = " ", Id = 2, Value = 500, Source = "F24", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString()},
-        new Transaction() { CategoryId = 2, Description = " ", Id = 3, Value = -500, Source = "Danske Bank", UserId = 1, SubcategoryId = 5, Type = "Expense", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() },
-        new Transaction() { CategoryId = 3, Description = " ", Id = 4, Value = -500, Source = "Zalando", UserId = 1, SubcategoryId = 5, Type = "Income", MadeAt = DateOnly.FromDateTime(DateTime.Today.Date).ToString() }
-    };
-
+    private void HandleOnIncomeRowClicked(){ }
     public bool FilterFunc1(Transaction transaction) => FilterFunc(transaction, searchString1);
-
     public bool FilterFunc(Transaction transaction, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))

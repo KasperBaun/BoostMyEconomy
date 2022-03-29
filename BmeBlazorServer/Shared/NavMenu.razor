@@ -51,16 +51,13 @@
 
 
 @code {
-    
     private async Task ToggleLogout()
     {
-        
         @inject IJSRuntime JsRuntime
         bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "This will log you out of the system. \n Are you sure?"); // Confirm
-            if(confirmed){
-                /* TODO:: Logout function logic */
-                await LocalStorage.RemoveItemAsync("token");
-                await AuthStateProvider.GetAuthenticationStateAsync();
-            }
+        if(confirmed){
+            await LocalStorage.RemoveItemAsync("token");
+            await AuthStateProvider.GetAuthenticationStateAsync();
+        }
     }
 }
