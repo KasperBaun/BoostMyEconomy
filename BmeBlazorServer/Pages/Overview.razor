@@ -24,21 +24,6 @@
                 <MudItem xs="12" sm="6" md="3">
                     <MudPaper Elevation="25" Class="rounded-xl">
                         <MudToolBar>
-                            <!--
-                            <MudDateRangePicker 
-                                Elevation="25"
-                                StartMonth="OverviewService.DateRange.Start" 
-                                @bind-DateRange="OverviewService.DateRange"
-                                OpenTo="OpenTo.Year"
-                                FixDay="1"
-                                FixMonth="1"
-                                ShowWeekNumbers = "true" 
-                                Color="Color.Primary" 
-                                PickerVariant="PickerVariant.Dialog"
-                                PickerClosed="OverviewService.PeriodChanged"
-                                AdornmentColor="Color.Primary" 
-                                IconSize="Size.Medium" />
-                            -->
                             <MudDatePicker  
                                 @bind-Date="OverviewService.YearSelected"
                                 OpenTo="OpenTo.Year" 
@@ -82,40 +67,56 @@
                     <MudGrid>
                          <!-- Notifications -->
                         <MudItem xs="12" sm="12" md="12">
-                            <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 125px;">
-                                <MudText Typo="Typo.h5">Notifications</MudText>
-                                <MudText Typo="Typo.body1">Welcome @UserService.UserName !</MudText>
-                                <MudText Typo="Typo.body1">Last time you logged on was 17th feb. 15:36</MudText>
-                            </MudPaper>
-                        </MudItem>
+                            <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 100px;">
+                                <MudGrid>
+                                    <MudItem xs="12" sm="12" md="4">
+                                        <MudText Typo="Typo.h5">Notifications</MudText>
+                                        <MudText Typo="Typo.body1">Welcome @UserService.UserName !</MudText>
+                                        <MudText Typo="Typo.body1">Last time you logged on was 17th feb. 15:36</MudText>
+                                    </MudItem>
+                                    <MudItem xs="12" sm="12" md="4">
+                                        Test
+                                    </MudItem>
+                                    <MudItem xs="12" sm="12" md="4">
+                                        Virker det
+                                    </MudItem>
 
-                        <!--Income-->
-                        <MudItem xs="12" sm="12" md="5">
-                            <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 300px;">
-                                <div class="d-flex"><MudText Typo="Typo.h5" Style="margin-left:0px;">Income</MudText> <MudText Color="Color.Primary"Typo="Typo.h5" Style="margin-left:auto;">Sum: @OverviewService.SumIncome</MudText></div>
-                                <MudChart 
-                                    LegendPosition ="Position.Bottom"
-                                    ChartType="ChartType.Bar" 
-                                    ChartSeries="OverviewService.Income" 
-                                    XAxisLabels="@IncomeLabels"
-                                    ChartOptions="@IncomeOptions"
-                                    />
+                                </MudGrid>
                             </MudPaper>
                         </MudItem>
 
                         <!--Income & total expenses-->
-                       <MudItem xs="12" sm="12" md="4" >
-                            <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 300px;">
+                       <MudItem xs="12" sm="12" md="6" >
+                            <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 400px;">
                                 <MudText Typo="Typo.h5">Income & total expenses</MudText>
-                                <MudChart ChartType="ChartType.Line" ChartSeries="@IncomeExpense" @bind-SelectedIndex="Index" 
-                                    LegendPosition="Position.Right" XAxisLabels="@IncomeExpenseLabels" Width="100%" Height="100%" ChartOptions="@IncomeExpensesOptions"></MudChart>
+                                <MudChart 
+                                    ChartType="ChartType.Line" 
+                                    ChartSeries="OverviewService.IncomeAndExpense" 
+                                    XAxisLabels="@IncomeExpenseLabels" 
+                                    Width="100%" 
+                                    Height="330px" 
+                                    ChartOptions="IncomeExpensesOptions"
+                                />
+                            </MudPaper>
+                        </MudItem>
+
+                        
+
+                        <!--Expenses breakdown-->
+                        <MudItem xs="12" sm="12" md="6">
+                            <MudPaper Elevation="25" Class=" rounded-xl pa-3" Style="height: 400px;">
+                                <MudText Typo="Typo.h5">Expenses breakdown</MudText>
+                                <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
+                                    InputData="@data" InputLabels="@labels">
+                                </MudChart>
                             </MudPaper>
                         </MudItem>
 
                         <!--Result-->
-                        <MudItem xs="12" sm="12" md="3" >
-                            <MudPaper Elevation="25" Class="rounded-xl pa-3 overflow-y-scroll" Style="height: 300px;" >
-                                <MudText Typo="Typo.h5">Result</MudText>
+                        <MudItem xs="12" sm="12" md="12" >
+                            <MudPaper Elevation="25" Class="rounded-xl" Style="height: 250px;" >
+                                <MudText Class="pa-3" Typo="Typo.h5">Result</MudText>
+                                <!--
                                 <MudDataGrid Items="@Results.Take(Results.Count())" Bordered="true" Dense="true" Class="overflow-y-scroll">
                                     <Columns>
                                         <Column T="Result" Field="Position" Title="Nr" />
@@ -123,27 +124,86 @@
                                         <Column T="Result" Field="Value" CellStyleFunc="@_cellStyleFunc"  />
                                     </Columns>
                                 </MudDataGrid>
+                                -->
+
+                                <MudSimpleTable 
+                                    Class="rounded-xl"
+                                    Style="overflow-x: auto; height:194px; width:100%;"
+                                    Dense = "true"
+                                    Hover = "true"
+                                    Striped = "true"
+                                    Elevation = "25"
+                                >
+                                   <table class="mud-xl-table mud-table-striped mud-table-hover">
+                                    <tr>
+                                        <th></th>
+                                        @foreach (string month in OverviewService.GetMonths.ToArray())
+                                        {
+                                        <td>@month</td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Income
+                                        </th>
+                                        @foreach (double i in OverviewService.IncomePrMonth.ToArray())
+                                        {
+                                        <td><div class="mud-typography-body1">@i</div></td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Expenses
+                                        </th>
+                                        @foreach (double e in OverviewService.ExpensesPrMonth.ToArray())
+                                        {
+                                        <td><div class="mud-typography-body1">@e</div></td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Result
+                                        </th>
+                                        @foreach (double r in OverviewService.ResultPrMonth.ToArray())
+                                        {
+                                            @if (r < 0)
+                                            {
+                                                <td><div class="mud-typography-body1 red-text">@r</div></td>
+                                            }
+                                            else
+                                            {
+                                                <td><div class="mud-typography-body1 green-text">@r</div></td>
+                                            }
+                                        }
+                                    </tr>
+                                     <tr>
+                                        <th>
+                                            Result acc
+                                        </th>
+                                        @foreach (double ra in OverviewService.ResultPrMonthAcc.ToArray())
+                                        {
+                                            @if (ra < 0)
+                                            {
+                                                <td><div class="mud-typography-body1 red-text">@ra</div></td>
+                                            }
+                                            else
+                                            {
+                                                <td><div class="mud-typography-body1 green-text">@ra</div></td>
+                                            }
+                                        }
+                                    </tr>
+                                   
+                                   
+                                    </table>
+                                </MudSimpleTable>
                             </MudPaper>
                         </MudItem>
 
-                        <!--Variable expenses-->
-                        <MudItem xs="12" sm="12" md="6">
-                            <MudPaper Elevation="25" Class="rounded-xl pa-3" Style="height: 300px;">
-                                <MudText Typo="Typo.h5">Variable expenses</MudText>
-                                <MudChart ChartType="ChartType.Line" ChartSeries="@VarExpenses" XAxisLabels="@VarExpensesLabels" Height="250px" ChartOptions="varExpensesOptions"></MudChart>
-                            </MudPaper>
-                        </MudItem>
-                        <!--Categories-->
-                        <MudItem xs="12" sm="12" md="6">
-                            <MudPaper Elevation="25" Class=" rounded-xl pa-3" Style="height: 300px;">
-                                <MudText Typo="Typo.h5">Categories</MudText>
-                                <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
-                                    InputData="@data" InputLabels="@labels">
-                                </MudChart>
-                            </MudPaper>
-                        </MudItem>
+
                     </MudGrid>
                 </MudItem>
+
+
 
                 <MudItem xs="12" sm="12" md="3">
                     <MudGrid>
@@ -200,6 +260,20 @@
 </AuthorizeView>
 
 @code {
+
+     // Style the cells according to a positive or negative result
+    private Func<Result, string> _cellStyle => x =>
+    {
+        string style = "";
+
+        if (x.Value >= 0)
+            style += "color:#00FF00";
+
+        else
+            style += "color:#FF0000";
+
+        return style;
+    };
     /* Date picker*/
 
     protected override async Task OnInitializedAsync()
@@ -225,39 +299,22 @@
         OverviewService.OnChange -= StateHasChanged;
     }
 
-
-
     /* Notifications */
 
     /* User information */
 
-    /* Income */
-    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
-
-    private ChartOptions IncomeOptions = new ChartOptions()
-    {
-        DisableLegend = true,
-        LineStrokeWidth = 5
-    };
-    public string[] IncomeLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-  
-
-
     /* Income & total expenses */
-
-    private ChartOptions IncomeExpensesOptions = new ChartOptions()
-    {
-        DisableLegend = true,
-        LineStrokeWidth = 5,
-        InterpolationOption = InterpolationOption.EndSlope,
-        YAxisFormat = "c2"
-    };
-    public List<ChartSeries> IncomeExpense = new List<ChartSeries>()
-    {
-        new ChartSeries() { Name = "Income", Data = new double[] { 0, 0, 90100, 0, 0, 0, 0, 0, 0, 0,0,0 } },
-        new ChartSeries() { Name = "Expense", Data = new double[] { 10, 41, 35, 51, 49, 62, 69, 91, 148, 89, 86, 99 } },
-    };
     public string[] IncomeExpenseLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+    private ChartOptions IncomeExpensesOptions = new ChartOptions()
+        {
+            DisableLegend = true,
+            LineStrokeWidth = 3,
+            InterpolationOption = InterpolationOption.EndSlope,
+            YAxisTicks = 20,
+            YAxisLines = false
+            //YAxisFormat = "c2"
+    };
+
 
     /* Result */
     public class Result
@@ -316,21 +373,6 @@
             LoadingRecentTransactions = true;
         }
     }
-
-
-    /* Variable expenses */
-
-    private ChartOptions varExpensesOptions = new ChartOptions()
-        {
-            DisableLegend = true,
-            LineStrokeWidth = 5,
-            InterpolationOption = InterpolationOption.EndSlope
-    };
-    public List<ChartSeries> VarExpenses = new List<ChartSeries>()
-    {
-        new ChartSeries() { Data = new double[] { 35, 41, 35, 51, 49, 62, 69, 91, 148, 64, 39, 25 } }
-    };
-    public string[] VarExpensesLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
     /* Categories*/
     public double[] data = { 25, 77, 28, 5 };

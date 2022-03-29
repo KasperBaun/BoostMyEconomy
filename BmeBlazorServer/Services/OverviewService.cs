@@ -12,9 +12,13 @@ namespace BmeBlazorServer.Services
         private List<Category> Categories { get; set; }
         public DateTime? YearSelected { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
         public List<Transaction> TransactionsForPeriod { get; set; } = new List<Transaction>();
-        public List<ChartSeries> Income { get; set; } = new();
-        public string SumIncome { get; set; }
+        public List<double> IncomePrMonth { get; set; } = new();
+        public List<double> ExpensesPrMonth { get; set; } = new();
+        public List<double> ResultPrMonth { get; set; } = new();
+        public List<double> ResultPrMonthAcc { get; set; } = new();
         public List<ChartSeries> IncomeAndExpense { get; set; } = new();
+        public List<string> GetMonths { get; set; } = new(){ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        public string SumIncome { get; set; }
         public int Balance { get; set; } = 1;
 
         public event Action OnChange;
@@ -40,7 +44,6 @@ namespace BmeBlazorServer.Services
                 AllUserTransactions = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
             }
         }
-
         private async Task FetchCategoriesFromAPI()
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Categories/All");
@@ -56,8 +59,6 @@ namespace BmeBlazorServer.Services
                 Categories = await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(responseBody));
             }
         }
-
-
         public async Task<bool> InitializeOverviewService()
         {
             while(Categories == null)
@@ -71,8 +72,10 @@ namespace BmeBlazorServer.Services
             TransactionsForPeriod = FilterTransactionsFromSelectedYear(YearSelected.Value);
             CalculateBalanceForPeriod();
             IncomeForPeriod();
-            SumIncome = CalculateSumForYear(Income);
+            SumIncome = CalculateSumForYear(IncomePrMonth);
             ExpensesForPeriod();
+            ResultForPeriod();
+            ResultForPeriodAcc();
             OnChange?.Invoke();
             return true;
         }
@@ -114,38 +117,68 @@ namespace BmeBlazorServer.Services
         {
             List<Transaction> list = TransactionsForPeriod.Where(x => x.Type=="Income").ToList();
             ChartSeries series = new();
-            double[] data = new double[12];
+            double[] chartData = new double[12];
             for(int i=0; i < 12; i++)
             {
                 List<Transaction> monthlyList = list.Where(x => DateTime.Parse(x.MadeAt).Month == i).ToList();
                 double monthlySum = monthlyList.Sum(x => x.Value);
                 //Console.WriteLine("$OverviewService.cs_IncomeForPeriod(): monthlysum for {0} is {1}",i,monthlySum);
-                data[i] = monthlySum/1000;
+                IncomePrMonth.Insert(i,monthlySum);
+                // Divide income by 1000 to make chart appear nicer in UI
+                chartData[i] = monthlySum/1000;
             }
-            Income.Add(new ChartSeries() { Name = "Income", Data = data });
+
+            IncomeAndExpense.Add(new ChartSeries() { Name = "Income", Data = chartData });
         }
         private void ExpensesForPeriod()
         {
-            IncomeAndExpense = Income;
             List<Transaction> list = TransactionsForPeriod.Where(x => x.Type == "Expense").ToList();
-            ChartSeries series = new();
-            double[] data = new double[12];
+            double[] chartData = new double[12];
             for (int i = 0; i < 12; i++)
             {
                 List<Transaction> monthlyList = list.Where(x => DateTime.Parse(x.MadeAt).Month == i).ToList();
                 double monthlySum = monthlyList.Sum(x => x.Value);
                 //Console.WriteLine("$OverviewService.cs_IncomeForPeriod(): monthlysum for {0} is {1}", i, monthlySum);
-                data[i] = (monthlySum/1000)*(-1);
+                ExpensesPrMonth.Insert(i, monthlySum*(-1));
+                // Divide expenses by 1000 to make chart appear nicer in UI
+                chartData[i] = (monthlySum / 1000)*(-1);
             }
-            Income.Add(new ChartSeries() { Name = "Expenses", Data = data });
+            IncomeAndExpense.Add(new ChartSeries() { Name = "Expenses", Data = chartData });
         }
-
-        private string CalculateSumForYear(List<ChartSeries> list)
+        private void ResultForPeriod()
+        {
+            for(int i = 0; i< IncomePrMonth.ToArray().Length; i++)
+            {   double result = IncomePrMonth.ToArray()[i] - ExpensesPrMonth.ToArray()[i];
+                ResultPrMonth.Insert(i, result );
+            }
+        }
+        private void ResultForPeriodAcc()
+        {
+            double[] resultPrMonth = ResultPrMonth.ToArray();
+            for(int i=0; i< resultPrMonth.Length; i++)
+            {
+                if (i == 0)
+                {
+                    ResultPrMonthAcc.Insert(i, resultPrMonth[i]);
+                }
+                else
+                {   if(DateTime.Now.Month >= i && DateTime.Now.Year >= YearSelected.Value.Year)
+                    {
+                        ResultPrMonthAcc.Insert(i, resultPrMonth[i] + ResultPrMonthAcc.ToArray()[i-1]);
+                    }
+                    else
+                    {
+                        ResultPrMonthAcc.Insert(i, 0);
+                    }
+                }
+            }
+        }
+        private string CalculateSumForYear(List<double> list)
         {
             double sum = 0;
-            foreach(ChartSeries series in list)
+            foreach(double element in list)
             {
-                sum = series.Data.ToList().Sum()*1000;
+                sum += element;
             }
             int thousands = (int)sum/1000;
             int hundreds = (int)sum %1000;

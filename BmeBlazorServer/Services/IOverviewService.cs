@@ -9,7 +9,11 @@ namespace BmeBlazorServer.Services
         int Balance { get; set; }
         event Action OnChange;
         List<Transaction> TransactionsForPeriod { get; set; }
-        List<ChartSeries> Income { get; set; }
+        List<double> IncomePrMonth { get; set; }
+        List<double> ExpensesPrMonth { get; set; }
+        List<double> ResultPrMonth { get; set; }
+        List<double> ResultPrMonthAcc { get; set; }
+        List<string> GetMonths { get; set; }
         List<ChartSeries> IncomeAndExpense { get; set; }
         Task<bool> InitializeOverviewService();
         DateTime? YearSelected { get; set; }
