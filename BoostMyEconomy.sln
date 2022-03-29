@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BmeBlazorServer", "BmeBlazo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BmeWebAPI", "BmeWebAPI\BmeWebAPI.csproj", "{3C5D90CE-5EF0-42A6-BEBD-8C30CC11E843}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BmeModels", "BmeModels\BmeModels.csproj", "{4777EC6C-5FE0-4FD0-B7ED-29FB6F149F61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BmeModels", "BmeModels\BmeModels.csproj", "{4777EC6C-5FE0-4FD0-B7ED-29FB6F149F61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

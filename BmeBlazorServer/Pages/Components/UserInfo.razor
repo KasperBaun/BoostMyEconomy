@@ -1,0 +1,39 @@
+﻿@using MudBlazor
+
+<MudCard Class="rounded-xl">
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudAvatar>
+                <MudIcon Color="Color.Primary" Icon="@Icons.Filled.Lens" Size="Size.Large" />
+            </MudAvatar>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.body1">Kasper Baun</MudText> 
+            <MudTextField
+                T="string"
+                Text="Verified account"
+                Class="mud-typography-body2 mud-text-primary" 
+                AdornmentColor="Color.Primary"
+                AdornmentIcon="@Icons.Filled.VerifiedUser"
+                IconSize="Size.Medium"
+                Adornment="Adornment.End" 
+            />
+            <MudButton Variant="Variant.Text" Color="Color.Primary">Edit account</MudButton>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Rounded.Shield" Color="Color.Default" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudText Typo="Typo.body2">This photo was taken in a small village in Istra Croatia.</MudText>
+    </MudCardContent>
+    <MudCardActions>
+        <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
+        <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
+    </MudCardActions>
+</MudCard>
+
+
+@code {
+
+}
