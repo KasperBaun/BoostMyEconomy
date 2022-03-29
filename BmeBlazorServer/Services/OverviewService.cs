@@ -16,6 +16,7 @@ namespace BmeBlazorServer.Services
         public List<double> ExpensesPrMonth { get; set; } = new();
         public List<double> ResultPrMonth { get; set; } = new();
         public List<double> ResultPrMonthAcc { get; set; } = new();
+        public List <Result> Results { get; set; } = new();
         public List<ChartSeries> IncomeAndExpense { get; set; } = new();
         public List<string> GetMonths { get; set; } = new(){ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
         public string SumIncome { get; set; }
@@ -76,6 +77,7 @@ namespace BmeBlazorServer.Services
             ExpensesForPeriod();
             ResultForPeriod();
             ResultForPeriodAcc();
+            GenerateResultsList();
             OnChange?.Invoke();
             return true;
         }
@@ -191,6 +193,28 @@ namespace BmeBlazorServer.Services
 
             return result;
         }
+        private void GenerateResultsList()
+        {
+            Results = new();
+            string[] months = GetMonths.ToArray();
+            double[] incomeResults = IncomePrMonth.ToArray();
+            double[] expensesResults = ExpensesPrMonth.ToArray();
+            double[] monthlyResults = ResultPrMonth.ToArray() ;
+            double[] monthlyResultAcc = ResultPrMonthAcc.ToArray() ;  
+            for(int i = 0; i< incomeResults.Length; i++)
+            {
+                Results.Insert(i,
+                    new Result
+                    {
+                        Month = months[i],
+                        Income = incomeResults[i],
+                        Expenses = expensesResults[i],
+                        MonthResult=monthlyResults[i],
+                        MonthResultAcc=monthlyResultAcc[i]
+                    });
+            }
+        }
+        
     }
 }
 
