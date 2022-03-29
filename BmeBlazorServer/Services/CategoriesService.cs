@@ -20,20 +20,30 @@ namespace BmeBlazorServer.Services
         /* Get all categories */
         public async Task<List<Category>> GetCategories()
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Categories/All");
-            var token =  await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            
-            var response = await httpClient.SendAsync(requestMessage);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            if(Categories == null)
             {
-                var responseBody = await response.Content.ReadAsStringAsync();
-                return await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(responseBody));
+                try
+                {
+                    var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Categories/All");
+                    var token =  await localStorageService.GetItemAsync<string>("token");
+                    requestMessage.Headers.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    var response = await httpClient.SendAsync(requestMessage);
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        var responseBody = await response.Content.ReadAsStringAsync();
+                        return Categories =  await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(responseBody));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    return null;
+                }
             }
-            else
-                return null;
+
+            return Categories;
         }
 
         /* Delete category */

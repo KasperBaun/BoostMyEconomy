@@ -1,4 +1,5 @@
 ﻿using BmeModels;
+using MudBlazor;
 
 namespace BmeBlazorServer.Services
 {
@@ -6,12 +7,14 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
+        private List<Transaction> AllUserTransactions { get; set; }
+        public List<Transaction> IncomeForPeriod { get; set; } = new List<Transaction>();
         public IncomeService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
         }
-        public DateTime? PeriodSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public DateRange? PeriodSelected { get; set; } = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
 
         public event Action OnChange;
 
@@ -32,7 +35,8 @@ namespace BmeBlazorServer.Services
 
         public void PeriodChanged()
         {
-            throw new NotImplementedException();
+            InitializeService();
+            OnChange?.Invoke();
         }
 
         public Task<bool> RemoveIncomeTransaction(Transaction transaction)
