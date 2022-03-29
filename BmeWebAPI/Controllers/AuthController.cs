@@ -1,6 +1,4 @@
 ﻿using BmeModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,7 +14,6 @@ namespace BmeWebAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-
         private readonly BmeDbContext _context;
         private readonly IConfiguration _configuration;
 
@@ -29,14 +26,12 @@ namespace BmeWebAPI.Controllers
         [HttpPost("UserExists")]
         public async Task<ActionResult<bool>> UserExists(string email)
         {
-            Models.User response = await _context.Users.SingleOrDefaultAsync(e => e.Email == email);
-            Console.WriteLine(response.Email);
-            
+            Models.User? response = await _context.Users.SingleOrDefaultAsync(e => e.Email == email);
+            //Console.WriteLine(response?.Email);
             if (response == null)
             {
                 return BadRequest("User not found");
             }
-            
             // TODO : Handle a way for the user to reset password
             return Ok(true);
         }
@@ -44,7 +39,7 @@ namespace BmeWebAPI.Controllers
         [HttpPost("Login")]
         public async Task<ActionResult<string>> Login(UserLoginDTO request)
         {
-            Models.User dbUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
+            Models.User? dbUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
             // Lookup user in DB so we can compare hash and salt
             if (dbUser == null)
             {
@@ -57,7 +52,6 @@ namespace BmeWebAPI.Controllers
 
             string token = CreateToken(dbUser).Result;
             return Ok(token);
-           
         }
 
         [HttpPost("Register")]
@@ -96,10 +90,13 @@ namespace BmeWebAPI.Controllers
                 return Conflict("User already exists!");
             }
         }
-
         private async Task<string> CreateToken(Models.User user)
         {
-            Models.Role userRole = await _context.Roles.FindAsync(user.RoleId);
+            Models.Role? userRole = await _context.Roles.FindAsync(user.RoleId);
+            if(userRole == null)
+            {
+                throw new Exception("User role was not found in AuthController_CreateToken()!");
+            }
             List<Claim> claims = new()
             {
                 new Claim(ClaimTypes.Name, user.FirstName+" "+user.LastName),
@@ -122,15 +119,12 @@ namespace BmeWebAPI.Controllers
 
             return jwt;
         }
-
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using var hmac = new HMACSHA512();
             passwordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
-      
-
         private static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using var hmac = new HMACSHA512(passwordSalt);

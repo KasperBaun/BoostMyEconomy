@@ -1,14 +1,7 @@
-﻿#nullable disable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BmeWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 
 namespace BmeWebAPI.Controllers
 {
@@ -28,14 +21,45 @@ namespace BmeWebAPI.Controllers
         [HttpGet("All")]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
         {
-            //int requestUserId = (await _context.Users.FindAsync(ClaimTypes.NameIdentifier)).Id;
-            //List<Transaction> transactions = _context.Transactions.Where(t => t.UserId == requestUserId).ToList();
             List<Transaction> transactions = _context.Transactions.ToList();
             return transactions;
         }
 
+        // POST: api/Transaction/
+        [Authorize(Roles = "Admin,User")]
+        [HttpPost]
+        public async Task<IActionResult> CreateTransaction(Transaction transaction)
+        {
+            _context.Transactions.Add(transaction);
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(true);
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine("$TransactionController_CreateTransaction(): " + ex.Message);
+                return Conflict("Transaction already exists!");
+            }
+        }
 
-
+        // PUT: api/Transaction/
+        [Authorize(Roles = "Admin,User")]
+        [HttpPut]
+        public async Task<IActionResult> UpdateTransaction(Transaction transaction)
+        {
+            _context.Transactions.Update(transaction);
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(true);
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine("$TransactionController_CreateTransaction(): " + ex.Message);
+                return Conflict("Transaction update failed @ TransactionController UpdateTransaction()!");
+            }
+        }
 
         // DELETE: api/Transaction/5
         [Authorize(Roles = "Admin,User")]
@@ -50,9 +74,7 @@ namespace BmeWebAPI.Controllers
 
             _context.Transactions.Remove(transaction);
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
-       
     }
 }
