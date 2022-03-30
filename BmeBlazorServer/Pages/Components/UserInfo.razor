@@ -3,8 +3,8 @@
 <MudCard Class="rounded-xl">
     <MudCardHeader>
         <CardHeaderAvatar>
-            <MudAvatar>
-                <MudIcon Color="Color.Primary" Icon="@Icons.Filled.Lens" Size="Size.Large" />
+            <MudAvatar Square="true" Variant="Variant.Filled">
+                <MudIcon  Color="Color.Primary" Icon="@Icons.Filled.Moving" Size="Size.Large" />
             </MudAvatar>
         </CardHeaderAvatar>
         <CardHeaderContent>
@@ -12,16 +12,18 @@
             <MudTextField
                 T="string"
                 Text="Verified account"
-                Class="mud-typography-body2 mud-text-primary" 
+                Style="font-size:10px;"
+                Class="mud-typography-body2 mud-text-secondary"
+                ReadOnly="true"
+                DisableUnderLine="true"
                 AdornmentColor="Color.Primary"
                 AdornmentIcon="@Icons.Filled.VerifiedUser"
                 IconSize="Size.Medium"
-                Adornment="Adornment.End" 
+                Adornment="Adornment.Start" 
             />
             <MudButton Variant="Variant.Text" Color="Color.Primary">Edit account</MudButton>
         </CardHeaderContent>
         <CardHeaderActions>
-            <MudIconButton Icon="@Icons.Rounded.Shield" Color="Color.Default" />
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
