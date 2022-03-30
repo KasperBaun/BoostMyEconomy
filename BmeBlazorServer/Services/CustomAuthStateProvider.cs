@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace BmeBlazorServer.Services
@@ -18,10 +19,31 @@ namespace BmeBlazorServer.Services
             
 
             if (!string.IsNullOrEmpty(token))
-            { 
-                // TODO: Handle when the token expires
-                IEnumerable<Claim> claimsList = ParseClaimsFromJwt(token);
-                identity = new ClaimsIdentity(claimsList, "jwt");
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var tokenContent = handler.ReadJwtToken(token);
+                if (tokenContent.Claims.Any())
+                {
+                    int timestamp = tokenContent.Payload.Exp.Value;
+                    DateTime date = ConvertFromUnixTimestamp(timestamp);
+                    if(date > DateTimeOffset.UtcNow)
+                    {
+                        IEnumerable<Claim> claimsList = ParseClaimsFromJwt(token);
+                        identity = new ClaimsIdentity(claimsList, "jwt");
+                    }
+                    else
+                    {
+                        await _localStorage.RemoveItemAsync("token");
+                        identity = new ClaimsIdentity();
+                    }
+                    
+                }
+                else
+                {
+                    await _localStorage.RemoveItemAsync("token");
+                    identity = new ClaimsIdentity();
+                }
+                
             }
 
             var user = new ClaimsPrincipal(identity);
@@ -32,7 +54,11 @@ namespace BmeBlazorServer.Services
 
             return state;
         }
-
+        public static DateTime ConvertFromUnixTimestamp(int timestamp)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return origin.AddSeconds(timestamp); //
+        }
         public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
             var payload = jwt.Split('.')[1];
