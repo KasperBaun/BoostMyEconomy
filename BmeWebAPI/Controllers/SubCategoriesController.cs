@@ -40,11 +40,7 @@ namespace BmeWebAPI.Controllers
 
             return subcategory;
         }
-        // POST api/<SubCategoriesController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
+    
 
         // PUT: api/SubCategories/5
         [Authorize(Roles = "Admin")]

@@ -1,98 +1,110 @@
 ﻿@using MudBlazor
-@using System
 @using BmeModels
 @using BmeBlazorServer.Services
+@using System.ComponentModel.DataAnnotations
 @inject ICategoryService CategoryService
 @inject ITransactionService TransactionService
 @inject ISnackbar Snackbar
 
+<EditForm Model="@model">
+<DataAnnotationsValidator/>
+<MudDialog Class="rounded-xl">
+    <DialogContent>
+        <MudText Typo="Typo.h4" Class="mx-3 mb-6 mt-4" Color="Color.Primary">Add income</MudText>
+        <MudTextField 
+            @bind-Value="model.Source"
+            For="@(() => model.Source)"
+            Label="Debitor/Source" 
+            HelperText="E.g: Microsoft"  
+            Class="pa-3" 
+            Variant="@incomeFieldVariant"
+            AdornmentColor="Color.Primary"
+            Adornment="Adornment.End" 
+            AdornmentIcon="@Icons.Material.Filled.Business"/>
 
+        <MudField 
+            Label="Type"
+            For="@(() => model.Type)"
+            Variant="@incomeFieldVariant" 
+            Class="pa-3"
+            Adornment="Adornment.End" 
+            AdornmentIcon="@Icons.Material.Filled.AccountBalance" 
+            AdornmentColor="Color.Primary">
+            Income
+        </MudField>
 
-       
-<MudTextField 
-    @bind-Value="model.Source" 
-    Label="Debitor/Source" 
-    HelperText="E.g: Microsoft"  
-    Class="pa-3" 
-    Variant="@incomeFieldVariant" 
-    Adornment="Adornment.Start" 
-    AdornmentIcon="@Icons.Material.Filled.AttachMoney"/>
+        <MudTextField 
+            @bind-Value="model.Value"
+            For="@(() => model.Value)"
+            Label="Value" 
+            HelperText="E.g: 4000" 
+            Class="pa-3" 
+            Variant="@incomeFieldVariant" 
+            AdornmentColor="Color.Primary"
+            Adornment="Adornment.End" 
+            AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
 
-<MudField 
-    Label="Type" 
-    Variant="@incomeFieldVariant" 
-    Class="pa-3"
-    Adornment="Adornment.Start" 
-    AdornmentIcon="@Icons.Material.Filled.Bloodtype" 
-    AdornmentColor="Color.Primary">
-    Income
-</MudField>
-
-<MudTextField 
-    @bind-Value="model.Value" 
-    Label="Value" 
-    HelperText="E.g: 4000" 
-    Class="pa-3" 
-    Variant="@incomeFieldVariant" 
-    Adornment="Adornment.Start" 
-    AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
-
-<MudDatePicker 
-    @bind-Date="@date"
-    Label="Date"
-    Class="pa-3"
-    ShowWeekNumbers="true"
-    AdornmentColor="Color.Primary"
-    Adornment="Adornment.End"
-    Variant="@incomeFieldVariant">
-</MudDatePicker>
+        <MudDatePicker 
+            @bind-Date="@date"
+            Label="Date"
+            Class="pa-3"
+            ShowWeekNumbers="true"
+            AdornmentColor="Color.Primary"
+            Adornment="Adornment.End"
+            Variant="@incomeFieldVariant">
+        </MudDatePicker>
                    
-<MudAutocomplete 
-    T="string" 
-    Label="Category"
-    Class="pa-3"
-    Clearable="true"
-    Variant="@incomeFieldVariant"
-    MaxItems="15"
-    @bind-Value="value1" 
-    SearchFunc="@Search1"
-    ResetValueOnEmptyText="true" >
-</MudAutocomplete>
+        <MudAutocomplete 
+            @bind-Value="value1"
+            T="string" 
+            Label="Category"
+            Class="pa-3"
+            Clearable="true"
+            Variant="@incomeFieldVariant"
+            MaxItems="15"
+            SearchFunc="@Search1"
+            ResetValueOnEmptyText="true" >
+        </MudAutocomplete>
                         
-<MudAutocomplete 
-    T="string" 
-    Label="Subcategory"
-    Class="pa-3"
-    Clearable="true"
-    Variant="@incomeFieldVariant"
-    MaxItems="15"
-    @bind-Value="value2" 
-    SearchFunc="@Search2"
-    ResetValueOnEmptyText="true" >
-</MudAutocomplete>
+        <MudAutocomplete 
+            T="string" 
+            Label="Subcategory"
+            Class="pa-3"
+            Clearable="true"
+            Variant="@incomeFieldVariant"
+            MaxItems="15"
+            @bind-Value="value2" 
+            SearchFunc="@Search2"
+            ResetValueOnEmptyText="true" >
+        </MudAutocomplete>
 
-<MudTextField 
-    @bind-Value="model.Description" 
-    Label="Description" 
-    HelperText="E.g: Sold my car"  
-    Class="pa-3" 
-    Variant="@incomeFieldVariant" 
-    Adornment="Adornment.Start" 
-    AdornmentIcon="@Icons.Material.Filled.AttachMoney" >
-</MudTextField>
-
-            
-<MudButton 
-    ButtonType="ButtonType.Submit" 
-    Variant="Variant.Filled" 
-    Color="Color.Primary" 
-    Class="mx-auto mb-4"
-    OnClick="OnValidSubmit">
-    Register
-</MudButton>
-               
+        <MudTextField 
+            @bind-Value="model.Description"
+            For="@(() => model.Description)"
+            Label="Description" 
+            HelperText="E.g: Sold my car"  
+            Class="pa-3" 
+            Variant="@incomeFieldVariant"
+            AdornmentColor="Color.Primary"
+            Adornment="Adornment.End" 
+            AdornmentIcon="@Icons.Material.Filled.TextSnippet" >
+        </MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Class="mx-auto mb-4" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Class="mx-auto mb-4" ButtonType="ButtonType.Submit" 
+            Color="Color.Primary" 
+            Variant="Variant.Filled"
+            OnClick="OnValidSubmit"
+        >Submit</MudButton>
+    </DialogActions>
+</MudDialog>
+</EditForm>               
 
 @code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    void Cancel() => MudDialog.Cancel();
     private Variant incomeFieldVariant = Variant.Filled;
     private DateTime? date { get; set; }
     private string value1 = string.Empty;
@@ -101,11 +113,7 @@
     private List<Subcategory> SubCategories = new();
     private List<string> categories = new();
     private List<string> subCategories = new();
-
-    public TransactionDTO model = new TransactionDTO()
-    {
-        Type="Income"
-    };
+    public TransactionDTO model = new TransactionDTO(){ Type="Income" };
 
     private async Task<IEnumerable<string>> Search1(string value)
     {
@@ -140,17 +148,32 @@
         {
             SubCategories = await CategoryService.GetSubCategories();
         }
-
         // if text is null or empty, show complete list
         if (string.IsNullOrEmpty(value))
             return subCategories;
         return subCategories.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
-
     private async Task OnValidSubmit()
     {
-        model.MadeAt = DateOnly.FromDateTime(date.Value).ToString();
-        model.CategoryId = Categories.Find(c => c.Title == value1).Id;
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Configuration.VisibleStateDuration = 3000;
+        if (!date.HasValue)
+        {
+            Snackbar.Add("Incorrect date - please check your input", Severity.Error);
+        }
+        else
+        {
+            model.MadeAt = DateOnly.FromDateTime(date.Value).ToString();
+        }
+        if (string.IsNullOrEmpty(value1))
+        {
+            Snackbar.Add("Incorrect category - please check your input", Severity.Error);
+        }
+        else
+        {
+            model.CategoryId = Categories.Find(c => c.Title == value1).Id;
+        }
         if(string.IsNullOrEmpty(value2)){
             model.SubcategoryId = null;
         }
@@ -162,11 +185,14 @@
         var response = await TransactionService.CreateTransaction(model);
         if (response.Status)
         {
-            Snackbar.Add("Submitted!");
+            Snackbar.Add("Income transactions submitted!", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+
         }
         else
         {
-            Snackbar.Add("Error!");
+            Snackbar.Add("Error!", Severity.Error);
+            MudDialog.Close(DialogResult.Cancel());
         }
     }
 }

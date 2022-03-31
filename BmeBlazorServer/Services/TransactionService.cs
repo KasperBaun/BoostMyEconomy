@@ -9,7 +9,6 @@ namespace BmeBlazorServer.Services
         private List<Transaction> AllUserTransactions { get; set; } = new();
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
-     
 
         public TransactionService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {

@@ -86,7 +86,7 @@ namespace BmeBlazorServer.Services
                 return list;
             }
         }
-        private ChartData FilterSources(List<Transaction> incomeTransactions)
+        private static ChartData FilterSources(List<Transaction> incomeTransactions)
         {
             List<double> data = new();
             List<string> transactionCategories = new();
@@ -119,9 +119,15 @@ namespace BmeBlazorServer.Services
         {
             List<double> data = new();
             List<string> months = new();
+            incomeTransactions.Sort((a, b) =>
+                    DateTime.Parse(a.MadeAt).Month
+                    .CompareTo(
+                    DateTime.Parse(b.MadeAt).Month
+                    ));
 
             foreach (Transaction t in incomeTransactions)
             {
+                Console.WriteLine("Month: {0}\n", DateTime.Parse(t.MadeAt).Month);
                 int tMonth = DateTime.Parse(t.MadeAt).Month;
                 string tMonthConverted = ConvertMonthToString(tMonth);
                 if (months.Contains(tMonthConverted)){
@@ -165,30 +171,22 @@ namespace BmeBlazorServer.Services
         }
         private static string ConvertMonthToString(int month)
         {
-            if(month == 0)
+            return month switch
             {
-                return String.Empty;
-            }
-            else
-            {
-                switch (month)
-                {
-                    default:    return String.Empty;
-                    case 1:     return "Jan";
-                    case 2:     return "Feb";
-                    case 3:     return "Mar";
-                    case 4:     return "Apr";
-                    case 5:     return "May";
-                    case 6:     return "Jun";
-                    case 7:     return "Jul";
-                    case 8:     return "Aug";
-                    case 9:     return "Sep";
-                    case 10:    return "Oct";
-                    case 11:    return "Nov";
-                    case 12:    return "Dec";
-                }
-            }
-            
+                1 => "Jan",
+                2 => "Feb",
+                3 => "Mar",
+                4 => "Apr",
+                5 => "May",
+                6 => "Jun",
+                7 => "Jul",
+                8 => "Aug",
+                9 => "Sep",
+                10 => "Oct",
+                11 => "Nov",
+                12 => "Dec",
+                _ => String.Empty,
+            };
         }
         public async Task<bool> InitializeService()
         {

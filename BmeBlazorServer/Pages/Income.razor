@@ -201,9 +201,8 @@
         {
             // Snackbar with could not add income
         }
-
-        // Snackbar with income added succesfully
-        dialog.Close();
+        await IncomeService.InitializeService();
+        StateHasChanged();
     }
 
     /* Income table */
