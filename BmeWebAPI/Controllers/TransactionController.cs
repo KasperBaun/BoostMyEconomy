@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using BmeWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
+using BmeModels;
+using System.Security.Claims;
 
 namespace BmeWebAPI.Controllers
 {
@@ -19,18 +21,36 @@ namespace BmeWebAPI.Controllers
         // GET: api/Transaction/All
         [Authorize(Roles ="Admin,User")]
         [HttpGet("All")]
-        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
+        public async Task<ActionResult<IEnumerable<Models.Transaction>>> GetTransactions()
         {
-            List<Transaction> transactions = _context.Transactions.ToList();
+            List<Models.Transaction> transactions = _context.Transactions.ToList();
             return transactions;
         }
 
         // POST: api/Transaction/
         [Authorize(Roles = "Admin,User")]
         [HttpPost]
-        public async Task<IActionResult> CreateTransaction(Transaction transaction)
+        public async Task<IActionResult> CreateTransaction(TransactionDTO transaction)
         {
-            _context.Transactions.Add(transaction);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier);
+            if(userId == null)
+            {
+                return BadRequest("UserId not found!");
+            }
+            Models.Transaction dbTransaction = new()
+            {   
+                Id = _context.Transactions.Count() + 1,
+                UserId = int.Parse(userId.Value),
+                Source = transaction.Source,
+                Value = transaction.Value,
+                MadeAt = transaction.MadeAt,
+                CategoryId = transaction.CategoryId,
+                Type = transaction.Type,
+                SubcategoryId = transaction.SubcategoryId,
+                Description = transaction.Description,
+            };
+
+                _context.Transactions.Add(dbTransaction);
             try
             {
                 await _context.SaveChangesAsync();
@@ -46,7 +66,7 @@ namespace BmeWebAPI.Controllers
         // PUT: api/Transaction/
         [Authorize(Roles = "Admin,User")]
         [HttpPut]
-        public async Task<IActionResult> UpdateTransaction(Transaction transaction)
+        public async Task<IActionResult> UpdateTransaction(Models.Transaction transaction)
         {
             _context.Transactions.Update(transaction);
             try

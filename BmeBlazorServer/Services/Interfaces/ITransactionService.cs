@@ -6,7 +6,7 @@ public interface ITransactionService
 {
     event Action? OnChange;
     Task<List<Transaction>> GetTransactions();
-    Task<bool> CreateTransaction(TransactionDTO transaction);
+    Task<ResponseModel> CreateTransaction(TransactionDTO transaction);
     Task<bool> UpdateTransaction(TransactionDTO transaction);
     Task<bool> DeleteTransaction(TransactionDTO transaction);
 

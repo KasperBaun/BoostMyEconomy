@@ -29,7 +29,7 @@ namespace BmeBlazorServer.Services
             localStorageService = _localStorageService;
         }
 
-        private async Task FetchUserTransactionsFromAPI()
+        private async Task FetchUserTransactions()
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Transaction/All");
             var token = await localStorageService.GetItemAsync<string>("token");
@@ -42,13 +42,13 @@ namespace BmeBlazorServer.Services
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
                 var responseContent = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
-                if(responseContent != null)
+                if (responseContent != null)
                 {
                     AllUserTransactions = responseContent;
                 }
                 else
                 {
-                    Console.WriteLine("$OverviewService.cs@FetchUserTransactionsFromAPI(): failed fetching transactions from WebAPI");
+                    Console.WriteLine("$TransactionService.cs@FetchUserTransactions(): failed fetching transactions from WebAPI");
                     AllUserTransactions.Clear();
                 }
             }
@@ -84,7 +84,7 @@ namespace BmeBlazorServer.Services
             }
             if(!AllUserTransactions.Any())
             {
-                await FetchUserTransactionsFromAPI();
+                await FetchUserTransactions();
             }
             if(YearSelected == null)
             {

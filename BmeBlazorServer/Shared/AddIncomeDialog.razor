@@ -51,10 +51,10 @@
 
         //if (form.IsValid)
         //{
-            bool success = await TransactionService.CreateTransaction(model);
-            if (success)
+            var response = await TransactionService.CreateTransaction(model);
+            if (response.Status)
             {
-                Snackbar.Add("Submited!");
+                Snackbar.Add("Submitted!");
             }
             else
             {

@@ -11,6 +11,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddTransient<ValidateHeaderHandler>();
 
+//builder.Services.AddSingleton<ITransactionService, TransactionService>();
 builder.Services.AddHttpClient<ITransactionService, TransactionService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("WebAPI_URL"));
