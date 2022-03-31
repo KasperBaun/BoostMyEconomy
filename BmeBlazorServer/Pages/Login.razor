@@ -163,6 +163,8 @@
         {
             var options = new DialogOptions() { MaxWidth = MaxWidth.Large, CloseOnEscapeKey = true };
             var dialog = DialogService.Show<ForgottenPasswordDialog>("Forgotten Password Dialog", options);
+            // TODO - Implement this
+            await Task.Delay(10);
         }
         catch (Exception ex)
         {

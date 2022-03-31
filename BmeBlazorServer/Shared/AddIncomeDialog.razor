@@ -1,27 +1,58 @@
-﻿@using MudBlazor;
-@using System;
-@using BmeModels;
+﻿@using MudBlazor
+@using System
+@using BmeModels
+@using BmeBlazorServer.Services
 @inject ISnackbar Snackbar
+@inject ICategoryService CategoryService
+@implements IDisposable
 
-<MudDialog Class="rounded-xl">
-    <DialogContent>
-        <MudTextField  T="string" Label="Name"></MudTextField>
-        <MudSelect  T="string" Label="Category" AnchorOrigin="Origin.BottomCenter">
-            <MudSelectItem Value="@("Cappuccino")" />
-            <MudSelectItem Value="@("Cafe Latte")" />
-            <MudSelectItem Value="@("Espresso")" />
-            <MudSelectItem Value="@("Irish Coffee")" />
-        </MudSelect>
-    </DialogContent>
-    <DialogActions>
-        <MudButton Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
-    </DialogActions>
-</MudDialog>
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudDialog Class="rounded-xl">
+        <DialogContent>
+            <MudTextField  T="string" Label="Name"></MudTextField>
+            <MudSelect  T="string" Label="Category" AnchorOrigin="Origin.BottomCenter">
+                @foreach (Category c in @categories)
+                {
+                    <MudSelectItem Value="@(c.Title)" />
+                }
+                <MudSelectItem Value="@("Cafe Latte")" />
+                <MudSelectItem Value="@("Espresso")" />
+                <MudSelectItem Value="@("Irish Coffee")" />
+            </MudSelect>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
+            <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+        </DialogActions>
+    </MudDialog>
+</MudContainer>
+
 
 @code {
+    public List<Category> categories = new List<Category>();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            CategoryService.OnChange += StateHasChanged;
+            bool dataReady = await CategoryService.InitializeService();
+            if (dataReady)
+            {
+                // Do stuff
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+    public void Dispose()
+    {
+        CategoryService.OnChange -= StateHasChanged;
+    }
+    //categories = CategoryService.GetCategories(); 
 
-    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new();
 
     Transaction NewTransaction = new Transaction()
         {

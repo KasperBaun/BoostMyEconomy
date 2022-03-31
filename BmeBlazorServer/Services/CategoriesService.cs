@@ -3,14 +3,14 @@ using Newtonsoft.Json;
 
 namespace BmeBlazorServer.Services
 {
-    public class CategoriesService : ICategoriesService
+    public class CategoryService : ICategoryService
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
         private List<Category> Categories { get; set; } = new();
-        public event Action OnChange;
+        public event Action? OnChange;
 
-        public CategoriesService(HttpClient _httpClient, ILocalStorageService _localStorageService)
+        public CategoryService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
@@ -32,6 +32,7 @@ namespace BmeBlazorServer.Services
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         var responseBody = await response.Content.ReadAsStringAsync();
+                        OnChange?.Invoke();
                         return Categories =  await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(responseBody));
                     }
                 }
@@ -66,5 +67,9 @@ namespace BmeBlazorServer.Services
             return await httpClient.PutAsJsonAsync("api/Categories/", category);
         }
 
+        public Task<bool> InitializeService()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

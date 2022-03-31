@@ -8,11 +8,11 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
-        private List<Transaction> AllUserTransactions { get; set; }
-        private List<Category> Categories { get; set; } 
+        private List<Transaction> AllUserTransactions { get; set; } = new();
+        private List<Category> Categories { get; set; } = new();
         public DateRange? PeriodSelected { get; set; } = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
         public List<Transaction> IncomeForPeriod { get; set; } = new List<Transaction>();
-        public event Action OnChange;
+        public event Action? OnChange;
         public IncomeService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
@@ -66,7 +66,7 @@ namespace BmeBlazorServer.Services
         public async Task<List<Transaction>> GetAllIncomeTransactions()
         {
             IncomeForPeriod.Clear();
-            if(AllUserTransactions == null)
+            if(!AllUserTransactions.Any())
             {
                 await FetchUserTransactionsFromAPI();
                 IncomeForPeriod = FilterTransactionsFromSelectedPeriod(PeriodSelected);

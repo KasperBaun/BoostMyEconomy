@@ -8,8 +8,8 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
-        private List<Transaction> AllUserTransactions { get; set; }
-        private List<Category> Categories { get; set; }
+        private List<Transaction> AllUserTransactions { get; set; } = new();
+        private List<Category> Categories { get; set; } = new();
         public DateTime? YearSelected { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
         public List<Transaction> TransactionsForPeriod { get; set; } = new List<Transaction>();
         public List<double> IncomePrMonth { get; set; } = new();
@@ -19,10 +19,10 @@ namespace BmeBlazorServer.Services
         public List <Result> Results { get; set; } = new();
         public List<ChartSeries> IncomeAndExpense { get; set; } = new();
         public List<string> GetMonths { get; set; } = new(){ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-        public string SumIncome { get; set; }
+        public string SumIncome { get; set; } = String.Empty;
         public int Balance { get; set; } = 1;
 
-        public event Action OnChange;
+        public event Action? OnChange;
 
         public OverviewService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
@@ -42,7 +42,16 @@ namespace BmeBlazorServer.Services
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                AllUserTransactions = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
+                var responseContent = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
+                if(responseContent != null)
+                {
+                    AllUserTransactions = responseContent;
+                }
+                else
+                {
+                    Console.WriteLine("$OverviewService.cs@FetchUserTransactionsFromAPI(): failed fetching transactions from WebAPI");
+                    AllUserTransactions.Clear();
+                }
             }
         }
         private async Task FetchCategoriesFromAPI()
@@ -51,26 +60,41 @@ namespace BmeBlazorServer.Services
             var token = await localStorageService.GetItemAsync<string>("token");
             requestMessage.Headers.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
             var response = await httpClient.SendAsync(requestMessage);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                Categories = await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(responseBody));
+                var responseContent = await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(responseBody));
+                if (responseContent != null)
+                {
+                    Categories = responseContent;
+                }
+                else
+                {
+                    Console.WriteLine("$OverviewService.cs@FetchCategoriesFromAPI(): failed fetching categories from WebAPI");
+                    Categories.Clear();
+                }
             }
         }
-        public async Task<bool> InitializeOverviewService()
+        public async Task<bool> InitializeService()
         {
-            while(Categories == null)
+            if(Categories == null)
             {
                 await FetchCategoriesFromAPI();
             }
-            while(AllUserTransactions == null)
+            if(AllUserTransactions == null)
             {
                 await FetchUserTransactionsFromAPI();
             }
-            TransactionsForPeriod = FilterTransactionsFromSelectedYear(YearSelected.Value);
+            if(YearSelected == null)
+            {
+                Console.WriteLine("$OverviewService.cs@InitializeService(): YearSelected is null!");
+            }
+            else
+            {
+                TransactionsForPeriod = FilterTransactionsFromSelectedYear(YearSelected.Value);
+            }
             CalculateBalanceForPeriod();
             IncomeForPeriod();
             SumIncome = CalculateSumForYear(IncomePrMonth);
@@ -90,9 +114,7 @@ namespace BmeBlazorServer.Services
         }
         public async void PeriodChanged()
         {
-            //TransactionsForPeriod = FilterTransactionsFromSelectedYear(YearSelected.Value);
-            //CalculateBalanceForPeriod();
-            await InitializeOverviewService();
+            await InitializeService();
             OnChange?.Invoke();
         }
         private void CalculateBalanceForPeriod()
@@ -170,18 +192,25 @@ namespace BmeBlazorServer.Services
                     ResultPrMonthAcc.Insert(i, resultPrMonth[i]);
                 }
                 else
-                {   if(DateTime.Now.Month >= i && DateTime.Now.Year >= YearSelected.Value.Year)
+                {   if(YearSelected == null)
                     {
-                        ResultPrMonthAcc.Insert(i, resultPrMonth[i] + ResultPrMonthAcc.ToArray()[i-1]);
+                        Console.WriteLine("$OverviewService@ResultForPeriodAcc(): YearSelected = null!");
                     }
                     else
                     {
-                        ResultPrMonthAcc.Insert(i, 0);
+                        if(DateTime.Now.Month >= i && DateTime.Now.Year >= YearSelected.Value.Year)
+                        {
+                            ResultPrMonthAcc.Insert(i, resultPrMonth[i] + ResultPrMonthAcc.ToArray()[i-1]);
+                        }
+                        else
+                        {
+                            ResultPrMonthAcc.Insert(i, 0);
+                        }
                     }
                 }
             }
         }
-        private string CalculateSumForYear(List<double> list)
+        private static string CalculateSumForYear(List<double> list)
         {
             double sum = 0;
             foreach(double element in list)

@@ -9,17 +9,16 @@ namespace BmeBlazorServer.Services
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
-        private User currentUser { get; set; }
-        public string UserName { get; set; }
-        public event Action OnChange;
+        public User CurrentUser { get; set; } = new();
+        public event Action? OnChange;
 
         public UserService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
         }
-
-        public async void ParseLoggedInUserName()
+        /*
+        private async void ParseLoggedInUserName()
         {
             var token = await localStorageService.GetItemAsync<string>("token");
             var handler = new JwtSecurityTokenHandler();
@@ -27,24 +26,35 @@ namespace BmeBlazorServer.Services
             var tokenS = jsonToken as JwtSecurityToken;
             var nameClaim = tokenS.Claims.Where(x => x.Type == ClaimTypes.Name).FirstOrDefault();
             var username = nameClaim.Value;
-            //Console.WriteLine("$UserService.cs - Username: "+ username);
-            UserName = username;
-            OnChange?.Invoke();
-        }
-
-        public async Task<int> ParseLoggedInUserId()
+            CurrentUser.FirstName = username.Split(' ')[0];
+            CurrentUser.LastName = username.Split(' ')[1];
+        }*/
+        private async Task<int> ParseLoggedInUserId()
         {
             var token = await localStorageService.GetItemAsync<string>("token");
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(token);
-            var tokenS = jsonToken as JwtSecurityToken;
-            var nameClaim = tokenS.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault();
-            int userId = int.Parse(nameClaim.Value);
-            return userId;
+            if (jsonToken is JwtSecurityToken tokenS)
+            {
+                var nameClaim = tokenS.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault();
+                if (nameClaim != null)
+                {
+                    int userId = int.Parse(nameClaim.Value);
+                    return userId;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
+                return 0;
+            }
         }
-        /* Get all users */
         public async Task<List<User>> GetUsers()
         {
+            List<User> users = new();    
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/User/All");
             var token =  await localStorageService.GetItemAsync<string>("token");
             requestMessage.Headers.Authorization =
@@ -55,13 +65,23 @@ namespace BmeBlazorServer.Services
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                return await Task.FromResult(JsonConvert.DeserializeObject<List<User>>(responseBody));
+                var apiUsers = JsonConvert.DeserializeObject<List<User>>(responseBody);
+                if(apiUsers != null)
+                {
+                    return apiUsers;
+                }
+                else
+                {
+                    Console.WriteLine("$UserService.cs@GetUsers(): failed fetching users from api");
+                    return users;
+                }
             }
             else
-                return null;
+            {
+                Console.WriteLine("$UserService.cs@GetUsers(): failed fetching users from api");
+                return users;
+            }
         }
-
-        /* Delete user */
         public async Task<HttpResponseMessage> DeleteUser(int userId)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Delete, requestUri: "api/User/"+userId);
@@ -72,20 +92,18 @@ namespace BmeBlazorServer.Services
             var response = await httpClient.SendAsync(requestMessage);
             return response;
         }
-
         public async Task<HttpResponseMessage> UpdateUser(User user)
         {  
             return await httpClient.PutAsJsonAsync("api/User/", user);
         }
-
-        public async Task<User> GetCurrentUser()
+        public async Task<bool> FetchCurrentUser()
         {
-            if(currentUser == null)
+            try
             {
-                try
-                {   
+                {
                     int userId = await ParseLoggedInUserId();
-                    var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/User/"+userId);
+                    string requestUri = "api/User/}"+userId;
+                    var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
                     var token = await localStorageService.GetItemAsync<string>("token");
                     requestMessage.Headers.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -94,23 +112,26 @@ namespace BmeBlazorServer.Services
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         var responseBody = await response.Content.ReadAsStringAsync();
-                        return currentUser = await Task.FromResult(JsonConvert.DeserializeObject<User>(responseBody));
+                        var responseUser = await Task.FromResult(JsonConvert.DeserializeObject<User>(responseBody));
+                        if (responseUser != null)
+                        {
+                            CurrentUser = responseUser;
+                            OnChange?.Invoke();
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                    return null;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                return currentUser;
+                Console.WriteLine(ex);
+                return false;
             }
+            return false;
         }
     }
 }

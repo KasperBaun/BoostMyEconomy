@@ -152,14 +152,14 @@
 
 
 @code {
-    User currentUser = new();
+
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            currentUser = await UserService.GetCurrentUser();
-            //Console.WriteLine(currentUser.Email);
+            await UserService.FetchCurrentUser();
+            Console.WriteLine("$Income.razor@OnInitializedAsync(): Attempting to fetch user from API: {0}",UserService.CurrentUser.Email);
             IncomeService.OnChange += StateHasChanged;
             bool dataReady = await IncomeService.InitializeService();
             if (dataReady)
@@ -202,7 +202,7 @@
     private bool dense = false;
     private bool striped = false;
     private string searchString1 = "";
-    private Transaction selectedItem1 = null;
+    private Transaction selectedItem1 = new();
     private HashSet<Transaction> selectedItems = new HashSet<Transaction>();
     private void HandleOnIncomeRowClicked(){ }
     public bool FilterFunc1(Transaction transaction) => FilterFunc(transaction, searchString1);

@@ -1,6 +1,6 @@
 ﻿@page "/overview"
 @using BmeModels;
-@using BmeBlazorServer.Services
+@using BmeBlazorServer.Services;
 @inject ISnackbar Snackbar
 @inject IUserService UserService
 @inject AuthenticationStateProvider AuthStateProvider
@@ -57,7 +57,7 @@
                         <MudToolBar>
                             <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" />
                             <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Color="Color.Inherit" />
-                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" OnClick = "OverviewService.InitializeOverviewService"/>
+                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Inherit" OnClick = "OverviewService.InitializeService"/>
                             <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" OnClick="StateHasChanged"  />
                         </MudToolBar>
                     </MudPaper>
@@ -71,7 +71,7 @@
                                 <MudGrid>
                                     <MudItem xs="12" sm="12" md="4">
                                         <MudText Typo="Typo.h5">Notifications</MudText>
-                                        <MudText Typo="Typo.body1">Welcome @UserService.UserName !</MudText>
+                                        <MudText Typo="Typo.body1">Welcome TODO</MudText>
                                         <MudText Typo="Typo.body1">Last time you logged on was 17th feb. 15:36</MudText>
                                     </MudItem>
                                     <MudItem xs="12" sm="12" md="4">
@@ -277,9 +277,8 @@
     {
         try
         {
-            UserService.ParseLoggedInUserName();
             OverviewService.OnChange += StateHasChanged;
-            bool dataReady = await OverviewService.InitializeOverviewService();
+            bool dataReady = await OverviewService.InitializeService();
             if (dataReady)
             {
                 LoadingRecentTransactions = false;

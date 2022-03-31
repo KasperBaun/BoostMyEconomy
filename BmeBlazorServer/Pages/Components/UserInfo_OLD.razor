@@ -1,7 +1,14 @@
 ﻿@using MudBlazor
 
-<MudCard Class="rounded-xl justify-center">
-            <MudText Class="center" Typo="Typo.body1">Kasper Baun</MudText> 
+<MudCard Class="rounded-xl">
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudAvatar Square="true" Variant="Variant.Filled">
+                <MudIcon  Color="Color.Primary" Icon="@Icons.Filled.Moving" Size="Size.Large" />
+            </MudAvatar>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.body1">Kasper Baun</MudText> 
             <MudTextField
                 T="string"
                 Text="Verified account"
@@ -15,6 +22,10 @@
                 Adornment="Adornment.Start" 
             />
             <MudButton Variant="Variant.Text" Color="Color.Primary">Edit account</MudButton>
+        </CardHeaderContent>
+        <CardHeaderActions>
+        </CardHeaderActions>
+    </MudCardHeader>
     <MudCardContent>
         <MudText Color="Color.Primary" Style="font-size:26px;">Net worth</MudText>
         <MudText >DKK 1.426.719</MudText>

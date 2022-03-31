@@ -5,7 +5,7 @@ namespace BmeBlazorServer.Services
 {
     public interface IIncomeService
     {
-        event Action OnChange;
+        event Action? OnChange;
         List<Transaction> IncomeForPeriod { get; set; }
         Task<bool> AddIncomeTransaction(Transaction transaction);
         Task<bool> RemoveIncomeTransaction(Transaction transaction);

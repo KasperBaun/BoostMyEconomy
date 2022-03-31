@@ -7,7 +7,7 @@ namespace BmeBlazorServer.Services
     {
         public string SumIncome { get; set; }
         int Balance { get; set; }
-        event Action OnChange;
+        event Action? OnChange;
         List<Transaction> TransactionsForPeriod { get; set; }
         List<Result> Results { get; set; }
         List<double> IncomePrMonth { get; set; }
@@ -16,7 +16,7 @@ namespace BmeBlazorServer.Services
         List<double> ResultPrMonthAcc { get; set; }
         List<string> GetMonths { get; set; }
         List<ChartSeries> IncomeAndExpense { get; set; }
-        Task<bool> InitializeOverviewService();
+        Task<bool> InitializeService();
         DateTime? YearSelected { get; set; }
         void PeriodChanged();
 
