@@ -18,7 +18,7 @@ namespace BmeWebAPI.Controllers
         // GET: api/Categories
         [Authorize(Roles = "Admin,User")]
         [HttpGet("All")]
-        public async Task<ActionResult<IEnumerable<Category>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
             return await _context.Categories.ToListAsync();
         }

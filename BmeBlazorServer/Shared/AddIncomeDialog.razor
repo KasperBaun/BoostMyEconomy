@@ -4,63 +4,171 @@
 @using BmeBlazorServer.Services
 @inject ICategoryService CategoryService
 @inject ITransactionService TransactionService
-@using System.ComponentModel.DataAnnotations
+@inject ISnackbar Snackbar
 
-<EditForm Model="@model" OnValidSubmit="OnValidSubmit" style="border-radius:24px;">
-<DataAnnotationsValidator/>
-<MudGrid>
-    <MudItem xs="12" sm="7">
-        <MudPaper Style="border-radius: 24px;" Width="700px;" Height="700px;">
-            <MudCard>
-                <MudCardContent Style="rounded-xl">
-                    <MudTextField Label="Source"
-                                    @bind-Value="model.Source" For="@(() => model.Source)"/>
-                    <MudTextField Label="Value" Class="mt-3"
-                                    @bind-Value="model.Value" For="@(() => model.Value)" InputType="InputType.Number"/>
-                    <MudTextField Label="Transaction date"  Class="mt-3"
-                                    @bind-Value="model.MadeAt" For="@(() => model.MadeAt)" InputType="InputType.Date"/>
-                    <MudTextField Label="Category" Class="mt-3"
-                                    @bind-Value="model.CategoryId" For="@(() => model.CategoryId)" InputType="InputType.Number"/>
-                    <MudTextField Label="Subcategory" Class="mt-3"
-                                    @bind-Value="model.SubcategoryId" For="@(() => model.SubcategoryId)"/>
-                    <MudTextField Label="Description" Class="mt-3"
-                                    @bind-Value="model.Description" For="@(() => model.Description)"/>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudPaper>
-    </MudItem>   
-</MudGrid>
-</EditForm>
+
+
+       
+<MudTextField 
+    @bind-Value="model.Source" 
+    Label="Debitor/Source" 
+    HelperText="E.g: Microsoft"  
+    Class="pa-3" 
+    Variant="@incomeFieldVariant" 
+    Adornment="Adornment.Start" 
+    AdornmentIcon="@Icons.Material.Filled.AttachMoney"/>
+
+<MudField 
+    Label="Type" 
+    Variant="@incomeFieldVariant" 
+    Class="pa-3"
+    Adornment="Adornment.Start" 
+    AdornmentIcon="@Icons.Material.Filled.Bloodtype" 
+    AdornmentColor="Color.Primary">
+    Income
+</MudField>
+
+<MudTextField 
+    @bind-Value="model.Value" 
+    Label="Value" 
+    HelperText="E.g: 4000" 
+    Class="pa-3" 
+    Variant="@incomeFieldVariant" 
+    Adornment="Adornment.Start" 
+    AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+
+<MudDatePicker 
+    @bind-Date="@date"
+    Label="Date"
+    Class="pa-3"
+    ShowWeekNumbers="true"
+    AdornmentColor="Color.Primary"
+    Adornment="Adornment.End"
+    Variant="@incomeFieldVariant">
+</MudDatePicker>
+                   
+<MudAutocomplete 
+    T="string" 
+    Label="Category"
+    Class="pa-3"
+    Clearable="true"
+    Variant="@incomeFieldVariant"
+    MaxItems="15"
+    @bind-Value="value1" 
+    SearchFunc="@Search1"
+    ResetValueOnEmptyText="true" >
+</MudAutocomplete>
+                        
+<MudAutocomplete 
+    T="string" 
+    Label="Subcategory"
+    Class="pa-3"
+    Clearable="true"
+    Variant="@incomeFieldVariant"
+    MaxItems="15"
+    @bind-Value="value2" 
+    SearchFunc="@Search2"
+    ResetValueOnEmptyText="true" >
+</MudAutocomplete>
+
+<MudTextField 
+    @bind-Value="model.Description" 
+    Label="Description" 
+    HelperText="E.g: Sold my car"  
+    Class="pa-3" 
+    Variant="@incomeFieldVariant" 
+    Adornment="Adornment.Start" 
+    AdornmentIcon="@Icons.Material.Filled.AttachMoney" >
+</MudTextField>
+
+            
+<MudButton 
+    ButtonType="ButtonType.Submit" 
+    Variant="Variant.Filled" 
+    Color="Color.Primary" 
+    Class="mx-auto mb-4"
+    OnClick="OnValidSubmit">
+    Register
+</MudButton>
+               
 
 @code {
-    [Inject] ISnackbar Snackbar { get; set; }
-    MudForm form;
+    private Variant incomeFieldVariant = Variant.Filled;
+    private DateTime? date { get; set; }
+    private string value1 = string.Empty;
+    private string value2 = string.Empty;
+    private List<Category> Categories = new();
+    private List<Subcategory> SubCategories = new();
+    private List<string> categories = new();
+    private List<string> subCategories = new();
 
     public TransactionDTO model = new TransactionDTO()
     {
         Type="Income"
     };
-    bool success;
+
+    private async Task<IEnumerable<string>> Search1(string value)
+    {
+        // fetch categories from API
+        if (!Categories.Any())
+        {
+            Categories = await CategoryService.GetCategories();
+            foreach(Category c in Categories)
+            {   
+                // Only take income part of categories
+                if(c.Id<=14)
+                    categories.Add(c.Title);
+            }
+        }
+        if (!SubCategories.Any())
+        {
+            SubCategories = await CategoryService.GetSubCategories();
+        }
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return categories;
+        }
+        return categories.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> Search2(string value)
+    {
+        // fetch subCategories from API
+        if (!SubCategories.Any())
+        {
+            SubCategories = await CategoryService.GetSubCategories();
+        }
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return subCategories;
+        return subCategories.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
 
     private async Task OnValidSubmit()
     {
-        //await form.Validate();
+        model.MadeAt = DateOnly.FromDateTime(date.Value).ToString();
+        model.CategoryId = Categories.Find(c => c.Title == value1).Id;
+        if(string.IsNullOrEmpty(value2)){
+            model.SubcategoryId = null;
+        }
+        else
+        {
+            model.SubcategoryId = SubCategories.Find(sc => sc.Title == value2).Id;
+        }
 
-        //if (form.IsValid)
-        //{
-            var response = await TransactionService.CreateTransaction(model);
-            if (response.Status)
-            {
-                Snackbar.Add("Submitted!");
-            }
-            else
-            {
-                Snackbar.Add("Error!");
-            }
-        //}
+        var response = await TransactionService.CreateTransaction(model);
+        if (response.Status)
+        {
+            Snackbar.Add("Submitted!");
+        }
+        else
+        {
+            Snackbar.Add("Error!");
+        }
     }
-
 }
+
+

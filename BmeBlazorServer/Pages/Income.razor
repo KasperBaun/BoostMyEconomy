@@ -193,8 +193,8 @@
     /* Add income */
     async Task OpenAddIncomeDialog()
     {
-        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, CloseOnEscapeKey = true };
-        var dialog = DialogService.Show<AddIncomeDialog>("Add income", options);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<AddIncomeDialog>("",options);
         var result = await dialog.Result;
 
         if (result.Cancelled)
