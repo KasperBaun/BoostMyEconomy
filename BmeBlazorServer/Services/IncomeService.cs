@@ -10,15 +10,16 @@ namespace BmeBlazorServer.Services
         private readonly ILocalStorageService localStorageService;
         private List<Transaction> AllUserTransactions { get; set; } = new();
         private List<Category> Categories { get; set; } = new();
-        public DateRange? PeriodSelected { get; set; } = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
+        public DateRange? PeriodSelected { get; set; }
         public List<Transaction> IncomeForPeriod { get; set; } = new List<Transaction>();
         public event Action? OnChange;
         public IncomeService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
+            PeriodSelected = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
         }
-        private async Task FetchUserTransactionsFromAPI()
+        private async Task FetchUserTransactions()
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Transaction/All");
             var token = await localStorageService.GetItemAsync<string>("token");
@@ -30,10 +31,19 @@ namespace BmeBlazorServer.Services
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                AllUserTransactions = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
+                var userTransactions = JsonConvert.DeserializeObject<List<Transaction>>(responseBody);
+                if(userTransactions != null)
+                {
+                    AllUserTransactions = userTransactions;
+                }
+                else
+                {
+                    AllUserTransactions.Clear();
+                    throw new Exception("$IncomeService.cs@FetchUserTransactions(): Fetch failed");
+                }
             }
         }
-        private async Task FetchCategoriesFromAPI()
+        private async Task FetchCategories()
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Categories/All");
             var token = await localStorageService.GetItemAsync<string>("token");
@@ -45,42 +55,41 @@ namespace BmeBlazorServer.Services
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                Categories = await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(responseBody));
+                var categories = JsonConvert.DeserializeObject<List<Category>>(responseBody);
+                if(categories != null)
+                {
+                    Categories = categories;
+                }
+                else
+                {
+                    Categories = new List<Category>();
+                    throw new Exception("$IncomeService.cs@FetchCategories(): Fetch failed");
+                }
             }
         }
         private List<Transaction> FilterTransactionsFromSelectedPeriod(DateRange periodSelected)
         {
             List<Transaction> list = new();
-            list = AllUserTransactions.Where(x => 
-            DateOnly.Parse(s: x.MadeAt) >= DateOnly.FromDateTime(periodSelected.Start.Value) &&
-            DateOnly.Parse(s: x.MadeAt) <= DateOnly.FromDateTime(periodSelected.End.Value) &&
-            x.Type=="Income"
-            ).ToList();
-            OnChange?.Invoke();
-            return list;
-        }
-        public Task<bool> AddIncomeTransaction(Transaction transaction)
-        {
-            throw new NotImplementedException();
-        }
-        public async Task<List<Transaction>> GetAllIncomeTransactions()
-        {
-            IncomeForPeriod.Clear();
-            if(!AllUserTransactions.Any())
+            if(periodSelected.Start.HasValue && periodSelected.End.HasValue)
             {
-                await FetchUserTransactionsFromAPI();
-                IncomeForPeriod = FilterTransactionsFromSelectedPeriod(PeriodSelected);
-                return IncomeForPeriod;
+                DateOnly Start = DateOnly.FromDateTime(periodSelected.Start.Value);
+                DateOnly End = DateOnly.FromDateTime(periodSelected.End.Value);
+                list = AllUserTransactions.Where(x => 
+                DateOnly.Parse(s: x.MadeAt) >= Start && DateOnly.Parse(s: x.MadeAt) <= End && x.Type=="Income").ToList();
+                return list;
             }
-
-            IncomeForPeriod = FilterTransactionsFromSelectedPeriod(PeriodSelected);
-            return IncomeForPeriod;
+            else
+            {
+                return list;
+            }
         }
         public async Task<bool> InitializeService()
         {
-            await FetchCategoriesFromAPI();
-            await FetchUserTransactionsFromAPI();
-            await GetAllIncomeTransactions();
+            await FetchCategories();
+            await FetchUserTransactions();
+
+            IncomeForPeriod = FilterTransactionsFromSelectedPeriod(PeriodSelected);
+            OnChange?.Invoke();
             return true;
         }
         public async void PeriodChanged()
@@ -89,6 +98,10 @@ namespace BmeBlazorServer.Services
             OnChange?.Invoke();
         }
         public Task<bool> RemoveIncomeTransaction(Transaction transaction)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<bool> AddIncomeTransaction(Transaction transaction)
         {
             throw new NotImplementedException();
         }

@@ -19,7 +19,7 @@ namespace BmeBlazorServer.Services
         /* Get all categories */
         public async Task<List<Category>> GetCategories()
         {
-            if(Categories == null)
+            if(!Categories.Any())
             {
                 try
                 {
@@ -32,17 +32,24 @@ namespace BmeBlazorServer.Services
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         var responseBody = await response.Content.ReadAsStringAsync();
-                        OnChange?.Invoke();
-                        return Categories =  await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(responseBody));
+                        var categories = JsonConvert.DeserializeObject<List<Category>>(responseBody);
+                        if(categories != null)
+                        {
+                            Categories = categories;
+                            OnChange?.Invoke();
+                            return categories;
+                        }
+                        else
+                        {
+                            return Categories;
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex);
-                    return null;
                 }
             }
-
             return Categories;
         }
 

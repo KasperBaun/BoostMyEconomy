@@ -9,7 +9,6 @@ namespace BmeBlazorServer.Services
         List<Transaction> IncomeForPeriod { get; set; }
         Task<bool> AddIncomeTransaction(Transaction transaction);
         Task<bool> RemoveIncomeTransaction(Transaction transaction);
-        Task<List<Transaction>> GetAllIncomeTransactions();
         Task<bool> InitializeService();
         DateRange? PeriodSelected { get; set; }
         void PeriodChanged();
