@@ -31,7 +31,7 @@ namespace BmeWebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var response = _context.Users.Find(id);
+            var response = await _context.Users.FindAsync(id);
             if(response != null)
             {
                 BmeModels.User userObject = new()

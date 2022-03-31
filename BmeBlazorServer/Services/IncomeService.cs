@@ -87,7 +87,6 @@ namespace BmeBlazorServer.Services
         {
             await FetchCategories();
             await FetchUserTransactions();
-
             IncomeForPeriod = FilterTransactionsFromSelectedPeriod(PeriodSelected);
             OnChange?.Invoke();
             return true;

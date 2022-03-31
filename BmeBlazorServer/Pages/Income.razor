@@ -159,7 +159,8 @@
         try
         {
             await UserService.FetchCurrentUser();
-            Console.WriteLine("$Income.razor@OnInitializedAsync(): Attempting to fetch user from API: {0}",UserService.CurrentUser.Email);
+            UserService.OnChange += StateHasChanged;
+            Console.WriteLine("$Income.razor@OnInitializedAsync(): Attempting to fetch user from API: "+ UserService.CurrentUser.Email);
             IncomeService.OnChange += StateHasChanged;
             bool dataReady = await IncomeService.InitializeService();
             if (dataReady)
@@ -176,11 +177,13 @@
     public void Dispose()
     {
         IncomeService.OnChange -= StateHasChanged;
+        UserService.OnChange -= StateHasChanged;
     }
+
+
     public double[] data = { 67, 21, 8, 4 };
     public string[] labels = { "Novozymes", "Børnepenge", "Udbytte", "Fritidsjob" };
 
-    DateRange _dateRange = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
 
     /* Add income */
     async Task OpenAddIncomeDialog()

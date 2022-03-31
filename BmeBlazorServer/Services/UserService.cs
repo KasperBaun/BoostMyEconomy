@@ -102,7 +102,8 @@ namespace BmeBlazorServer.Services
             {
                 {
                     int userId = await ParseLoggedInUserId();
-                    string requestUri = "api/User/}"+userId;
+                    Console.WriteLine("$UserService.cs@FetchCurrentUser(): Error - userId = " + userId);
+                    string requestUri = "api/User/"+userId;
                     var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
                     var token = await localStorageService.GetItemAsync<string>("token");
                     requestMessage.Headers.Authorization =
