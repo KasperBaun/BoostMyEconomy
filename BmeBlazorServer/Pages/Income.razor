@@ -1,4 +1,5 @@
 ﻿@page "/income"
+@using MudBlazor;
 @using BmeModels;
 @inject IDialogService DialogService
 @inject IIncomeService IncomeService
@@ -101,13 +102,16 @@
                     </MudItem>
                     <!-- History -->
                     <MudItem xs="12" sm="12" md="6">
-                        <MudPaper Elevation="2" Class="rounded-xl" Style="height: 300px;">
-                            <MudText Typo="Typo.h5" Class="pa-3" >History</MudText>
+                        <MudPaper Elevation="2" Class="rounded-xl pa-3" Style="height: 330px;">
+                            <MudText Typo="Typo.h5">History</MudText>
                             <MudChart 
                                 ChartType="ChartType.Line" 
                                 ChartSeries="IncomeService.IncomeHistory" 
-                                ChartOptions="incomeHistoryOptions"
+                                ChartOptions="@incomeHistoryOptions"
                                 XAxisLabels="IncomeService.IncomeHistoryLabels"
+                                Width="100%"
+                                Height="285px"
+
                                 Class="ma-auto">
 
                             </MudChart>
@@ -115,7 +119,7 @@
                     </MudItem>
                     <!--Sources-->
                     <MudItem xs="12" sm="12" md="6">
-                        <MudPaper Elevation="2" Class=" rounded-xl" Style="height: 300px;">
+                        <MudPaper Elevation="2" Class=" rounded-xl" Style="height: 330px;">
                             <MudText Typo="Typo.h5" Class="pa-3" >Sources</MudText>
                             <MudChart 
                                 ChartType="ChartType.Pie" 
@@ -219,7 +223,7 @@
         if (transaction.Source != null)
         {
             if (transaction.Source.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
+                return true;
         }
         if (transaction.Value.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
@@ -233,15 +237,12 @@
     private ChartOptions incomeHistoryOptions = new ChartOptions()
         {
             DisableLegend = true,
-            LineStrokeWidth = 10,
-            InterpolationOption = InterpolationOption.EndSlope,
-            YAxisFormat = "c2"
+            LineStrokeWidth = 5,
+            InterpolationOption = InterpolationOption.Straight,
+            YAxisFormat = "c",
+            YAxisLines = false,
+            MaxNumYAxisTicks = 5,
+            XAxisLines = true
     };
-    public List<ChartSeries> incomeHistory = new List<ChartSeries>()
-    {
-        new ChartSeries() { Data = new double[] { 35, 41, 35, 51, 49, 62, 69, 91, 148, 64, 39, 25 } },
-    };
-    public string[] incomeHistoryLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-
+ 
 }

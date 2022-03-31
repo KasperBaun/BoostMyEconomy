@@ -2,93 +2,65 @@
 @using System
 @using BmeModels
 @using BmeBlazorServer.Services
-@inject ISnackbar Snackbar
 @inject ICategoryService CategoryService
-@implements IDisposable
+@inject ITransactionService TransactionService
+@using System.ComponentModel.DataAnnotations
 
-<MudContainer MaxWidth="MaxWidth.Medium">
-    <MudDialog Class="rounded-xl">
-        <DialogContent>
-            <MudTextField  T="string" Label="Name"></MudTextField>
-            <MudSelect  T="string" Label="Category" AnchorOrigin="Origin.BottomCenter">
-                @foreach (Category c in @categories)
-                {
-                    <MudSelectItem Value="@(c.Title)" />
-                }
-                <MudSelectItem Value="@("Cafe Latte")" />
-                <MudSelectItem Value="@("Espresso")" />
-                <MudSelectItem Value="@("Irish Coffee")" />
-            </MudSelect>
-        </DialogContent>
-        <DialogActions>
-            <MudButton Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
-            <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
-        </DialogActions>
-    </MudDialog>
-</MudContainer>
-
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit" style="border-radius:24px;">
+<DataAnnotationsValidator/>
+<MudGrid>
+    <MudItem xs="12" sm="7">
+        <MudPaper Style="border-radius: 24px;" Width="700px;" Height="700px;">
+            <MudCard>
+                <MudCardContent Style="rounded-xl">
+                    <MudTextField Label="Source"
+                                    @bind-Value="model.Source" For="@(() => model.Source)"/>
+                    <MudTextField Label="Value" Class="mt-3"
+                                    @bind-Value="model.Value" For="@(() => model.Value)" InputType="InputType.Number"/>
+                    <MudTextField Label="Transaction date"  Class="mt-3"
+                                    @bind-Value="model.MadeAt" For="@(() => model.MadeAt)" InputType="InputType.Date"/>
+                    <MudTextField Label="Category" Class="mt-3"
+                                    @bind-Value="model.CategoryId" For="@(() => model.CategoryId)" InputType="InputType.Number"/>
+                    <MudTextField Label="Subcategory" Class="mt-3"
+                                    @bind-Value="model.SubcategoryId" For="@(() => model.SubcategoryId)"/>
+                    <MudTextField Label="Description" Class="mt-3"
+                                    @bind-Value="model.Description" For="@(() => model.Description)"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudPaper>
+    </MudItem>   
+</MudGrid>
+</EditForm>
 
 @code {
-    public List<Category> categories = new List<Category>();
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            CategoryService.OnChange += StateHasChanged;
-            bool dataReady = await CategoryService.InitializeService();
-            if (dataReady)
-            {
-                // Do stuff
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
-    public void Dispose()
-    {
-        CategoryService.OnChange -= StateHasChanged;
-    }
-    //categories = CategoryService.GetCategories(); 
+    [Inject] ISnackbar Snackbar { get; set; }
+    MudForm form;
 
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new();
-
-    Transaction NewTransaction = new Transaction()
-        {
-            Id = 1, // Get this from database but how?
-            UserId = 1,
-            MadeAt = DateTime.Now.Date.ToString(),
-            Value = 0,
-            Type = "Income",
-            CategoryId = 0,
-            SubcategoryId = 0,
-            Description = "",
-            Source = "",
+    public TransactionDTO model = new TransactionDTO()
+    {
+        Type="Income"
     };
+    bool success;
 
-    private void Cancel()
+    private async Task OnValidSubmit()
     {
-        MudDialog?.Cancel();
+        //await form.Validate();
+
+        //if (form.IsValid)
+        //{
+            bool success = await TransactionService.CreateTransaction(model);
+            if (success)
+            {
+                Snackbar.Add("Submited!");
+            }
+            else
+            {
+                Snackbar.Add("Error!");
+            }
+        //}
     }
 
-    private void Submit()
-    {
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
-        Snackbar.Configuration.VisibleStateDuration = 3000;
-        Random rand = new Random();
-        bool incomeAdded = rand.NextDouble() > 0.5;
-       
-        /* If user exists, reset password*/
-        if(incomeAdded){
-            Snackbar.Add("Income added succesfully.", Severity.Success);
-            MudDialog?.Close(DialogResult.Ok(true));
-        }   
-        else
-        {
-            Snackbar.Add("Could not add income. Please try again.", Severity.Error);
-            MudDialog?.Close(DialogResult.Cancel());
-        }
-    }
 }

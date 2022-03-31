@@ -20,7 +20,7 @@ namespace BmeBlazorServer.Services
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
-            PeriodSelected = new DateRange(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now.Date);
+            PeriodSelected = new DateRange(new DateTime(DateTime.Now.Year, 1, 1), DateTime.Now.Date);
         }
         private async Task FetchUserTransactions()
         {

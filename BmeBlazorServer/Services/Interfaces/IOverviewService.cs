@@ -19,7 +19,5 @@ namespace BmeBlazorServer.Services
         Task<bool> InitializeService();
         DateTime? YearSelected { get; set; }
         void PeriodChanged();
-
-
     }
 }
