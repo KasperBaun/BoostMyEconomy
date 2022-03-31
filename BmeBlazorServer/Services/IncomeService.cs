@@ -12,6 +12,7 @@ namespace BmeBlazorServer.Services
         private List<Category> Categories { get; set; } = new();
         public DateRange? PeriodSelected { get; set; }
         public List<Transaction> IncomeForPeriod { get; set; } = new List<Transaction>();
+        public List<ChartData> IncomeSourcesForPeriod { get; set; } = new List<ChartData>();
         public event Action? OnChange;
         public IncomeService(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
@@ -82,6 +83,12 @@ namespace BmeBlazorServer.Services
             {
                 return list;
             }
+        }
+        private List<ChartData> FilterSources(List<Transaction> incomeTransactions)
+        {
+            List<ChartData> list = new();
+            return list;
+
         }
         public async Task<bool> InitializeService()
         {

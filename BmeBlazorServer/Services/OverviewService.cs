@@ -79,11 +79,11 @@ namespace BmeBlazorServer.Services
         }
         public async Task<bool> InitializeService()
         {
-            if(Categories == null)
+            if(!Categories.Any())
             {
                 await FetchCategoriesFromAPI();
             }
-            if(AllUserTransactions == null)
+            if(!AllUserTransactions.Any())
             {
                 await FetchUserTransactionsFromAPI();
             }
