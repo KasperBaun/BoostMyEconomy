@@ -102,12 +102,12 @@
                     <!-- History -->
                     <MudItem xs="12" sm="12" md="6">
                         <MudPaper Elevation="2" Class="rounded-xl" Style="height: 300px;">
-                            <MudText Typo="Typo.h5">History</MudText>
+                            <MudText Typo="Typo.h5" Class="pa-3" >History</MudText>
                             <MudChart 
                                 ChartType="ChartType.Line" 
-                                ChartSeries="@incomeHistory" 
+                                ChartSeries="IncomeService.IncomeHistory" 
                                 ChartOptions="incomeHistoryOptions"
-                                XAxisLabels="@incomeHistoryLabels"
+                                XAxisLabels="IncomeService.IncomeHistoryLabels"
                                 Class="ma-auto">
 
                             </MudChart>
@@ -116,9 +116,14 @@
                     <!--Sources-->
                     <MudItem xs="12" sm="12" md="6">
                         <MudPaper Elevation="2" Class=" rounded-xl" Style="height: 300px;">
-                            <MudText Typo="Typo.h5">Sources</MudText>
-                            <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
-                                InputData="@data" InputLabels="@labels">
+                            <MudText Typo="Typo.h5" Class="pa-3" >Sources</MudText>
+                            <MudChart 
+                                ChartType="ChartType.Pie" 
+                                LegendPosition="Position.Right" 
+                                Width="225px" Height="225px"
+                                InputData="IncomeService.IncomeSourcesForPeriod.Data" 
+                                InputLabels="IncomeService.IncomeSourcesForPeriod.Labels"
+                            >
                             </MudChart>
                         </MudPaper>
                     </MudItem>
@@ -181,10 +186,6 @@
     }
 
 
-    public double[] data = { 67, 21, 8, 4 };
-    public string[] labels = { "Novozymes", "Børnepenge", "Udbytte", "Fritidsjob" };
-
-
     /* Add income */
     async Task OpenAddIncomeDialog()
     {
@@ -241,5 +242,6 @@
         new ChartSeries() { Data = new double[] { 35, 41, 35, 51, 49, 62, 69, 91, 148, 64, 39, 25 } },
     };
     public string[] incomeHistoryLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
 
 }

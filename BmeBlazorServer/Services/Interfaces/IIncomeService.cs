@@ -7,7 +7,9 @@ namespace BmeBlazorServer.Services
     {
         event Action? OnChange;
         List<Transaction> IncomeForPeriod { get; set; }
-        List<ChartData> IncomeSourcesForPeriod { get; set; }
+        ChartData IncomeSourcesForPeriod { get; set; }
+        List<ChartSeries> IncomeHistory { get; set; }
+        string[] IncomeHistoryLabels { get; set; }
         Task<bool> AddIncomeTransaction(Transaction transaction);
         Task<bool> RemoveIncomeTransaction(Transaction transaction);
         Task<bool> InitializeService();

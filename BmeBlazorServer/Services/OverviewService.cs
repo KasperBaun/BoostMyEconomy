@@ -21,7 +21,6 @@ namespace BmeBlazorServer.Services
         public List<string> GetMonths { get; set; } = new(){ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
         public string SumIncome { get; set; } = String.Empty;
         public int Balance { get; set; } = 1;
-
         public event Action? OnChange;
 
         public OverviewService(HttpClient _httpClient, ILocalStorageService _localStorageService)
