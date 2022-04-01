@@ -54,10 +54,42 @@ namespace BmeBlazorServer.Services
             }
         }
 
-        public Task<ResponseModel> DeleteTransaction(Transaction transaction)
+        public async Task<ResponseModel> DeleteTransaction(int transactionId)
         {
-            OnChange?.Invoke();
-            throw new NotImplementedException();
+            ResponseModel responseModel = new();
+            HttpRequestMessage? requestMessage = new(HttpMethod.Delete, requestUri: "api/Transaction/"+transactionId);
+            var token = await localStorageService.GetItemAsync<string>("token");
+            requestMessage.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await httpClient.SendAsync(requestMessage);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                responseModel.Status = true;
+                //Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
+                responseModel.Message = response.ReasonPhrase + response.Content;
+                //var index = AllUserTransactions.FindIndex(x => x.Id == transactionId);
+                await FetchUserTransactions();
+                //AllUserTransactions.RemoveAt(index);
+                OnChange?.Invoke();
+                return responseModel;
+            }
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden ||
+                response.StatusCode == System.Net.HttpStatusCode.BadRequest ||
+                response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
+                responseModel.Status = false;
+                responseModel.Message = response.ReasonPhrase + response.Content;
+                return responseModel;
+            }
+            else
+            {
+                Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
+                responseModel.Status = false;
+                responseModel.Message = "Something went wrong";
+                return responseModel;
+            }
         }
 
         public async Task<List<Transaction>> GetTransactions()
@@ -69,10 +101,46 @@ namespace BmeBlazorServer.Services
             return AllUserTransactions;
         }
 
-        public Task<ResponseModel> UpdateTransaction(Transaction transaction)
+        public async Task<ResponseModel> UpdateTransaction(Transaction transaction)
         {
-            OnChange?.Invoke();
-            throw new NotImplementedException();
+            ResponseModel responseModel = new();
+            HttpRequestMessage? requestMessage = new(HttpMethod.Put, requestUri: "api/Transaction/");
+            requestMessage.Content = new StringContent(
+                JsonConvert.SerializeObject(transaction), System.Text.Encoding.UTF8, "application/json");
+            var token = await localStorageService.GetItemAsync<string>("token");
+            requestMessage.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await httpClient.SendAsync(requestMessage);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                responseModel.Status = true;
+                Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
+                responseModel.Message = response.ReasonPhrase + response.Content;
+                var index = AllUserTransactions.FindIndex(x => x.Id == transaction.Id);
+                if(index > -1)
+                {
+                    AllUserTransactions[index] = transaction;
+                }
+                OnChange?.Invoke();
+                return responseModel;
+            }
+            if (response.StatusCode == System.Net.HttpStatusCode.Conflict ||
+                response.StatusCode == System.Net.HttpStatusCode.BadRequest ||
+                response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
+                responseModel.Status = false;
+                responseModel.Message = response.ReasonPhrase + response.Content;
+                return responseModel;
+            }
+            else
+            {
+                Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
+                responseModel.Status = false;
+                responseModel.Message = "Something went wrong";
+                return responseModel;
+            }
         }
 
         private async Task FetchUserTransactions()
