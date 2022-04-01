@@ -48,14 +48,14 @@
                     </MudToolBar>
                 </MudPaper>
             </MudItem>
-             <!-- Add expense -->
+             <!-- Add transaction -->
             <MudItem xs="12" sm="6" md="3">
                 <MudPaper Elevation="25" Class="rounded-xl">
                     <MudToolBar Class="px-0">
                     <MudButton Variant="Variant.Filled" 
                         Class="rounded-xl mud-height-full mud-button-full-width" 
                         StartIcon="@Icons.Material.Outlined.Add" 
-                        OnClick="OpenAddIncomeDialog"
+                        OnClick="OpenAddTransactionDialog"
                         Color="Color.Primary">
                         Add income
                     </MudButton>
@@ -74,9 +74,9 @@
                                 Style="margin:auto; overflow-y:hidden" 
                                 Dense="@dense" 
                                 Hover="true" 
-                                Bordered="false" 
+                                Bordered="false"
                                 Striped="@striped"
-                                Filter="new Func<Transaction,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                                Filter="new Func<Transaction,bool>(FilterFunc1)" @bind-SelectedItem="@selectedTransaction"
                                 >
                             <HeaderContent>
                                 <MudTh>Date</MudTh>
@@ -119,7 +119,7 @@
                     </MudItem>
                     <!--Sources-->
                     <MudItem xs="12" sm="12" md="6">
-                        <MudPaper Elevation="2" Class=" rounded-xl" Style="height: 330px;">
+                        <MudPaper Elevation="2" Class="rounded-xl" Style="height: 330px;">
                             <MudText Typo="Typo.h5" Class="pa-3" >Sources</MudText>
                             <MudChart 
                                 ChartType="ChartType.Pie" 
@@ -191,10 +191,10 @@
 
 
     /* Add income */
-    async Task OpenAddIncomeDialog()
+    async Task OpenAddTransactionDialog()
     {
         var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
-        var dialog = DialogService.Show<AddIncomeDialog>("",options);
+        var dialog = DialogService.Show<AddTransactionDialog>("",options);
         var result = await dialog.Result;
 
         if (result.Cancelled)
@@ -209,9 +209,8 @@
     private bool dense = false;
     private bool striped = false;
     private string searchString1 = "";
-    private Transaction selectedItem1 = new();
+    private Transaction selectedTransaction = new();
     private HashSet<Transaction> selectedItems = new HashSet<Transaction>();
-    private void HandleOnIncomeRowClicked(){ }
     public bool FilterFunc1(Transaction transaction) => FilterFunc(transaction, searchString1);
     public bool FilterFunc(Transaction transaction, string searchString)
     {
@@ -229,6 +228,22 @@
         if ($"{transaction.Description} {transaction.CategoryId} {transaction.MadeAt}".Contains(searchString))
             return true;
         return false;
+    }
+    [Parameter]
+    public Transaction editTransaction { get; set; }
+    async Task OpenEditTransactionDialog()
+    {
+        var transactionParameter = new DialogParameters { { "editTransaction", editTransaction } };
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<EditTransactionDialog>(editTransaction.Source,options);
+        var result = await dialog.Result;
+
+        if (result.Cancelled)
+        {
+            // Snackbar with could not add income
+        }
+        await IncomeService.InitializeService();
+        StateHasChanged();
     }
 
     /* History */

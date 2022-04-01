@@ -45,6 +45,7 @@ builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
 });
 
 builder.Services.AddMudServices();
+builder.Services.AddMudBlazorDialog();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredLocalStorage();

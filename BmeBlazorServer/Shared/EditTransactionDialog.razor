@@ -6,14 +6,14 @@
 @inject ITransactionService TransactionService
 @inject ISnackbar Snackbar
 
-<EditForm Model="@model">
+<EditForm Model="@transaction">
 <DataAnnotationsValidator/>
 <MudDialog Class="rounded-xl">
     <DialogContent>
-        <MudText Typo="Typo.h4" Class="mx-3 mb-6 mt-4" Color="Color.Primary">Add income</MudText>
+        <MudText Typo="Typo.h4" Class="mx-3 mb-6 mt-4" Color="Color.Primary">Edit transaction</MudText>
         <MudTextField 
-            @bind-Value="model.Source"
-            For="@(() => model.Source)"
+            @bind-Value="transaction.Source"
+            For="@(() => transaction.Source)"
             Label="Debitor/Source" 
             HelperText="E.g: Microsoft"  
             Class="pa-3" 
@@ -24,7 +24,7 @@
 
         <MudField 
             Label="Type"
-            For="@(() => model.Type)"
+            For="@(() => transaction.Type)"
             Variant="@incomeFieldVariant" 
             Class="pa-3"
             Adornment="Adornment.End" 
@@ -33,9 +33,21 @@
             Income
         </MudField>
 
+        <MudAutocomplete 
+            @bind-Value="transaction.Type"
+            T="string" 
+            Label="Category"
+            Class="pa-3"
+            Clearable="true"
+            Variant="@incomeFieldVariant"
+            MaxItems="15"
+            SearchFunc="@Search1"
+            ResetValueOnEmptyText="true" >
+        </MudAutocomplete>
+
         <MudTextField 
-            @bind-Value="model.Value"
-            For="@(() => model.Value)"
+            @bind-Value="transaction.Value"
+            For="@(() => transaction.Value)"
             Label="Value" 
             HelperText="E.g: 4000" 
             Class="pa-3" 
@@ -79,8 +91,8 @@
         </MudAutocomplete>
 
         <MudTextField 
-            @bind-Value="model.Description"
-            For="@(() => model.Description)"
+            @bind-Value="transaction.Description"
+            For="@(() => transaction.Description)"
             Label="Description" 
             HelperText="E.g: Sold my car"  
             Class="pa-3" 
@@ -92,17 +104,23 @@
     </DialogContent>
     <DialogActions>
         <MudButton Class="mx-auto mb-4" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Class="mx-auto mb-4" ButtonType="ButtonType.Submit" 
+        <MudButton Class="mx-auto mb-4" 
             Color="Color.Primary" 
             Variant="Variant.Filled"
-            OnClick="OnValidSubmit"
-        >Submit</MudButton>
+            OnClick="OnEdit"
+        >Edit</MudButton>
+        <MudButton Class="mx-auto mb-4" 
+            Color="Color.Primary" 
+            Variant="Variant.Filled"
+            OnClick="OnDelete"
+        >Delete</MudButton>
     </DialogActions>
 </MudDialog>
 </EditForm>               
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Transaction transaction { get; set; }
 
     void Cancel() => MudDialog.Cancel();
     private Variant incomeFieldVariant = Variant.Filled;
@@ -113,7 +131,6 @@
     private List<Subcategory> SubCategories = new();
     private List<string> categories = new();
     private List<string> subCategories = new();
-    public TransactionDTO model = new TransactionDTO(){ Type="Income" };
 
     private async Task<IEnumerable<string>> Search1(string value)
     {
@@ -127,10 +144,12 @@
                 if(c.Id<=14)
                     categories.Add(c.Title);
             }
+            value1 = categories.ElementAt(transaction.CategoryId);
         }
         if (!SubCategories.Any())
         {
             SubCategories = await CategoryService.GetSubCategories();
+            value2 = subCategories.ElementAt(transaction.SubcategoryId.Value);
         }
 
         // if text is null or empty, show complete list
@@ -147,6 +166,7 @@
         if (!SubCategories.Any())
         {
             SubCategories = await CategoryService.GetSubCategories();
+            value2 = subCategories.ElementAt(transaction.SubcategoryId.Value);
         }
         // if text is null or empty, show complete list
         if (string.IsNullOrEmpty(value))
@@ -164,7 +184,7 @@
         }
         else
         {
-            model.MadeAt = DateOnly.FromDateTime(date.Value).ToString();
+            transaction.MadeAt = DateOnly.FromDateTime(date.Value).ToString();
         }
         if (string.IsNullOrEmpty(value1))
         {
@@ -172,17 +192,17 @@
         }
         else
         {
-            model.CategoryId = Categories.Find(c => c.Title == value1).Id;
+            transaction.CategoryId = Categories.Find(c => c.Title == value1).Id;
         }
         if(string.IsNullOrEmpty(value2)){
-            model.SubcategoryId = null;
+            transaction.SubcategoryId = null;
         }
         else
         {
-            model.SubcategoryId = SubCategories.Find(sc => sc.Title == value2).Id;
+            transaction.SubcategoryId = SubCategories.Find(sc => sc.Title == value2).Id;
         }
 
-        var response = await TransactionService.CreateTransaction(model);
+        var response = await TransactionService.UpdateTransaction(transaction);
         if (response.Status)
         {
             Snackbar.Add("Income transactions submitted!", Severity.Success);
@@ -194,6 +214,14 @@
             Snackbar.Add("Error!", Severity.Error);
             MudDialog.Close(DialogResult.Cancel());
         }
+    }
+    private async Task OnEdit()
+    {
+
+    }
+    private async Task OnDelete()
+    {
+        
     }
 }
 

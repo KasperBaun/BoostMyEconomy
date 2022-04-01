@@ -54,7 +54,7 @@ namespace BmeBlazorServer.Services
             }
         }
 
-        public Task<bool> DeleteTransaction(TransactionDTO transaction)
+        public Task<ResponseModel> DeleteTransaction(Transaction transaction)
         {
             OnChange?.Invoke();
             throw new NotImplementedException();
@@ -69,7 +69,7 @@ namespace BmeBlazorServer.Services
             return AllUserTransactions;
         }
 
-        public Task<bool> UpdateTransaction(TransactionDTO transaction)
+        public Task<ResponseModel> UpdateTransaction(Transaction transaction)
         {
             OnChange?.Invoke();
             throw new NotImplementedException();
