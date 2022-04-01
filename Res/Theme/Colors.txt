@@ -1,8 +1,0 @@
-Background = #4A6572 <=> RGB(74,101,114)
-Primary =  #1EB980 <=> RGB(30,185,128)
-PrimaryShaded = #1EB980 <=> RGB(30,185,128) with 50% visibility
-Surface = #344955 <=> 
-PrimaryVariant = RGB(52,73,85)
-TextFaded = #FFFFFF 50% visibility
-NegativeValue = #DD0C0C <=> RGB(221,12,12)
-NegativeValueShaded = #DD0C0C <=> RGB(221,12,12) 50% visibility

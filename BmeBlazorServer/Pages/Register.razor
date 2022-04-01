@@ -1,0 +1,312 @@
+﻿@page "/register"
+
+<PageTitle>Register</PageTitle>
+@using System.Text.RegularExpressions;
+@using System.ComponentModel.DataAnnotations;
+@using BmeModels;
+@using BmeBlazorServer.Services;
+@inject IAuthService authService;
+@inject NavigationManager _nav;
+@inject ISnackbar Snackbar;
+@inject AuthenticationStateProvider AuthStateProvider
+
+<AuthorizeView>
+    <Authorized>
+        <Overview>
+
+        </Overview>
+    </Authorized>
+
+    <NotAuthorized>
+    <MudContainer Class="mt-16" MaxWidth="MaxWidth.Small">
+  
+        <EditForm Model="@user" Context="RegisterContext" OnValidSubmit="OnValidSubmit">
+            <MudPaper Class="center rounded-xl pa-12 mt-1" Elevation="4">
+                <div class="d-flex justify-center">
+                    <MudIcon Icon="@Icons.Material.Filled.AreaChart" Color="Color.Primary" Style="height:50%; width:50%;"/>
+                </div>
+                <MudText Class="mud-typography-h3" Align="Align.Center">
+                       Sign up and get to
+                </MudText>
+                <MudText Class="mud-typography-h3" Color="Color.Primary" Align="Align.Center">boosting.</MudText>
+
+                <MudGrid Spacing="6">
+                    <MudItem xs="12">
+                        <MudGrid Class="mt-10">
+                            <DataAnnotationsValidator/>
+                            <!-- First name field-->
+                            <MudItem xs=12 md="6" lg="6" xl="6">
+                                <MudTextField 
+                                    Label="First name" 
+                                    @bind-Value="user.FirstName" 
+                                    Placeholder="John" 
+                                    For="@(() => user.FirstName)"
+                                    Variant="Variant.Outlined"
+                                />
+                            </MudItem>
+                            <!-- Last name field-->
+                            <MudItem xs=12 md="6" lg="6" xl="6">
+                                <MudTextField Label="Last name" @bind-Value="user.LastName" Placeholder="Doe" For="@(() => user.LastName)"Variant="Variant.Outlined"/>
+                            </MudItem>
+                            <!-- Email field-->    
+                            <MudItem xs=12>
+                                <MudTextField Label="Email" @bind-Value="user.Email" Placeholder="Your email adress" For="@(() => user.Email)" Variant="Variant.Outlined"/>
+                            </MudItem>
+                            <!-- Password field-->
+                            <MudItem xs=12>
+                                <MudTextField   Label="Password" @bind-Value="user.Password" 
+                                                Placeholder="Create a password" 
+                                                For="@(() => user.Password)"
+                                                HelperText="Use 8-30 characters with a mix of letters, numbers & symbols" 
+                                                InputType="@PasswordInput"
+                                                Variant="Variant.Outlined"
+                                                Adornment="Adornment.End" 
+                                                AdornmentColor="Color.Primary" 
+                                                AdornmentIcon="@PasswordInputIcon"
+                                                OnAdornmentClick="TogglePasswordHidden"
+                                                /> 
+                            </MudItem>
+
+                            <!-- Register button -->
+                            <MudItem xs="12" Class="d-flex justify-center">
+                                <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="rounded-lg" Style="width: 100%; height: 50px;">
+                                    @if (_processing)
+                                    {
+                                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                                        <MudText Class="ms-2">Processing</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText>Register</MudText>
+                                    }
+                                </MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </EditForm>
+    </MudContainer>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private UserRegistrationDTO user = new UserRegistrationDTO();
+
+    /* This block of code is used to handle user registrering when pressing the register button */ 
+    private bool _processing = false;
+
+    private async Task OnValidSubmit(EditContext RegisterContext)
+    {
+        StateHasChanged();
+        await OnRegisterClicked();
+    }
+
+    private async Task OnRegisterClicked()
+    {
+        _processing = true;
+        try
+        {
+            var response = await authService.RegisterUser(user);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+                Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+                Snackbar.Configuration.VisibleStateDuration = 3000;
+                Snackbar.Add("User created succesfully. You can now login", Severity.Success);
+                _processing = false;
+                _nav.NavigateTo("login");
+            }
+            if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+                Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+                Snackbar.Configuration.VisibleStateDuration = 3000;
+                Snackbar.Add("User already exists. Please try again.", Severity.Error);
+                _processing = false;
+            }
+            if(response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+                Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+                Snackbar.Configuration.VisibleStateDuration = 3000;
+                Snackbar.Add("Failed to create user. Please try again.", Severity.Error);
+                _processing = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("$Register.razor: Exception caught - " + ex.Message);
+        }
+    }
+
+    
+
+    /* Hide/show password functionality */
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void TogglePasswordHidden()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    /* Password strenght functionality */
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+<MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">
+    <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">Checkout</MudText>
+    <MudGrid Spacing="6" Class="mt-16">
+        <MudItem xs="7">
+            <MudText Typo="Typo.h5" GutterBottom="true">Billing address</MudText>
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="Email" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="Mobile number" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="Personal number" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField T="string" Label="First name" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField T="string" Label="Last name" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="Address" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField T="string" Label="Postal code" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField T="string" Label="Postal Area" />
+                </MudItem>
+                <MudItem xs="12" Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled" DisableElevation="true" Color="Color.Primary" Size="Size.Large" Class="mt-8">Continue to Payment</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem xs="5">
+            <MudText Typo="Typo.h5" GutterBottom="true">Cart</MudText>
+            <MudPaper Class="d-flex flex-column" Style="height:100%;" Outlined="true">
+                <MudList Clickable="true">
+                    <MudListItem Icon="@Icons.Material.Filled.ContentCut">
+                        <div class="d-flex">
+                            <MudText>Scissor - Big</MudText>
+                            <MudText Inline="true" Class="ml-auto">$5</MudText>
+                        </div>
+                    </MudListItem>
+                    <MudListItem Icon="@Icons.Material.Filled.AirplanemodeActive">
+                        <div class="d-flex">
+                            <MudText>Model Airplane</MudText>
+                            <MudText Class="ml-auto">$20</MudText>
+                        </div>
+                    </MudListItem>
+                    <MudListItem Icon="@Icons.Material.Filled.Create">
+                        <div class="d-flex">
+                            <MudText>Plastic Glue</MudText>
+                            <MudText Class="ml-auto">$12</MudText>
+                        </div>
+                    </MudListItem>
+                    <MudListItem Icon="@Icons.Material.Filled.ColorLens">
+                        <div class="d-flex">
+                            <MudText>Color set - Modern planes</MudText>
+                            <MudText Class="ml-auto">$16</MudText>
+                        </div>
+                    </MudListItem>
+                </MudList>
+                <div class="mt-auto">
+                    <MudDivider />
+                    <div class="d-flex pa-4">
+                        <MudText>Total:</MudText>
+                        <MudText Class="ml-auto"><b>$53</b></MudText>
+                    </div>
+                </div>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+-->
+
+@code {
+    private int currentCount = 0;
+	
+	[Parameter]
+	public int IncrementAmount { get; set; } = 1;
+
+    private void IncrementCount()
+    {
+        currentCount+= IncrementAmount;
+    }
+}

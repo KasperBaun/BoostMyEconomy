@@ -1,0 +1,69 @@
+﻿@inherits LayoutComponentBase
+@using MudBlazor.Services;
+@using BmeBlazorServer.Theme;
+@using BmeModels;
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>BoostMyEconomy</PageTitle>
+
+<MudThemeProvider Theme="RallyGreenDarkTheme"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<AuthorizeView>
+    <Authorized>
+        <MudLayout>
+            <MudDrawer Elevation="4" Open="true">
+                <NavMenu />
+            </MudDrawer>
+
+            <MudMainContent>
+                @Body
+            </MudMainContent>
+        </MudLayout>
+    </Authorized>
+    <NotAuthorized>
+        <MudMainContent>
+                @Body
+        </MudMainContent>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+@code {
+
+    MudTheme RallyGreenDarkTheme = new MudTheme()
+        {
+            Palette = new Palette()
+            {
+                AppbarBackground = Colors.BlueGrey.Darken3,
+                AppbarText = Colors.Grey.Default, 
+                TextPrimary = Colors.Shades.White,
+                TextSecondary = Colors.Shades.White,
+                DrawerBackground = Colors.BlueGrey.Darken3,
+                DrawerText = Colors.Green.Default,
+                Background = Colors.BlueGrey.Darken1,
+                Surface = Colors.BlueGrey.Darken3,
+                Primary = Colors.Teal.Default,
+                Secondary = Colors.Green.Darken1,
+                Tertiary = Colors.Green.Darken1,
+                Info = Colors.Green.Darken1,
+                Success = Colors.Green.Darken1,
+                Warning = Colors.Green.Darken1,
+                Error = Colors.Red.Darken1,
+                TableLines = Colors.Teal.Default,
+                TableStriped = Colors.Teal.Default,
+                TableHover = Colors.Teal.Default,
+                LinesDefault = Colors.Teal.Default,
+            },
+          
+            LayoutProperties = new LayoutProperties()
+            {
+                DrawerWidthLeft = "100px",
+                DrawerWidthRight = "100px",
+                AppbarHeight = "5px"
+               
+            }
+        };
+}
