@@ -67,6 +67,10 @@
                 <MudGrid>
                     <MudItem xs="12" sm="12" md="12">
                             <MudTable
+                                @ref="mudTable"
+                                T="Transaction"
+                                RowClassFunc="@SelectedRowClassFunc"
+                                OnRowClick="OpenEditTransactionDialog"
                                 Height="360px"
                                 Items="IncomeService.IncomeForPeriod" 
                                 Elevation="25"
@@ -76,7 +80,8 @@
                                 Hover="true" 
                                 Bordered="false"
                                 Striped="@striped"
-                                Filter="new Func<Transaction,bool>(FilterFunc1)" @bind-SelectedItem="@selectedTransaction"
+                                Filter="new Func<Transaction,bool>(FilterFunc1)" 
+                                @bind-SelectedItem="@selectedTransaction"
                                 >
                             <HeaderContent>
                                 <MudTh>Date</MudTh>
@@ -206,10 +211,13 @@
     }
 
     /* Income table */
+    private MudTable<Transaction> mudTable;
+    private int selectedRowNumber = -1;
     private bool dense = false;
     private bool striped = false;
     private string searchString1 = "";
-    private Transaction selectedTransaction = new();
+    [Parameter]
+    public Transaction selectedTransaction { get; set; } = new();
     private HashSet<Transaction> selectedItems = new HashSet<Transaction>();
     public bool FilterFunc1(Transaction transaction) => FilterFunc(transaction, searchString1);
     public bool FilterFunc(Transaction transaction, string searchString)
@@ -229,13 +237,44 @@
             return true;
         return false;
     }
-    [Parameter]
-    public Transaction editTransaction { get; set; }
+
+    private string SelectedRowClassFunc(Transaction transaction, int rowNumber)
+    {
+        if (selectedRowNumber == rowNumber)
+        {
+            selectedRowNumber = -1;
+            return string.Empty;
+        }
+        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(transaction))
+        {
+            selectedRowNumber = rowNumber;
+            return "selected";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+
+    //[Parameter]
+    //public Transaction editTransaction { get; set; } = new();
     async Task OpenEditTransactionDialog()
     {
-        var transactionParameter = new DialogParameters { { "editTransaction", editTransaction } };
+        /*
+        editTransaction.Id = selectedTransaction.Id;
+        editTransaction.UserId = selectedTransaction.UserId;
+        editTransaction.MadeAt = selectedTransaction.MadeAt;
+        editTransaction.Value = selectedTransaction.Value;
+        editTransaction.Type = selectedTransaction.Type;
+        editTransaction.CategoryId = selectedTransaction.CategoryId;
+        editTransaction.Source = selectedTransaction.Source;
+        editTransaction.SubcategoryId = selectedTransaction.SubcategoryId;
+        editTransaction.Description = selectedTransaction.Description;
+        */
+        
+        var transactionParameter = new DialogParameters { ["transaction"]=selectedTransaction };
         var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
-        var dialog = DialogService.Show<EditTransactionDialog>(editTransaction.Source,options);
+        var dialog = DialogService.Show<EditTransactionDialog>("",transactionParameter, options);
         var result = await dialog.Result;
 
         if (result.Cancelled)

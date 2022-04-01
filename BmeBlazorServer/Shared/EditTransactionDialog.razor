@@ -6,14 +6,14 @@
 @inject ITransactionService TransactionService
 @inject ISnackbar Snackbar
 
-<EditForm Model="@transaction">
+<EditForm Model="@transaction" >
 <DataAnnotationsValidator/>
 <MudDialog Class="rounded-xl">
     <DialogContent>
         <MudText Typo="Typo.h4" Class="mx-3 mb-6 mt-4" Color="Color.Primary">Edit transaction</MudText>
         <MudTextField 
-            @bind-Value="transaction.Source"
-            For="@(() => transaction.Source)"
+            @bind-Value="@transaction.Source"
+            For="@(() => @transaction.Source)"
             Label="Debitor/Source" 
             HelperText="E.g: Microsoft"  
             Class="pa-3" 
@@ -24,7 +24,6 @@
 
         <MudField 
             Label="Type"
-            For="@(() => transaction.Type)"
             Variant="@incomeFieldVariant" 
             Class="pa-3"
             Adornment="Adornment.End" 
@@ -34,7 +33,7 @@
         </MudField>
 
         <MudAutocomplete 
-            @bind-Value="transaction.Type"
+            @bind-Value="@transaction.Type"
             T="string" 
             Label="Category"
             Class="pa-3"
@@ -46,8 +45,8 @@
         </MudAutocomplete>
 
         <MudTextField 
-            @bind-Value="transaction.Value"
-            For="@(() => transaction.Value)"
+            @bind-Value="@transaction.Value"
+            For="@(() => @transaction.Value)"
             Label="Value" 
             HelperText="E.g: 4000" 
             Class="pa-3" 
@@ -91,8 +90,8 @@
         </MudAutocomplete>
 
         <MudTextField 
-            @bind-Value="transaction.Description"
-            For="@(() => transaction.Description)"
+            @bind-Value="@transaction.Description"
+            For="@(() => @transaction.Description)"
             Label="Description" 
             HelperText="E.g: Sold my car"  
             Class="pa-3" 
@@ -120,7 +119,9 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public Transaction transaction { get; set; }
+    [Parameter] public Transaction transaction { get; set; } = new Transaction();
+    public Transaction model { get; set; } = new();
+
 
     void Cancel() => MudDialog.Cancel();
     private Variant incomeFieldVariant = Variant.Filled;

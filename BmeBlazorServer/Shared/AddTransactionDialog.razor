@@ -186,7 +186,7 @@
         var response = await TransactionService.CreateTransaction(model);
         if (response.Status)
         {
-            Snackbar.Add("Income transactions submitted!", Severity.Success);
+            Snackbar.Add("Income transaction submitted!", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
 
         }
