@@ -10,11 +10,11 @@ namespace BmeModels
         public string Source { get; set; } = null!;
 
         [Required]
-        [RegularExpression(@"[-0-9][^\>A-Za-z]*", ErrorMessage = "Password must contain at least one capital letter, one lowercase letter and one digit")]
+        [RegularExpression(@"[-0-9][^\>A-Za-z]*", ErrorMessage = "Value must only contain numbers!")]
         public int Value { get; set; }
 
         [Required(ErrorMessage = "Transaction date is required!")]
-        public string MadeAt { get; set; } = null!;
+        public DateTime MadeAt { get; set; }
 
         [Required(ErrorMessage = "Category is required!")]
         public int CategoryId { get; set; }

@@ -1,8 +1,8 @@
 ﻿using BmeModels;
 
-namespace BmeBlazorServer.Services
+namespace BmeBlazorServer.Repositories
 {
-    public interface IUserService
+    public interface IUserRepository
     {
         event Action? OnChange;
         public User CurrentUser { get; set; }

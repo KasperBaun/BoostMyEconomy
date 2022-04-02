@@ -1,9 +1,10 @@
 ﻿@page "/income"
-@using MudBlazor;
-@using BmeModels;
+@using MudBlazor
+@using BmeModels
+@using BmeBlazorServer.Repositories
 @inject IDialogService DialogService
 @inject IIncomeService IncomeService
-@inject IUserService UserService
+@inject IUserRepository UserRepository
 @implements IDisposable
 
 <PageTitle>Income</PageTitle>
@@ -172,9 +173,9 @@
     {
         try
         {
-            await UserService.FetchCurrentUser();
-            UserService.OnChange += StateHasChanged;
-            Console.WriteLine("$Income.razor@OnInitializedAsync(): Attempting to fetch user from API: "+ UserService.CurrentUser.Email);
+            await UserRepository.FetchCurrentUser();
+            UserRepository.OnChange += StateHasChanged;
+            Console.WriteLine("$Income.razor@OnInitializedAsync(): Attempting to fetch user from API: "+ UserRepository.CurrentUser.Email);
             IncomeService.OnChange += StateHasChanged;
             bool dataReady = await IncomeService.InitializeService();
             if (dataReady)
@@ -191,7 +192,7 @@
     public void Dispose()
     {
         IncomeService.OnChange -= StateHasChanged;
-        UserService.OnChange -= StateHasChanged;
+        UserRepository.OnChange -= StateHasChanged;
     }
 
 

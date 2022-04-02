@@ -1,19 +1,23 @@
 ﻿using BmeModels;
 using Newtonsoft.Json;
+using BmeBlazorServer.Services;
 
-namespace BmeBlazorServer.Services
+namespace BmeBlazorServer.Repositories
 {
-    public class TransactionService : ITransactionService
+    public class TransactionRepository : ITransactionRepository
     {
         public event Action? OnChange;
-        private List<Transaction> AllUserTransactions { get; set; } = new();
+        private List<Transaction> UserTransactions { get; set; } = new();
+        private List<Category> Categories { get; set; } = new();
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
+        private readonly ICategoryRepository categoryRepository;
 
-        public TransactionService(HttpClient _httpClient, ILocalStorageService _localStorageService)
+        public TransactionRepository(HttpClient _httpClient, ILocalStorageService _localStorageService, ICategoryRepository _categoryRepository)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
+            categoryRepository = _categoryRepository;
         }
 
         public async Task<ResponseModel> CreateTransaction(TransactionDTO transaction)
@@ -94,11 +98,11 @@ namespace BmeBlazorServer.Services
 
         public async Task<List<Transaction>> GetTransactions()
         {
-            if (!AllUserTransactions.Any())
+            if (!UserTransactions.Any())
             {
                 await FetchUserTransactions();
             }
-            return AllUserTransactions;
+            return UserTransactions;
         }
 
         public async Task<ResponseModel> UpdateTransaction(Transaction transaction)
@@ -117,10 +121,10 @@ namespace BmeBlazorServer.Services
                 responseModel.Status = true;
                 Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
                 responseModel.Message = response.ReasonPhrase + response.Content;
-                var index = AllUserTransactions.FindIndex(x => x.Id == transaction.Id);
+                var index = UserTransactions.FindIndex(x => x.Id == transaction.Id);
                 if(index > -1)
                 {
-                    AllUserTransactions[index] = transaction;
+                    UserTransactions[index] = transaction;
                 }
                 OnChange?.Invoke();
                 return responseModel;
@@ -145,11 +149,30 @@ namespace BmeBlazorServer.Services
 
         private async Task FetchUserTransactions()
         {
+            Categories = await categoryRepository.GetCategories();
+            //foreach(Category c in Categories)
+            //{
+            //    Console.WriteLine(c.Title);
+            //}
+            /*
+            for(int i = 0; i<50; i++)
+            {
+                TransactionDTO transactionDTO = new()
+                {
+                    CategoryId = 1,
+                    Description = "Hej",
+                    MadeAt = DateTime.Now,
+                    Source = "Novozymes",
+                    SubcategoryId = 0,
+                    Type ="Income",
+                    UserId = 3,
+                    Value = 4500+i
+                };
+                CreateTransaction(transactionDTO);
+            }
+            */
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Transaction/All");
-            var token = await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
+            requestMessage.Headers.Authorization = AuthStateProvider.TokenBearer;
             var response = await httpClient.SendAsync(requestMessage);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -158,12 +181,12 @@ namespace BmeBlazorServer.Services
                 var responseContent = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
                 if (responseContent != null)
                 {
-                    AllUserTransactions = responseContent;
+                    UserTransactions = responseContent;
                 }
                 else
                 {
                     Console.WriteLine("$TransactionService.cs@FetchUserTransactions(): failed fetching transactions from WebAPI");
-                    AllUserTransactions.Clear();
+                    UserTransactions.Clear();
                 }
             }
         }

@@ -1,7 +1,8 @@
 ﻿@page "/overview"
 @using BmeModels
+@using BmeBlazorServer.Repositories
 @inject ISnackbar Snackbar
-@inject IUserService UserService
+@inject IUserRepository UserRepository
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IOverviewService OverviewService
 @implements IDisposable

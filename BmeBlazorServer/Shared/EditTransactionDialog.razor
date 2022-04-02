@@ -1,9 +1,10 @@
 ﻿@using MudBlazor
 @using BmeModels
 @using BmeBlazorServer.Services
+@using BmeBlazorServer.Repositories
 @using System.ComponentModel.DataAnnotations
-@inject ICategoryService CategoryService
-@inject ITransactionService TransactionService
+@inject ICategoryRepository CategoryRepository
+@inject ITransactionRepository TransactionRepository
 @inject ISnackbar Snackbar
 
 <EditForm Model="transaction" >
@@ -128,7 +129,7 @@
         // fetch categories from API
         if (!Categories.Any())
         {
-            Categories = await CategoryService.GetCategories();
+            Categories = await CategoryRepository.GetCategories();
             foreach(Category c in Categories)
             {   
                 // Only take income part of categories
@@ -152,7 +153,7 @@
         // fetch subCategories from API
         if (!SubCategories.Any())
         {
-            SubCategories = await CategoryService.GetSubCategories();
+            SubCategories = await CategoryRepository.GetSubCategories();
             value2 = SubCategories.Single(x => x.Id == transaction.SubcategoryId).Title;
         }
         // if text is null or empty, show complete list
@@ -175,7 +176,7 @@
         bool inputOk = ValidateInput();
         if (inputOk)
         {
-            var response = await TransactionService.UpdateTransaction(transaction);
+            var response = await TransactionRepository.UpdateTransaction(transaction);
             if (response.Status)
             {
                 Snackbar.Add("Income edit successful!", Severity.Success);
@@ -203,7 +204,7 @@
         bool inputOk = ValidateInput();
         if (inputOk)
         {
-            var response = await TransactionService.DeleteTransaction(transaction.Id);
+            var response = await TransactionRepository.DeleteTransaction(transaction.Id);
             if (response.Status)
             {
                 Snackbar.Add("Delete successful!", Severity.Success);

@@ -1,84 +1,33 @@
 ﻿using BmeModels;
 using MudBlazor;
-using Newtonsoft.Json;
+using BmeBlazorServer.Repositories;
 
 namespace BmeBlazorServer.Services
 {
     public class IncomeService : IIncomeService
     {
-        private readonly HttpClient httpClient;
-        private readonly ILocalStorageService localStorageService;
-        private List<Transaction> AllUserTransactions { get; set; } = new();
-        private List<Category> Categories { get; set; } = new();
+        private readonly ITransactionRepository transactionRepository;
+        private List<Transaction> UserTransactions { get; set; } = new();
         public DateRange? PeriodSelected { get; set; }
         public List<Transaction> IncomeForPeriod { get; set; } = new();
         public ChartData IncomeSourcesForPeriod { get; set; } = new();
         public List<ChartSeries> IncomeHistory { get; set; } = new();
         public string[] IncomeHistoryLabels { get; set; } = Array.Empty<string>();
         public event Action? OnChange;
-        public IncomeService(HttpClient _httpClient, ILocalStorageService _localStorageService)
+        public IncomeService(ITransactionRepository _transactionRepository)
         {
-            httpClient = _httpClient;
-            localStorageService = _localStorageService;
+            transactionRepository = _transactionRepository;
             PeriodSelected = new DateRange(new DateTime(DateTime.Now.Year, 1, 1), DateTime.Now.Date);
-        }
-        private async Task FetchUserTransactions()
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Transaction/All");
-            var token = await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var response = await httpClient.SendAsync(requestMessage);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                var responseBody = await response.Content.ReadAsStringAsync();
-                var userTransactions = JsonConvert.DeserializeObject<List<Transaction>>(responseBody);
-                if(userTransactions != null)
-                {
-                    AllUserTransactions = userTransactions;
-                }
-                else
-                {
-                    AllUserTransactions.Clear();
-                    throw new Exception("$IncomeService.cs@FetchUserTransactions(): Fetch failed");
-                }
-            }
-        }
-        private async Task FetchCategories()
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Categories/All");
-            var token = await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var response = await httpClient.SendAsync(requestMessage);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                var responseBody = await response.Content.ReadAsStringAsync();
-                var categories = JsonConvert.DeserializeObject<List<Category>>(responseBody);
-                if(categories != null)
-                {
-                    Categories = categories;
-                }
-                else
-                {
-                    Categories = new List<Category>();
-                    throw new Exception("$IncomeService.cs@FetchCategories(): Fetch failed");
-                }
-            }
         }
         private List<Transaction> FilterTransactionsFromSelectedPeriod(DateRange periodSelected)
         {
             List<Transaction> list = new();
             if(periodSelected.Start.HasValue && periodSelected.End.HasValue)
             {
-                DateOnly Start = DateOnly.FromDateTime(periodSelected.Start.Value);
-                DateOnly End = DateOnly.FromDateTime(periodSelected.End.Value);
-                list = AllUserTransactions.Where(x => 
-                DateOnly.Parse(s: x.MadeAt) >= Start && DateOnly.Parse(s: x.MadeAt) <= End && x.Type=="Income").ToList();
+                DateTime Start = periodSelected.Start.Value;
+                DateTime End = periodSelected.End.Value;
+                list = UserTransactions.Where(x => 
+                x.MadeAt.Date >= Start && x.MadeAt <= End && x.Type=="Income").ToList();
                 return list;
             }
             else
@@ -120,15 +69,15 @@ namespace BmeBlazorServer.Services
             List<double> data = new();
             List<string> months = new();
             incomeTransactions.Sort((a, b) =>
-                    DateTime.Parse(a.MadeAt).Month
+                    a.MadeAt.Month
                     .CompareTo(
-                    DateTime.Parse(b.MadeAt).Month
+                    b.MadeAt.Month
                     ));
 
             foreach (Transaction t in incomeTransactions)
             {
-                Console.WriteLine("Month: {0}\n", DateTime.Parse(t.MadeAt).Month);
-                int tMonth = DateTime.Parse(t.MadeAt).Month;
+                Console.WriteLine("Month: {0}\n", t.MadeAt.Month);
+                int tMonth = t.MadeAt.Month;
                 string tMonthConverted = ConvertMonthToString(tMonth);
                 if (months.Contains(tMonthConverted)){
                     continue;
@@ -138,7 +87,7 @@ namespace BmeBlazorServer.Services
                     months.Add(tMonthConverted);
                     int index = months.FindIndex(m => m == tMonthConverted);
                     double sourceSum = incomeTransactions.Where(x => 
-                        DateTime.Parse(x.MadeAt).Month == tMonth).ToList().Sum(y => y.Value);
+                        x.MadeAt.Month == tMonth).ToList().Sum(y => y.Value);
                     data.Insert(index,sourceSum);
                 }
             }
@@ -190,8 +139,7 @@ namespace BmeBlazorServer.Services
         }
         public async Task<bool> InitializeService()
         {
-            await FetchCategories();
-            await FetchUserTransactions();
+            UserTransactions = await transactionRepository.GetTransactions();
             IncomeForPeriod = FilterTransactionsFromSelectedPeriod(PeriodSelected);
             IncomeSourcesForPeriod = FilterSources(IncomeForPeriod);
             FilterHistory(IncomeForPeriod);

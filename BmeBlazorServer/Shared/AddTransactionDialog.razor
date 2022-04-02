@@ -1,9 +1,10 @@
 ﻿@using MudBlazor
 @using BmeModels
 @using BmeBlazorServer.Services
+@using BmeBlazorServer.Repositories
 @using System.ComponentModel.DataAnnotations
-@inject ICategoryService CategoryService
-@inject ITransactionService TransactionService
+@inject ICategoryRepository CategoryRepository
+@inject ITransactionRepository TransactionRepository
 @inject ISnackbar Snackbar
 
 <EditForm Model="@model">
@@ -121,7 +122,7 @@
         // fetch categories from API
         if (!Categories.Any())
         {
-            Categories = await CategoryService.GetCategories();
+            Categories = await CategoryRepository.GetCategories();
             foreach(Category c in Categories)
             {   
                 // Only take income part of categories
@@ -131,7 +132,7 @@
         }
         if (!SubCategories.Any())
         {
-            SubCategories = await CategoryService.GetSubCategories();
+            SubCategories = await CategoryRepository.GetSubCategories();
         }
 
         // if text is null or empty, show complete list
@@ -147,7 +148,7 @@
         // fetch subCategories from API
         if (!SubCategories.Any())
         {
-            SubCategories = await CategoryService.GetSubCategories();
+            SubCategories = await CategoryRepository.GetSubCategories();
         }
         // if text is null or empty, show complete list
         if (string.IsNullOrEmpty(value))
@@ -165,7 +166,7 @@
         }
         else
         {
-            model.MadeAt = DateOnly.FromDateTime(date.Value).ToString();
+            model.MadeAt = date.Value;
         }
         if (string.IsNullOrEmpty(value1))
         {
@@ -183,7 +184,7 @@
             model.SubcategoryId = SubCategories.Find(sc => sc.Title == value2).Id;
         }
 
-        var response = await TransactionService.CreateTransaction(model);
+        var response = await TransactionRepository.CreateTransaction(model);
         if (response.Status)
         {
             Snackbar.Add("Income transaction submitted!", Severity.Success);

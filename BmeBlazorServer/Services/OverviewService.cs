@@ -1,15 +1,12 @@
 ﻿using BmeModels;
 using MudBlazor;
-using Newtonsoft.Json;
-
+using BmeBlazorServer.Repositories;
 namespace BmeBlazorServer.Services
 {
     public class OverviewService : IOverviewService
     {
-        private readonly HttpClient httpClient;
-        private readonly ILocalStorageService localStorageService;
-        private List<Transaction> AllUserTransactions { get; set; } = new();
-        private List<Category> Categories { get; set; } = new();
+        private readonly ITransactionRepository transactionRepository;
+        private List<Transaction> UserTransactions { get; set; } = new();
         public DateTime? YearSelected { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
         public List<Transaction> TransactionsForPeriod { get; set; } = new List<Transaction>();
         public List<double> IncomePrMonth { get; set; } = new();
@@ -19,72 +16,22 @@ namespace BmeBlazorServer.Services
         public List <Result> Results { get; set; } = new();
         public List<ChartSeries> IncomeAndExpense { get; set; } = new();
         public List<string> GetMonths { get; set; } = new(){ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-        public string SumIncome { get; set; } = String.Empty;
+        public string SumIncome { get; set; } = string.Empty;
         public int Balance { get; set; } = 1;
         public event Action? OnChange;
 
-        public OverviewService(HttpClient _httpClient, ILocalStorageService _localStorageService)
+        public OverviewService(ITransactionRepository _transactionRepository)
         {
-            httpClient = _httpClient;
-            localStorageService = _localStorageService;
+           transactionRepository = _transactionRepository;
         }
-
-        private async Task FetchUserTransactions()
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Transaction/All");
-            var token = await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var response = await httpClient.SendAsync(requestMessage);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                var responseBody = await response.Content.ReadAsStringAsync();
-                var responseContent = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
-                if (responseContent != null)
-                {
-                    AllUserTransactions = responseContent;
-                }
-                else
-                {
-                    Console.WriteLine("$TransactionService.cs@FetchUserTransactions(): failed fetching transactions from WebAPI");
-                    AllUserTransactions.Clear();
-                }
-            }
-        }
-        private async Task FetchCategoriesFromAPI()
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Categories/All");
-            var token = await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await httpClient.SendAsync(requestMessage);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                var responseBody = await response.Content.ReadAsStringAsync();
-                var responseContent = await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(responseBody));
-                if (responseContent != null)
-                {
-                    Categories = responseContent;
-                }
-                else
-                {
-                    Console.WriteLine("$OverviewService.cs@FetchCategoriesFromAPI(): failed fetching categories from WebAPI");
-                    Categories.Clear();
-                }
-            }
-        }
+             
         public async Task<bool> InitializeService()
         {
-            if(!Categories.Any())
+     
+            if(!UserTransactions.Any())
             {
-                await FetchCategoriesFromAPI();
-            }
-            if(!AllUserTransactions.Any())
-            {
-                await FetchUserTransactions();
+                UserTransactions = await transactionRepository.GetTransactions();
+                //await FetchUserTransactions();
             }
             if(YearSelected == null)
             {
@@ -107,7 +54,8 @@ namespace BmeBlazorServer.Services
         private List<Transaction> FilterTransactionsFromSelectedYear(DateTime yearSelected)
         {
             List<Transaction> list = new();
-            list = AllUserTransactions.Where(x => DateOnly.Parse(s: x.MadeAt).Year == yearSelected.Year).ToList();
+            list = UserTransactions.Where(x =>  x.MadeAt.Year == yearSelected.Year).ToList();
+            list.Sort((x, y) => DateTime.Compare(x.MadeAt, y.MadeAt));
             OnChange?.Invoke();
             return list;
         }
@@ -146,7 +94,7 @@ namespace BmeBlazorServer.Services
             double[] chartData = new double[12];
             for(int i=0; i < 12; i++)
             {
-                List<Transaction> monthlyList = list.Where(x => DateTime.Parse(x.MadeAt).Month == i).ToList();
+                List<Transaction> monthlyList = list.Where(x => x.MadeAt.Month == i).ToList();
                 double monthlySum = monthlyList.Sum(x => x.Value);
                 //Console.WriteLine("$OverviewService.cs_IncomeForPeriod(): monthlysum for {0} is {1}",i,monthlySum);
                 IncomePrMonth.Insert(i,monthlySum);
@@ -163,7 +111,7 @@ namespace BmeBlazorServer.Services
             double[] chartData = new double[12];
             for (int i = 0; i < 12; i++)
             {
-                List<Transaction> monthlyList = list.Where(x => DateTime.Parse(x.MadeAt).Month == i).ToList();
+                List<Transaction> monthlyList = list.Where(x => x.MadeAt.Month == i).ToList();
                 double monthlySum = monthlyList.Sum(x => x.Value);
                 //Console.WriteLine("$OverviewService.cs_IncomeForPeriod(): monthlysum for {0} is {1}", i, monthlySum);
                 ExpensesPrMonth.Insert(i, monthlySum*(-1));
@@ -199,7 +147,16 @@ namespace BmeBlazorServer.Services
                     {
                         if(DateTime.Now.Month >= i && DateTime.Now.Year >= YearSelected.Value.Year)
                         {
-                            ResultPrMonthAcc.Insert(i, resultPrMonth[i] + ResultPrMonthAcc.ToArray()[i-1]);
+                            double prevSum = ResultPrMonthAcc.ToArray()[i-1];
+                            if(prevSum == 0)
+                            {
+                                for( int x = resultPrMonth.Length; x>resultPrMonth.Length; x--)
+                                {
+                                    if(resultPrMonth[x] > prevSum)
+                                        prevSum = ResultPrMonthAcc.ToArray()[x]; break;
+                                }
+                            }
+                            ResultPrMonthAcc.Insert(i, resultPrMonth[i] + prevSum);
                         }
                         else
                         {

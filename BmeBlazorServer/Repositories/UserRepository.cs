@@ -3,16 +3,16 @@ using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace BmeBlazorServer.Services
+namespace BmeBlazorServer.Repositories
 {
-    public class UserService : IUserService
+    public class UserRepository : IUserRepository
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
         public User CurrentUser { get; set; } = new();
         public event Action? OnChange;
 
-        public UserService(HttpClient _httpClient, ILocalStorageService _localStorageService)
+        public UserRepository(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;

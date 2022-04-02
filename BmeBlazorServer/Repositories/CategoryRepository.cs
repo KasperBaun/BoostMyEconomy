@@ -1,9 +1,9 @@
 ﻿using BmeModels;
 using Newtonsoft.Json;
 
-namespace BmeBlazorServer.Services
+namespace BmeBlazorServer.Repositories
 {
-    public class CategoryService : ICategoryService
+    public class CategoryRepository : ICategoryRepository
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
@@ -11,7 +11,7 @@ namespace BmeBlazorServer.Services
         private List<Subcategory> SubCategories { get; set; } = new();
         public event Action? OnChange;
 
-        public CategoryService(HttpClient _httpClient, ILocalStorageService _localStorageService)
+        public CategoryRepository(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
