@@ -234,7 +234,7 @@
         }
         if (transaction.Value.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if ($"{transaction.Description} {transaction.CategoryId} {transaction.MadeAt}".Contains(searchString))
+        if ($"{transaction.Description} {transaction.Category.Title} {transaction.MadeAt}".Contains(searchString))
             return true;
         return false;
     }

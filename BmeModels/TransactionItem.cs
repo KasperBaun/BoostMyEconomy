@@ -1,7 +1,7 @@
 ﻿
 namespace BmeModels
 {
-    public class TransactionItem
+    public class Transactionitem
     {
         public int Id { get; set; }
         public int TransactionId { get; set; }

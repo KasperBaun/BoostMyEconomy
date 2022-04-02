@@ -21,9 +21,46 @@ namespace BmeWebAPI.Controllers
         // GET: api/Transaction/All
         [Authorize(Roles ="Admin,User")]
         [HttpGet("All")]
-        public async Task<ActionResult<IEnumerable<Models.Transaction>>> GetTransactions()
+        public async Task<ActionResult<IEnumerable<BmeModels.Transaction>>> GetTransactions()
         {
-            List<Models.Transaction> transactions = _context.Transactions.ToList();
+            List<Models.Transaction> dbTransactions = _context.Transactions.ToList();
+            List<BmeModels.Transaction> transactions = new();
+            foreach (var transaction in dbTransactions)
+            {
+                Models.Category dbCategory = _context.Categories.Single(c => c.Id == transaction.CategoryId);
+                Models.Subcategory? dbSubcategory = new();
+                if (_context.Subcategories.Any())
+                {
+                    dbSubcategory = _context.Subcategories.SingleOrDefault(c => c.Id == transaction.SubcategoryId);
+                }
+                BmeModels.Subcategory subcategory = new();
+                BmeModels.Category category = new()
+                {
+                    Id = dbCategory.Id,
+                    Decription = dbCategory.Decription,
+                    Title = dbCategory.Title,
+                };
+                if(dbSubcategory != null)
+                {
+                    subcategory.Id = dbSubcategory.Id;
+                    subcategory.Title = dbSubcategory.Title;
+                    subcategory.ParentCategoryId = dbSubcategory.ParentCategoryId;
+                    subcategory.Description = dbSubcategory.Description;
+                }
+                BmeModels.Transaction transactionModel = new()
+                {
+                    Id = transaction.Id,
+                    UserId = transaction.UserId,
+                    MadeAt = DateTime.Parse(transaction.MadeAt),
+                    Source = transaction.Source,
+                    Type = transaction.Type,
+                    Value = transaction.Value,
+                    Description = transaction.Description,
+                    Category = category,
+                    Subcategory = subcategory,
+                };
+                transactions.Add(transactionModel);
+            }
             return transactions;
         }
 
@@ -43,7 +80,7 @@ namespace BmeWebAPI.Controllers
                 UserId = int.Parse(userId.Value),
                 Source = transaction.Source,
                 Value = transaction.Value,
-                MadeAt = transaction.MadeAt,
+                MadeAt = transaction.MadeAt.ToString(),
                 CategoryId = transaction.CategoryId,
                 Type = transaction.Type,
                 SubcategoryId = transaction.SubcategoryId,

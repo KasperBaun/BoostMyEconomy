@@ -150,27 +150,7 @@ namespace BmeBlazorServer.Repositories
         private async Task FetchUserTransactions()
         {
             Categories = await categoryRepository.GetCategories();
-            //foreach(Category c in Categories)
-            //{
-            //    Console.WriteLine(c.Title);
-            //}
-            /*
-            for(int i = 0; i<50; i++)
-            {
-                TransactionDTO transactionDTO = new()
-                {
-                    CategoryId = 1,
-                    Description = "Hej",
-                    MadeAt = DateTime.Now,
-                    Source = "Novozymes",
-                    SubcategoryId = 0,
-                    Type ="Income",
-                    UserId = 3,
-                    Value = 4500+i
-                };
-                CreateTransaction(transactionDTO);
-            }
-            */
+        
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/Transaction/All");
             requestMessage.Headers.Authorization = AuthStateProvider.TokenBearer;
             var response = await httpClient.SendAsync(requestMessage);
@@ -180,7 +160,12 @@ namespace BmeBlazorServer.Repositories
                 var responseBody = await response.Content.ReadAsStringAsync();
                 var responseContent = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
                 if (responseContent != null)
-                {
+                {   /*
+                    foreach(var transaction in responseContent)
+                    {
+                        Console.WriteLine(transaction.ToString());
+                    }
+                    */
                     UserTransactions = responseContent;
                 }
                 else

@@ -137,7 +137,7 @@
                     categories.Add(c.Title);
             }
             types.Add("Income"); types.Add("Income");
-            value1 = Categories.Single(x => x.Id == transaction.CategoryId).Title;
+            value1 = transaction.Category.Title;
         }
 
         // if text is null or empty, show complete list
@@ -154,7 +154,7 @@
         if (!SubCategories.Any())
         {
             SubCategories = await CategoryRepository.GetSubCategories();
-            value2 = SubCategories.Single(x => x.Id == transaction.SubcategoryId).Title;
+            value2 = transaction.Subcategory.Title;
         }
         // if text is null or empty, show complete list
         if (string.IsNullOrEmpty(value))
@@ -241,14 +241,14 @@
         }
         else
         {
-            transaction.CategoryId = Categories.Find(c => c.Title == value1).Id;
+            //transaction.CategoryId = Categories.Find(c => c.Title == value1).Id;
         }
         if(string.IsNullOrEmpty(value2)){
-            transaction.SubcategoryId = 0;
+            //transaction.SubcategoryId = 0;
         }
         else
         {
-            transaction.SubcategoryId = SubCategories.Find(sc => sc.Title == value2).Id;
+            //transaction.SubcategoryId = SubCategories.Find(sc => sc.Title == value2).Id;
         }
         return true;
     }
