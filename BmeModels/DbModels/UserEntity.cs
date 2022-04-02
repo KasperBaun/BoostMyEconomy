@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BmeWebAPI.Models
+namespace BmeModels.DbModels
 {
-    public partial class User
+    public partial class UserEntity
     {
-        public User()
+        public UserEntity()
         {
-            Transactions = new HashSet<Transaction>();
+            Transactions = new HashSet<TransactionEntity>();
         }
 
         public int Id { get; set; }
@@ -21,7 +21,7 @@ namespace BmeWebAPI.Models
         public int? Age { get; set; }
         public string? Gender { get; set; }
 
-        public virtual Role Role { get; set; } = null!;
-        public virtual ICollection<Transaction> Transactions { get; set; }
+        public virtual RoleEntity Role { get; set; } = null!;
+        public virtual ICollection<TransactionEntity> Transactions { get; set; }
     }
 }

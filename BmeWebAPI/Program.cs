@@ -7,9 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-using System.Security.Cryptography.X509Certificates;
-using System.Net;
-using System.Net.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 

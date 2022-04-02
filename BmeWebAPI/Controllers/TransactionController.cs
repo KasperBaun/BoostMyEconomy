@@ -23,7 +23,7 @@ namespace BmeWebAPI.Controllers
         [HttpGet("All")]
         public async Task<ActionResult<IEnumerable<BmeModels.Transaction>>> GetTransactions()
         {
-            List<Models.Transaction> dbTransactions = _context.Transactions.ToList();
+            List<Models.TransactionEntity> dbTransactions = _context.Transactions.ToList();
             List<BmeModels.Transaction> transactions = new();
             foreach (var transaction in dbTransactions)
             {
@@ -43,7 +43,7 @@ namespace BmeWebAPI.Controllers
             {
                 return BadRequest("UserId not found!");
             }
-            Models.Transaction dbTransaction = new()
+            Models.TransactionEntity dbTransaction = new()
             {   
                 Id = _context.Transactions.Count() + 1,
                 UserId = int.Parse(userId.Value),
@@ -72,7 +72,7 @@ namespace BmeWebAPI.Controllers
         // PUT: api/Transaction/
         [Authorize(Roles = "Admin,User")]
         [HttpPut]
-        public async Task<IActionResult> UpdateTransaction(Models.Transaction transaction)
+        public async Task<IActionResult> UpdateTransaction(Models.TransactionEntity transaction)
         {
             _context.Transactions.Update(transaction);
             try
@@ -103,10 +103,10 @@ namespace BmeWebAPI.Controllers
             return NoContent();
         }
 
-        private BmeModels.Transaction dbToModel(Models.Transaction dbTransaction)
+        private BmeModels.Transaction dbToModel(Models.TransactionEntity dbTransaction)
         {
-            Models.Category dbCategory = _context.Categories.Single(c => c.Id == dbTransaction.CategoryId);
-            Models.Subcategory? dbSubcategory = new()
+            Models.CategoryEntity dbCategory = _context.Categories.Single(c => c.Id == dbTransaction.CategoryId);
+            Models.SubcategoryEntity? dbSubcategory = new()
             {
                 Id = 0,
                 ParentCategoryId = 0,

@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BmeWebAPI.Models
+namespace BmeModels.DbModels
 {
-    public partial class Subcategory
+    public partial class SubcategoryEntity
     {
         public int Id { get; set; }
         public int ParentCategoryId { get; set; }
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
 
-        public virtual Category ParentCategory { get; set; } = null!;
+        public virtual CategoryEntity ParentCategory { get; set; } = null!;
     }
 }

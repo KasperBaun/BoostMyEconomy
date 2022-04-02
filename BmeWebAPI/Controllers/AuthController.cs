@@ -26,7 +26,7 @@ namespace BmeWebAPI.Controllers
         [HttpPost("UserExists")]
         public async Task<ActionResult<bool>> UserExists(string email)
         {
-            Models.User? response = await _context.Users.SingleOrDefaultAsync(e => e.Email == email);
+            Models.UserEntity? response = await _context.Users.SingleOrDefaultAsync(e => e.Email == email);
             //Console.WriteLine(response?.Email);
             if (response == null)
             {
@@ -39,7 +39,7 @@ namespace BmeWebAPI.Controllers
         [HttpPost("Login")]
         public async Task<ActionResult<string>> Login(UserLoginDTO request)
         {
-            Models.User? dbUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
+            Models.UserEntity? dbUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
             // Lookup user in DB so we can compare hash and salt
             if (dbUser == null)
             {
@@ -55,12 +55,12 @@ namespace BmeWebAPI.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<ActionResult<Models.User>> Register(UserRegistrationDTO newUser)
+        public async Task<ActionResult<Models.UserEntity>> Register(UserRegistrationDTO newUser)
         {
             var userExists = await _context.Users.AnyAsync(e => e.Email == newUser.Email);
             if (!userExists) 
             {
-                Models.User user = new();
+                Models.UserEntity user = new();
                 user.Id = _context.Users.Count() + 1;
                 user.RoleId = 2;
                 user.FirstName = newUser.FirstName;
@@ -90,9 +90,9 @@ namespace BmeWebAPI.Controllers
                 return Conflict("User already exists!");
             }
         }
-        private async Task<string> CreateToken(Models.User user)
+        private async Task<string> CreateToken(Models.UserEntity user)
         {
-            Models.Role? userRole = await _context.Roles.FindAsync(user.RoleId);
+            Models.RoleEntity? userRole = await _context.Roles.FindAsync(user.RoleId);
             if(userRole == null)
             {
                 throw new Exception("User role was not found in AuthController_CreateToken()!");

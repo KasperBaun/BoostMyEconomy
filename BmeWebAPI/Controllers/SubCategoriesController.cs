@@ -21,7 +21,7 @@ namespace BmeWebAPI.Controllers
         // GET: api/SubCategories
         [Authorize(Roles = "Admin,User")]
         [HttpGet("All")]
-        public async Task<ActionResult<IEnumerable<Subcategory>>> GetSubCategories()
+        public async Task<ActionResult<IEnumerable<SubcategoryEntity>>> GetSubCategories()
         {
             return await _context.Subcategories.ToListAsync();
         }
@@ -29,7 +29,7 @@ namespace BmeWebAPI.Controllers
         // GET: api/Categories/5
         [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
-        public async Task<ActionResult<Subcategory>> GetSubCategory(int subcategoryId)
+        public async Task<ActionResult<SubcategoryEntity>> GetSubCategory(int subcategoryId)
         {
             var subcategory = await _context.Subcategories.FindAsync(subcategoryId);
 
@@ -45,7 +45,7 @@ namespace BmeWebAPI.Controllers
         // PUT: api/SubCategories/5
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(int subcategoryId, Subcategory subcategory)
+        public async Task<IActionResult> PutCategory(int subcategoryId, SubcategoryEntity subcategory)
         {
             if (subcategoryId != subcategory.Id)
             {

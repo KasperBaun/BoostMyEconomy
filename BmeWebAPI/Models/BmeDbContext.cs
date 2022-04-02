@@ -16,12 +16,12 @@ namespace BmeWebAPI.Models
         {
         }
 
-        public virtual DbSet<Category> Categories { get; set; } = null!;
-        public virtual DbSet<Role> Roles { get; set; } = null!;
-        public virtual DbSet<Subcategory> Subcategories { get; set; } = null!;
-        public virtual DbSet<Transaction> Transactions { get; set; } = null!;
-        public virtual DbSet<Transactionitem> Transactionitems { get; set; } = null!;
-        public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<CategoryEntity> Categories { get; set; } = null!;
+        public virtual DbSet<RoleEntity> Roles { get; set; } = null!;
+        public virtual DbSet<SubcategoryEntity> Subcategories { get; set; } = null!;
+        public virtual DbSet<TransactionEntity> Transactions { get; set; } = null!;
+        public virtual DbSet<TransactionitemEntity> Transactionitems { get; set; } = null!;
+        public virtual DbSet<UserEntity> Users { get; set; } = null!;
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,7 +29,7 @@ namespace BmeWebAPI.Models
             modelBuilder.UseCollation("utf8_general_ci")
                 .HasCharSet("utf8");
 
-            modelBuilder.Entity<Category>(entity =>
+            modelBuilder.Entity<CategoryEntity>(entity =>
             {
                 entity.ToTable("categories");
 
@@ -46,7 +46,7 @@ namespace BmeWebAPI.Models
                     .HasColumnName("title");
             });
 
-            modelBuilder.Entity<Role>(entity =>
+            modelBuilder.Entity<RoleEntity>(entity =>
             {
                 entity.ToTable("roles");
 
@@ -63,7 +63,7 @@ namespace BmeWebAPI.Models
                     .HasColumnName("title");
             });
 
-            modelBuilder.Entity<Subcategory>(entity =>
+            modelBuilder.Entity<SubcategoryEntity>(entity =>
             {
                 entity.ToTable("subcategories");
 
@@ -90,7 +90,7 @@ namespace BmeWebAPI.Models
                     .HasConstraintName("parentCategoryId");
             });
 
-            modelBuilder.Entity<Transaction>(entity =>
+            modelBuilder.Entity<TransactionEntity>(entity =>
             {
                 entity.ToTable("transactions");
 
@@ -139,7 +139,7 @@ namespace BmeWebAPI.Models
                     .HasConstraintName("userId");
             });
 
-            modelBuilder.Entity<Transactionitem>(entity =>
+            modelBuilder.Entity<TransactionitemEntity>(entity =>
             {
                 entity.ToTable("transactionitems");
 
@@ -166,7 +166,7 @@ namespace BmeWebAPI.Models
                     .HasConstraintName("TransactionId");
             });
 
-            modelBuilder.Entity<User>(entity =>
+            modelBuilder.Entity<UserEntity>(entity =>
             {
                 entity.ToTable("users");
 
