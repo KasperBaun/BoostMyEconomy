@@ -106,7 +106,14 @@ namespace BmeWebAPI.Controllers
         private BmeModels.Transaction dbToModel(Models.Transaction dbTransaction)
         {
             Models.Category dbCategory = _context.Categories.Single(c => c.Id == dbTransaction.CategoryId);
-            Models.Subcategory? dbSubcategory = new();
+            Models.Subcategory? dbSubcategory = new()
+            {
+                Id = 0,
+                ParentCategoryId = 0,
+                ParentCategory = null,
+                Description = "",
+                Title = ""
+            };
             if (_context.Subcategories.Any())
             {
                 dbSubcategory = _context.Subcategories.SingleOrDefault(c => c.Id == dbTransaction.SubcategoryId);
@@ -118,13 +125,11 @@ namespace BmeWebAPI.Controllers
                 Decription = dbCategory.Decription,
                 Title = dbCategory.Title,
             };
-            if (dbSubcategory != null)
-            {
-                subcategory.Id = dbSubcategory.Id;
-                subcategory.Title = dbSubcategory.Title;
-                subcategory.ParentCategoryId = dbSubcategory.ParentCategoryId;
-                subcategory.Description = dbSubcategory.Description;
-            }
+            
+            subcategory.Id = dbSubcategory.Id;
+            subcategory.Title = dbSubcategory.Title;
+            subcategory.ParentCategoryId = dbSubcategory.ParentCategoryId;
+            subcategory.Description = dbSubcategory.Description;
             BmeModels.Transaction transactionModel = new()
             {
                 Id = dbTransaction.Id,

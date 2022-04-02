@@ -167,11 +167,12 @@
 
 
 @code {
+    User currentUser = new();
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            await UserRepository.FetchCurrentUser();
+            currentUser = await UserRepository.GetCurrentUser();
             /* Subscripe to changes @ UserRepository and IncomeService */
             UserRepository.OnChange += StateHasChanged;
             IncomeService.OnChange += StateHasChanged;
@@ -273,7 +274,12 @@
         editTransaction.Description = selectedTransaction.Description;
         */
         
-        var transactionParameter = new DialogParameters { ["transaction"]=selectedTransaction };
+        var transactionParameter = new DialogParameters { 
+            ["transaction"]=selectedTransaction, 
+            ["date"]=selectedTransaction.MadeAt,
+            ["category"]=selectedTransaction.Category.Title,
+            ["subcategory"]=selectedTransaction.Subcategory.Title
+        };
         var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
         var dialog = DialogService.Show<EditTransactionDialog>("",transactionParameter, options);
         var result = await dialog.Result;

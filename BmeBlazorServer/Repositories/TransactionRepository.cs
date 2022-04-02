@@ -110,9 +110,7 @@ namespace BmeBlazorServer.Repositories
             HttpRequestMessage? requestMessage = new(HttpMethod.Put, requestUri: "api/Transaction/");
             requestMessage.Content = new StringContent(
                 JsonConvert.SerializeObject(transaction), System.Text.Encoding.UTF8, "application/json");
-            var token = await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            requestMessage.Headers.Authorization = AuthStateProvider.TokenBearer;
 
             var response = await httpClient.SendAsync(requestMessage);
             if (response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.NoContent)

@@ -6,7 +6,7 @@ namespace BmeBlazorServer.Repositories
     {
         event Action? OnChange;
         public User CurrentUser { get; set; }
-        Task<bool> FetchCurrentUser();
+        Task<User> GetCurrentUser();
         Task<List<User>> GetUsers();
         Task<HttpResponseMessage> UpdateUser(User user);
         Task<HttpResponseMessage> DeleteUser(int userId);

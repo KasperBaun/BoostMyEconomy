@@ -94,7 +94,16 @@ namespace BmeBlazorServer.Repositories
         {  
             return await httpClient.PutAsJsonAsync("api/User/", user);
         }
-        public async Task<bool> FetchCurrentUser()
+        public async Task<User> GetCurrentUser()
+        {
+            if(CurrentUser == null)
+            {
+                await FetchCurrentUser();
+            }
+
+            return CurrentUser;
+        }
+        private async Task<bool> FetchCurrentUser()
         {
             try
             {
@@ -102,9 +111,7 @@ namespace BmeBlazorServer.Repositories
                     int userId = await ParseLoggedInUserId();
                     string requestUri = "api/User/"+userId;
                     var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
-                    var token = await localStorageService.GetItemAsync<string>("token");
-                    requestMessage.Headers.Authorization =
-                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    requestMessage.Headers.Authorization = AuthStateProvider.TokenBearer;
                     var response = await httpClient.SendAsync(requestMessage);
 
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
