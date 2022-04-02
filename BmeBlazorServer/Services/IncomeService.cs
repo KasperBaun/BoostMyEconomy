@@ -19,20 +19,40 @@ namespace BmeBlazorServer.Services
             transactionRepository = _transactionRepository;
             PeriodSelected = new DateRange(new DateTime(DateTime.Now.Year, 1, 1), DateTime.Now.Date);
         }
+        public async Task<bool> InitializeService()
+        {
+            UserTransactions = await transactionRepository.GetTransactions();
+            if(PeriodSelected.Start.HasValue && PeriodSelected.End.HasValue)
+            {
+                IncomeForPeriod = FilterTransactionsFromSelectedPeriod(new DateRange(PeriodSelected.Start.Value,PeriodSelected.End.Value));
+            }
+            else
+            {
+                throw new Exception("Error with value from PeriodSelected@IncomeService.cs");
+            }
+            IncomeSourcesForPeriod = FilterSources(IncomeForPeriod);
+            FilterHistory(IncomeForPeriod);
+            OnChange?.Invoke();
+            return true;
+        }
+        public async void PeriodChanged()
+        {
+            await InitializeService();
+            OnChange?.Invoke();
+        }
         private List<Transaction> FilterTransactionsFromSelectedPeriod(DateRange periodSelected)
         {
             List<Transaction> list = new();
             if(periodSelected.Start.HasValue && periodSelected.End.HasValue)
             {
-                DateTime Start = periodSelected.Start.Value;
-                DateTime End = periodSelected.End.Value;
-                list = UserTransactions.Where(x => 
-                x.MadeAt.Date >= Start && x.MadeAt <= End && x.Type=="Income").ToList();
+                var Start = DateOnly.FromDateTime(periodSelected.Start.Value);
+                var End = DateOnly.FromDateTime(periodSelected.End.Value);
+                list = UserTransactions.Where(x => DateOnly.FromDateTime(x.MadeAt) >= Start && DateOnly.FromDateTime(x.MadeAt) <= End && x.Type=="Income").ToList();
                 return list;
             }
             else
             {
-                return list;
+                throw new Exception("Error with periodSelected.Value @ IncomeService.cs - FilterTransactionsFromSelectedPeriod()");
             }
         }
         private static ChartData FilterSources(List<Transaction> incomeTransactions)
@@ -76,7 +96,7 @@ namespace BmeBlazorServer.Services
 
             foreach (Transaction t in incomeTransactions)
             {
-                Console.WriteLine("Month: {0}\n", t.MadeAt.Month);
+                //Console.WriteLine("Month: {0}\n", t.MadeAt.Month);
                 int tMonth = t.MadeAt.Month;
                 string tMonthConverted = ConvertMonthToString(tMonth);
                 if (months.Contains(tMonthConverted)){
@@ -136,28 +156,6 @@ namespace BmeBlazorServer.Services
                 12 => "Dec",
                 _ => String.Empty,
             };
-        }
-        public async Task<bool> InitializeService()
-        {
-            UserTransactions = await transactionRepository.GetTransactions();
-            IncomeForPeriod = FilterTransactionsFromSelectedPeriod(PeriodSelected);
-            IncomeSourcesForPeriod = FilterSources(IncomeForPeriod);
-            FilterHistory(IncomeForPeriod);
-            OnChange?.Invoke();
-            return true;
-        }
-        public async void PeriodChanged()
-        {
-            await InitializeService();
-            OnChange?.Invoke();
-        }
-        public Task<bool> RemoveIncomeTransaction(Transaction transaction)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<bool> AddIncomeTransaction(Transaction transaction)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -200,7 +200,6 @@ namespace BmeBlazorServer.Services
                     });
             }
         }
-        
     }
 }
 
