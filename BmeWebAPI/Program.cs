@@ -15,12 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 /* Add services to the container */
 builder.Services.AddControllers();
-ServicePointManager.ServerCertificateValidationCallback = delegate (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-{
-    return true;
-};
-/* Setup DBContext and add configuration options */
 
+/* Setup DBContext and add configuration options */
 builder.Services.AddDbContext<BmeDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

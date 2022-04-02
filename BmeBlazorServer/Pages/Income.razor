@@ -167,15 +167,13 @@
 
 
 @code {
-
-
     protected override async Task OnInitializedAsync()
     {
         try
         {
             await UserRepository.FetchCurrentUser();
+            /* Subscripe to changes @ UserRepository and IncomeService */
             UserRepository.OnChange += StateHasChanged;
-            Console.WriteLine("$Income.razor@OnInitializedAsync(): Attempting to fetch user from API: "+ UserRepository.CurrentUser.Email);
             IncomeService.OnChange += StateHasChanged;
             bool dataReady = await IncomeService.InitializeService();
             if (dataReady)
@@ -199,8 +197,10 @@
     /* Add income */
     async Task OpenAddTransactionDialog()
     {
+        TransactionDTO transactionDTO = new() { Type = "Income" };
+        var transactionParameter = new DialogParameters { ["transaction"]=transactionDTO };
         var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
-        var dialog = DialogService.Show<AddTransactionDialog>("",options);
+        var dialog = DialogService.Show<AddTransactionDialog>("", transactionParameter, options);
         var result = await dialog.Result;
 
         if (result.Cancelled)

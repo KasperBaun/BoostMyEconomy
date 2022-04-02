@@ -24,19 +24,18 @@ namespace BmeBlazorServer.Repositories
         {
             ResponseModel responseModel = new();
             HttpRequestMessage? requestMessage = new(HttpMethod.Post, requestUri: "api/Transaction/");
-            requestMessage.Content = new StringContent(
-                JsonConvert.SerializeObject(transaction),System.Text.Encoding.UTF8, "application/json");
-            var token = await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            requestMessage.Content = new StringContent(JsonConvert.SerializeObject(transaction),System.Text.Encoding.UTF8, "application/json");
+            requestMessage.Headers.Authorization = AuthStateProvider.TokenBearer;
 
             var response = await httpClient.SendAsync(requestMessage);
             if(response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.Created)
             {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var responseContent = await Task.FromResult(JsonConvert.DeserializeObject<Transaction>(responseBody));
                 responseModel.Status = true;
                 Console.WriteLine(response.ReasonPhrase + response.Content+"\n");
                 responseModel.Message = response.ReasonPhrase + response.Content;
-                await FetchUserTransactions();
+                UserTransactions.Add(responseContent);
                 OnChange?.Invoke();
                 return responseModel;
             }

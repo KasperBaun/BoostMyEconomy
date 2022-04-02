@@ -58,7 +58,7 @@
         </MudDatePicker>
                    
         <MudAutocomplete 
-            @bind-Value="@value1"
+            @bind-Value="transaction.Category.Title"
             T="string" 
             Label="Category"
             Class="pa-3"
@@ -76,7 +76,7 @@
             Clearable="true"
             Variant="@incomeFieldVariant"
             MaxItems="15"
-            @bind-Value="@value2" 
+            @bind-Value="@transaction.Subcategory.Title" 
             SearchFunc="@Search2"
             ResetValueOnEmptyText="true" >
         </MudAutocomplete>

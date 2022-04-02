@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using BmeBlazorServer.Services;
 
 namespace BmeBlazorServer.Repositories
 {
@@ -56,10 +57,7 @@ namespace BmeBlazorServer.Repositories
         {
             List<User> users = new();    
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/User/All");
-            var token =  await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            
+            requestMessage.Headers.Authorization = AuthStateProvider.TokenBearer;
             var response = await httpClient.SendAsync(requestMessage);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -102,7 +100,6 @@ namespace BmeBlazorServer.Repositories
             {
                 {
                     int userId = await ParseLoggedInUserId();
-                    Console.WriteLine("$UserService.cs@FetchCurrentUser(): Error - userId = " + userId);
                     string requestUri = "api/User/"+userId;
                     var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
                     var token = await localStorageService.GetItemAsync<string>("token");
@@ -117,6 +114,7 @@ namespace BmeBlazorServer.Repositories
                         if (responseUser != null)
                         {
                             CurrentUser = responseUser;
+                            //Console.WriteLine(responseUser.ToString());
                             OnChange?.Invoke();
                             return true;
                         }
