@@ -5,6 +5,7 @@
 @inject IDialogService DialogService
 @inject IIncomeService IncomeService
 @inject IUserRepository UserRepository
+@inject ITransactionRepository TransactionRepository
 @implements IDisposable
 
 <PageTitle>Income</PageTitle>
@@ -176,6 +177,7 @@
             /* Subscripe to changes @ UserRepository and IncomeService */
             UserRepository.OnChange += StateHasChanged;
             IncomeService.OnChange += StateHasChanged;
+            TransactionRepository.OnChange += StateHasChanged;
             bool dataReady = await IncomeService.InitializeService();
             if (dataReady)
             {
@@ -192,6 +194,7 @@
     {
         IncomeService.OnChange -= StateHasChanged;
         UserRepository.OnChange -= StateHasChanged;
+        TransactionRepository.OnChange -= StateHasChanged;
     }
 
 
@@ -208,7 +211,7 @@
         {
             // Snackbar with could not add income
         }
-        await IncomeService.InitializeService();
+        IncomeService.PeriodChanged();
         StateHasChanged();
     }
 
@@ -258,22 +261,9 @@
         }
     }
 
-    //[Parameter]
-    //public Transaction editTransaction { get; set; } = new();
+
     async Task OpenEditTransactionDialog()
     {
-        /*
-        editTransaction.Id = selectedTransaction.Id;
-        editTransaction.UserId = selectedTransaction.UserId;
-        editTransaction.MadeAt = selectedTransaction.MadeAt;
-        editTransaction.Value = selectedTransaction.Value;
-        editTransaction.Type = selectedTransaction.Type;
-        editTransaction.CategoryId = selectedTransaction.CategoryId;
-        editTransaction.Source = selectedTransaction.Source;
-        editTransaction.SubcategoryId = selectedTransaction.SubcategoryId;
-        editTransaction.Description = selectedTransaction.Description;
-        */
-        
         var transactionParameter = new DialogParameters { 
             ["transaction"]=selectedTransaction, 
             ["date"]=selectedTransaction.MadeAt,
@@ -283,17 +273,11 @@
         var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
         var dialog = DialogService.Show<EditTransactionDialog>("",transactionParameter, options);
         var result = await dialog.Result;
-
-        if (result.Cancelled)
-        {
-            // Snackbar with could not add income
-        }
-        await IncomeService.InitializeService();
+        IncomeService.PeriodChanged();
         StateHasChanged();
     }
 
     /* History */
-
     private ChartOptions incomeHistoryOptions = new ChartOptions()
         {
             DisableLegend = true,

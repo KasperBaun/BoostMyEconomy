@@ -17,13 +17,22 @@ namespace BmeModels
 
         public override string ToString()
         {
+            string subcategoryTitle;
+            if(Subcategory == null)
+            {
+                subcategoryTitle = "";
+            }
+            else
+            {
+                subcategoryTitle = Subcategory.Title;
+            }
             return "Id: " + Id + " " +
                     "UserId: " + UserId + " " +
                     "MadeAt: " + MadeAt.ToString() + " " +
                     "Value: " + Value.ToString() + " " +
                     "Categorytitle: " + Category.Title + " " +
                     "Source: " + Source + " " +
-                    "Subcategorytitle: " + Subcategory.Title + " " +
+                    "Subcategorytitle: " + subcategoryTitle + " " +
                     "Description: " + Description;
         }
 

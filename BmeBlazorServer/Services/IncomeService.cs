@@ -21,6 +21,7 @@ namespace BmeBlazorServer.Services
         }
         public async Task<bool> InitializeService()
         {
+            UserTransactions.Clear();
             UserTransactions = await transactionRepository.GetTransactions();
             if(PeriodSelected.Start.HasValue && PeriodSelected.End.HasValue)
             {
@@ -40,6 +41,7 @@ namespace BmeBlazorServer.Services
             await InitializeService();
             OnChange?.Invoke();
         }
+      
         private List<Transaction> FilterTransactionsFromSelectedPeriod(DateRange periodSelected)
         {
             List<Transaction> list = new();

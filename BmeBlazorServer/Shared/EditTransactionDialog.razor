@@ -42,13 +42,14 @@
             Label="Value" 
             HelperText="E.g: 4000" 
             Class="pa-3" 
+            InputType="InputType.Number"
             Variant="@incomeFieldVariant" 
             AdornmentColor="Color.Primary"
             Adornment="Adornment.End" 
             AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
 
         <MudDatePicker 
-            @bind-Date="@date"
+            @bind-Date="date"
             Label="Date"
             Class="pa-3"
             ShowWeekNumbers="true"
@@ -58,7 +59,7 @@
         </MudDatePicker>
                    
         <MudAutocomplete 
-            @bind-Value="@category"
+            @bind-Value="transaction.Category.Title"
             T="string" 
             Label="Category"
             Class="pa-3"
@@ -70,13 +71,13 @@
         </MudAutocomplete>
                         
         <MudAutocomplete 
+            @bind-Value="subcategory" 
             T="string" 
             Label="Subcategory"
             Class="pa-3"
             Clearable="true"
             Variant="@incomeFieldVariant"
             MaxItems="15"
-            @bind-Value="@subcategory" 
             SearchFunc="@Search2"
             ResetValueOnEmptyText="true" >
         </MudAutocomplete>
@@ -113,8 +114,8 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Transaction transaction { get; set; } = new Transaction();
     [Parameter] public DateTime? date { get; set; } = new DateTime();
-    [Parameter] public string category { get; set; } = string.Empty;
-    [Parameter] public string subcategory { get; set; } = string.Empty;
+    [Parameter] public string category { get; set; }
+    [Parameter] public string subcategory { get; set; } 
 
     void Cancel() => MudDialog.Cancel();
     private Variant incomeFieldVariant = Variant.Filled;
@@ -136,7 +137,6 @@
                 if(c.Id<=14)
                     categories.Add(c.Title);
             }
-            category = transaction.Category.Title;
         }
 
         // if text is null or empty, show complete list
@@ -153,8 +153,6 @@
         if (!SubCategories.Any())
         {
             SubCategories = await CategoryRepository.GetSubCategories();
-            if (transaction.Subcategory != null)
-                subcategory = transaction.Subcategory.Title;
         }
         // if text is null or empty, show complete list
         if (string.IsNullOrEmpty(value))
@@ -173,9 +171,10 @@
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
         Snackbar.Configuration.VisibleStateDuration = 3000;
-        bool inputOk = ValidateInput();
+        bool inputOk = await ValidateInput();
         if (inputOk)
         {
+            //Console.WriteLine(transaction.ToString());
             var response = await TransactionRepository.UpdateTransaction(transaction);
             if (response.Status)
             {
@@ -196,23 +195,24 @@
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
         Snackbar.Configuration.VisibleStateDuration = 3000;
-        bool inputOk = ValidateInput();
-        if (inputOk)
+        ResponseModel response = new();
+        //bool validated = await ValidateInput();
+        //if (validated)
+        //{
+        response = await TransactionRepository.DeleteTransaction(transaction);
+        if (response.Status)
         {
-            var response = await TransactionRepository.DeleteTransaction(transaction.Id);
-            if (response.Status)
-            {
-                Snackbar.Add("Delete successful!", Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            }
+            Snackbar.Add("Delete successful!", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
-            Snackbar.Add("Error! Changes were not saved.", Severity.Error);
+            Snackbar.Add("Error! Changes were not saved: "+ response.Message, Severity.Error);
         }
+        //}
     }
 
-    private bool ValidateInput()
+    private async Task<bool> ValidateInput()
     {
         if (!date.HasValue || date.Value >= DateTime.Now)
         {
@@ -223,21 +223,73 @@
         {
             transaction.MadeAt = date.Value;
         }
-        if (string.IsNullOrEmpty(category))
+        if (string.IsNullOrEmpty(transaction.Category.Title))
         {
             Snackbar.Add("Incorrect category - please check your input", Severity.Error);
             return false;
         }
         else
         {
-            transaction.Category.Title = category;
+            if (!Categories.Any())
+                Categories = await CategoryRepository.GetCategories();
+            Category tcat = Categories.Single(c => c.Title == transaction.Category.Title);
+            if(tcat == null)
+            {
+                Snackbar.Add("ERROR - tcat is null!");
+            }
+            else
+            {
+                transaction.Category = tcat; 
+            }
         }
         if(string.IsNullOrEmpty(subcategory)){
             transaction.Subcategory = null;
         }
         else
         {
-            transaction.Subcategory.Title =  subcategory;
+            if (!SubCategories.Any())
+                SubCategories = await CategoryRepository.GetSubCategories();
+            Subcategory? tsubcat = SubCategories.SingleOrDefault(c => c.Title == subcategory);
+            if(tsubcat == null)
+            {
+                transaction.Subcategory = new Subcategory
+                    {
+                        Id = 0,
+                        Description = " ",
+                        ParentCategoryId = 0,
+                        Title = " ",
+                    };
+            }
+        }
+        if(transaction.Id == 0)
+        {
+            Snackbar.Add("Transaction Id: 0 - Error!", Severity.Error);
+            return false;
+        }
+        if(transaction.UserId == 0)
+        {
+            Snackbar.Add("Transaction UserId: 0 - Error!", Severity.Error);
+            return false;
+        }
+        if(transaction.Value == 0)
+        {
+            Snackbar.Add("Transaction value: 0 - Error!", Severity.Error);
+            return false;
+        }
+        if(string.IsNullOrEmpty(transaction.Type))
+        {
+            Snackbar.Add("Transaction Type is null!", Severity.Error);
+            return false;
+        }
+        if (string.IsNullOrEmpty(transaction.Source))
+        {
+            Snackbar.Add("Transaction Source is empty or null!", Severity.Error);
+            transaction.Source = "";
+            return false;
+        }
+        if (string.IsNullOrEmpty(transaction.Description))
+        {
+            transaction.Description = "";
         }
         return true;
     }

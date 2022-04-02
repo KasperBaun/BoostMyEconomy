@@ -8,6 +8,6 @@ namespace BmeBlazorServer.Repositories
         Task<List<Transaction>> GetTransactions();
         Task<ResponseModel> CreateTransaction(TransactionDTO transaction);
         Task<ResponseModel> UpdateTransaction(Transaction transaction);
-        Task<ResponseModel> DeleteTransaction(int transactionId);
+        Task<ResponseModel> DeleteTransaction(Transaction transaction);
     }
 }

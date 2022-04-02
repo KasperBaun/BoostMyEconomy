@@ -10,13 +10,11 @@ namespace BmeBlazorServer.Repositories
         private List<Transaction> UserTransactions { get; set; } = new();
         private List<Category> Categories { get; set; } = new();
         private readonly HttpClient httpClient;
-        private readonly ILocalStorageService localStorageService;
         private readonly ICategoryRepository categoryRepository;
 
-        public TransactionRepository(HttpClient _httpClient, ILocalStorageService _localStorageService, ICategoryRepository _categoryRepository)
+        public TransactionRepository(HttpClient _httpClient, ICategoryRepository _categoryRepository)
         {
             httpClient = _httpClient;
-            localStorageService = _localStorageService;
             categoryRepository = _categoryRepository;
         }
 
@@ -57,42 +55,30 @@ namespace BmeBlazorServer.Repositories
             }
         }
 
-        public async Task<ResponseModel> DeleteTransaction(int transactionId)
+        public async Task<ResponseModel> DeleteTransaction(Transaction transaction)
         {
             ResponseModel responseModel = new();
-            HttpRequestMessage? requestMessage = new(HttpMethod.Delete, requestUri: "api/Transaction/"+transactionId);
-            var token = await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpRequestMessage? requestMessage = new(HttpMethod.Delete, requestUri: "api/Transaction/");
+            requestMessage.Content = new StringContent(
+                JsonConvert.SerializeObject(transaction), System.Text.Encoding.UTF8, "application/json");
+            requestMessage.Headers.Authorization = AuthStateProvider.TokenBearer;
 
             var response = await httpClient.SendAsync(requestMessage);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            if ((response.StatusCode == System.Net.HttpStatusCode.OK) || (response.StatusCode == System.Net.HttpStatusCode.NoContent))
             {
                 responseModel.Status = true;
-                //Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
                 responseModel.Message = response.ReasonPhrase + response.Content;
-                //var index = AllUserTransactions.FindIndex(x => x.Id == transactionId);
-                await FetchUserTransactions();
-                //AllUserTransactions.RemoveAt(index);
+                UserTransactions.Remove(transaction);
                 OnChange?.Invoke();
                 return responseModel;
             }
-            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden ||
-                response.StatusCode == System.Net.HttpStatusCode.BadRequest ||
-                response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
-                responseModel.Status = false;
-                responseModel.Message = response.ReasonPhrase + response.Content;
-                return responseModel;
-            }
-            else
-            {
-                Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
-                responseModel.Status = false;
-                responseModel.Message = "Something went wrong";
-                return responseModel;
-            }
+            
+            Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
+            responseModel.Status = false;
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseContent = await Task.FromResult(JsonConvert.DeserializeObject<List<Transaction>>(responseBody));
+            responseModel.Message = response.ReasonPhrase + responseContent;
+            return responseModel;
         }
 
         public async Task<List<Transaction>> GetTransactions()
@@ -116,7 +102,7 @@ namespace BmeBlazorServer.Repositories
             if (response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.NoContent)
             {
                 responseModel.Status = true;
-                Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
+                //Console.WriteLine(response.ReasonPhrase + response.Content.ReadAsStream(). + "\n");
                 responseModel.Message = response.ReasonPhrase + response.Content;
                 var index = UserTransactions.FindIndex(x => x.Id == transaction.Id);
                 if(index > -1)
@@ -139,7 +125,7 @@ namespace BmeBlazorServer.Repositories
             {
                 Console.WriteLine(response.ReasonPhrase + response.Content + "\n");
                 responseModel.Status = false;
-                responseModel.Message = "Something went wrong";
+                responseModel.Message = response.StatusCode.ToString()+" " + response.RequestMessage;
                 return responseModel;
             }
         }

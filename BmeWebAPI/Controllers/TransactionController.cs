@@ -21,29 +21,32 @@ namespace BmeWebAPI.Controllers
         // GET: api/Transaction/All
         [Authorize(Roles ="Admin,User")]
         [HttpGet("All")]
-        public async Task<ActionResult<IEnumerable<BmeModels.Transaction>>> GetTransactions()
+        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
         {
-            List<Models.TransactionEntity> dbTransactions = _context.Transactions.ToList();
-            List<BmeModels.Transaction> transactions = new();
-            foreach (var transaction in dbTransactions)
-            {
-                BmeModels.Transaction transactionModel = dbToModel(transaction);
-                transactions.Add(transactionModel);
-            }
-            return transactions;
+            return await Task.Run(() =>
+                {
+                    List<TransactionEntity> dbTransactions = _context.Transactions.ToList();
+                    List<Transaction> transactions = new();
+                    foreach (var transaction in dbTransactions)
+                    {
+                        Transaction transactionModel = DbToModel(transaction);
+                        transactions.Add(transactionModel);
+                    }
+                    return transactions;
+                });
         }
 
         // POST: api/Transaction/
         [Authorize(Roles = "Admin,User")]
         [HttpPost]
-        public async Task<ActionResult<BmeModels.Transaction>> CreateTransaction(TransactionDTO transaction)
+        public async Task<ActionResult<Transaction>> CreateTransaction(TransactionDTO transaction)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier);
             if(userId == null)
             {
                 return BadRequest("UserId not found!");
             }
-            Models.TransactionEntity dbTransaction = new()
+            TransactionEntity dbTransaction = new()
             {   
                 Id = _context.Transactions.Count() + 1,
                 UserId = int.Parse(userId.Value),
@@ -60,7 +63,7 @@ namespace BmeWebAPI.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return dbToModel(dbTransaction);
+                return DbToModel(dbTransaction);
             }
             catch (DbUpdateException ex)
             {
@@ -72,9 +75,10 @@ namespace BmeWebAPI.Controllers
         // PUT: api/Transaction/
         [Authorize(Roles = "Admin,User")]
         [HttpPut]
-        public async Task<IActionResult> UpdateTransaction(Models.TransactionEntity transaction)
-        {
-            _context.Transactions.Update(transaction);
+        public async Task<IActionResult> UpdateTransaction(Transaction transaction)
+        {   
+            TransactionEntity dbTransaction = ModelToDb(transaction);
+            _context.Transactions.Update(dbTransaction);
             try
             {
                 await _context.SaveChangesAsync();
@@ -89,37 +93,42 @@ namespace BmeWebAPI.Controllers
 
         // DELETE: api/Transaction/5
         [Authorize(Roles = "Admin,User")]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteTransaction(Transaction transaction)
         {
-            var transaction = await _context.Transactions.FindAsync(id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
+            var dbTransaction = await _context.Transactions.FindAsync(transaction.Id);
+            if (dbTransaction == null) { return NotFound(); }
 
-            _context.Transactions.Remove(transaction);
+            _context.Transactions.Remove(dbTransaction);
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        private BmeModels.Transaction dbToModel(Models.TransactionEntity dbTransaction)
+        [ApiExplorerSettings(IgnoreApi = true)]
+        private Transaction DbToModel(TransactionEntity dbTransaction)
         {
-            Models.CategoryEntity dbCategory = _context.Categories.Single(c => c.Id == dbTransaction.CategoryId);
-            Models.SubcategoryEntity? dbSubcategory = new()
+            CategoryEntity dbCategory = _context.Categories.Single(c => c.Id == dbTransaction.CategoryId);
+            SubcategoryEntity dbSubcategory = new()
             {
                 Id = 0,
                 ParentCategoryId = 0,
-                ParentCategory = null,
-                Description = "",
-                Title = ""
+                Title = " ",
+                Description = " ",
             };
             if (_context.Subcategories.Any())
             {
-                dbSubcategory = _context.Subcategories.SingleOrDefault(c => c.Id == dbTransaction.SubcategoryId);
+                SubcategoryEntity dbSub = _context.Subcategories.Single(s => s.Id == dbTransaction.SubcategoryId);
+                if(dbSub == null)
+                {
+
+                }
+                else
+                {
+                    dbSubcategory = dbSub;
+                }
             }
-            BmeModels.Subcategory subcategory = new();
-            BmeModels.Category category = new()
+            Subcategory subcategory = new();
+            Category category = new()
             {
                 Id = dbCategory.Id,
                 Decription = dbCategory.Decription,
@@ -130,7 +139,7 @@ namespace BmeWebAPI.Controllers
             subcategory.Title = dbSubcategory.Title;
             subcategory.ParentCategoryId = dbSubcategory.ParentCategoryId;
             subcategory.Description = dbSubcategory.Description;
-            BmeModels.Transaction transactionModel = new()
+            Transaction transactionModel = new()
             {
                 Id = dbTransaction.Id,
                 UserId = dbTransaction.UserId,
@@ -143,6 +152,39 @@ namespace BmeWebAPI.Controllers
                 Subcategory = subcategory,
             };
             return transactionModel;
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        private static TransactionEntity ModelToDb(Transaction transaction)
+        {
+            string descrip = "";
+            Subcategory subcategory = new();
+            TransactionEntity transactionEntity = new();
+            if(transaction.Category == null)
+            {
+                throw new Exception(message:"Category is null @ ModelToDb - TransactionController.cs ");
+            }
+            if(transaction.Subcategory == null)
+            {
+                subcategory.Id = 0;
+            }
+            if(!string.IsNullOrEmpty(transaction.Description))
+            {
+                descrip = transaction.Description;
+            }
+
+            transactionEntity.Id = transaction.Id;
+            transactionEntity.UserId = transaction.UserId;
+            transactionEntity.MadeAt = transaction.MadeAt.ToString();
+            transactionEntity.Value = transaction.Value;
+            transactionEntity.Type = transaction.Type;
+            transactionEntity.CategoryId = transaction.Category.Id;
+            transactionEntity.Source = transaction.Source;
+            transactionEntity.SubcategoryId = subcategory.Id;
+            transactionEntity.Description = descrip;
+
+            return transactionEntity;
+
         }
     }
 }
