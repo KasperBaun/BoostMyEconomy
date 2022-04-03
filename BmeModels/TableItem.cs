@@ -13,7 +13,7 @@ namespace BmeModels
         public string IconString { get; set; }
     public override string ToString()
     {
-            return Name + "U+0020(" + Value + ")" + IconString;
+            return "Name: "+ Name + " Value: "  + Value + " IconString: " + IconString;
 
     }
     }

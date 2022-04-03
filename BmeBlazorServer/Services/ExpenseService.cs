@@ -14,6 +14,7 @@ namespace BmeBlazorServer.Services
         public List<ChartSeries> ExpenseHistory { get; set; } = new();
         public string[] ExpenseHistoryLabels { get; set; } = Array.Empty<string>();
         public List<TableItem> VarExpenseTableItems { get; set; } = new();
+        public List<TableItem> FixedExpenseTableItems { get; set; } = new();
         public event Action? OnChange;
         public ExpenseService(ITransactionRepository _transactionRepository)
         {
@@ -35,6 +36,7 @@ namespace BmeBlazorServer.Services
             ExpenseSourcesForPeriod = FilterSources(ExpensesForPeriod);
             FilterHistory(ExpensesForPeriod);
             VarExpenseTableItems = FilterVarFixedExpenses(ExpensesForPeriod);
+            FixedExpenseTableItems = FilterVarFixedExpenses(ExpensesForPeriod);
             OnChange?.Invoke();
             return true;
         }
@@ -151,7 +153,7 @@ namespace BmeBlazorServer.Services
                 if (sumCategories.Contains(t.Category.Title))
                 {
                     int index = sumCategories.FindIndex(c => c == t.Category.Title);
-                    double sourceSum = expensesList.Where(x => x.Category.Title == t.Source).Sum(y => y.Value);
+                    double sourceSum = expensesList.Where(x => x.Category.Title == t.Category.Title).Sum(y => y.Value);
                     sum[index] = sourceSum;
                 }
                 else
@@ -209,39 +211,39 @@ namespace BmeBlazorServer.Services
             return categoryId switch
             {
                 /* 0-14 is income categories */
-                0 => "@Icons.Material.Filled.Work",
-                1 => "@Icons.Material.Filled.MonetizationOn",
-                2 => "@Icons.Material.Rounded.Payments",
-                3 => "@Icons.Material.Filled.Business",
-                4 => "@Icons.Material.Rounded.ChildCare",
-                5 => "@Icons.Material.Filled.Balance",
-                6 => "@Icons.Material.Filled.PriceChange",
-                7 => "@Icons.Material.Filled.AttachMoney",
-                8 => "@Icons.Material.Filled.AreaChart",
-                9 => "@Icons.Material.Filled.AreaChart",
-                10 => "@Icons.Material.Filled.CardGiftcard",
-                11 => "@Icons.Material.Filled.ShoppingCart",
-                12 => "@Icons.Material.Filled.Elderly",
-                13 => "@Icons.Material.Filled.WaterfallChart",
-                14 => "@Icons.Material.Filled.Chair",
+                0 =>  Icons.Material.Filled.Work,
+                1 =>  Icons.Material.Filled.MonetizationOn,
+                2 =>  Icons.Material.Rounded.Payments,
+                3 =>  Icons.Material.Filled.Business,
+                4 =>  Icons.Material.Rounded.ChildCare,
+                5 =>  Icons.Material.Filled.Balance,
+                6 =>  Icons.Material.Filled.PriceChange,
+                7 =>  Icons.Material.Filled.AttachMoney,
+                8 =>  Icons.Material.Filled.AreaChart,
+                9 =>  Icons.Material.Filled.AreaChart,
+                10 => Icons.Material.Filled.CardGiftcard,
+                11 => Icons.Material.Filled.ShoppingCart,
+                12 => Icons.Material.Filled.Elderly,
+                13 => Icons.Material.Filled.WaterfallChart,
+                14 => Icons.Material.Filled.Chair,
 
                 /* 15-30 is expense categories */
-                15 => "@Icons.Material.Filled.HomeWork",
-                16 => "@Icons.Material.Filled.Power",
-                17 => "@Icons.Material.Rounded.EmojiTransportation",
-                18 => "@Icons.Material.Filled.Policy",
-                19 => "@Icons.Material.Filled.ChildFriendly",
-                20 => "@Icons.Material.Filled.CurrencyExchange",
-                21 => "@Icons.Material.Filled.AddShoppingCart",
-                22 => "@Icons.Material.Filled.Theaters",
-                23 => "Icons.Material.Filled.Restaurant",
-                24 => "@Icons.Material.Filled.CrisisAlert",
-                25 => "@Icons.Material.Filled.Subscriptions",
-                26 => "@Icons.Material.Filled.EscalatorWarning",
-                27 => "@Icons.Material.Filled.MedicalServices",
-                28 => "@Icons.Material.Filled.Handyman",
-                29 => "@Icons.Material.Filled.Pets",
-                30 => "@Icons.Material.Filled.Engineering",
+                15 => Icons.Material.Filled.HomeWork,
+                16 => Icons.Material.Filled.Power,
+                17 => Icons.Material.Rounded.EmojiTransportation,
+                18 => Icons.Material.Filled.Policy,
+                19 => Icons.Material.Filled.ChildFriendly,
+                20 => Icons.Material.Filled.CurrencyExchange,
+                21 => Icons.Material.Filled.AddShoppingCart,
+                22 => Icons.Material.Filled.Theaters,
+                23 => Icons.Material.Filled.Restaurant,
+                24 => Icons.Material.Filled.CrisisAlert,
+                25 => Icons.Material.Filled.Subscriptions,
+                26 => Icons.Material.Filled.EscalatorWarning,
+                27 => Icons.Material.Filled.MedicalServices,
+                28 => Icons.Material.Filled.Handyman,
+                29 => Icons.Material.Filled.Pets,
+                30 => Icons.Material.Filled.Engineering,
                 _ => string.Empty,
             };
         }

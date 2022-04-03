@@ -92,15 +92,19 @@
                                 <MudTh>Date</MudTh>
                                 <MudTh>Source</MudTh>
                                 <MudTh>Value</MudTh>
+                                <MudTh>Category</MudTh>
+                                <MudTh>Comment</MudTh>
                             </HeaderContent>
 
                             <RowTemplate
                                 Context="ExpenseTable"
                             >
                                 <!--<MudTd DataLabel="Icon"><MudIcon Icon="@Icons.Material.Filled.House"></MudIcon></MudTd>-->
-                                <MudTd DataLabel="Date">@ExpenseTable.MadeAt</MudTd>
+                                <MudTd DataLabel="Date">@DateOnly.FromDateTime(ExpenseTable.MadeAt)</MudTd>
                                 <MudTd DataLabel="Source">@ExpenseTable.Source</MudTd>
                                 <MudTd DataLabel="Value">@ExpenseTable.Value</MudTd>
+                                <MudTd>@ExpenseTable.Category.Title</MudTd>
+                                <MudTd>@ExpenseTable.Description</MudTd>
                             </RowTemplate>
 
                             <PagerContent >
@@ -132,7 +136,7 @@
                     <!--Expenses breakdown-->
                     <MudItem xs="12" sm="12" md="6">
                         <MudPaper Elevation="2" Class="rounded-xl" Style="height: 330px;">
-                            <MudText Typo="Typo.h5" Class="pa-3" >Expenses breakdown</MudText>
+                            <MudText Typo="Typo.h5" Class="pa-3" >Expenses breakdown by source</MudText>
                             <MudChart 
                                 ChartType="ChartType.Pie" 
                                 LegendPosition="Position.Right" 
@@ -150,11 +154,11 @@
             <MudItem xs="12" sm="12" md="3">
                 <MudItem>
                 <MudPaper Elevation="2" Class="rounded-xl" Style="height:390px">
-                    <MudText Typo="Typo.h5" Class="pa-3" >Top-5 variable expenses</MudText>
+                    <MudText Typo="Typo.h5" Class="pa-3" >Top-5 variable expenses by category</MudText>
                     <MudTable
                                 T="TableItem"
                                 OnRowClick="OnVariableExpenseClick"
-                                Height="360px"
+                                Height="334px"
                                 Items="ExpenseService.VarExpenseTableItems.Take(5)" 
                                 Elevation="25"
                                 Class="rounded-xl"
@@ -162,6 +166,7 @@
                                 Dense="false" 
                                 Hover="true" 
                                 Bordered="false"
+                                Outlined="false"
                                 Striped="false"
                                 Loading="@loading"
                                 LoadingProgressColor="Color.Primary"
@@ -176,25 +181,51 @@
                             </HeaderContent>-->
 
                             <RowTemplate
-                                Context="ExpenseTable"
+                                Context="VarExpenseTable"
                             >
-                                <MudTd DataLabel="Icon"><MudIcon Icon="@ExpenseTable.IconString" Color="Color.Primary" Size="Size.Medium"/></MudTd>
-                                <MudTd DataLabel="Name" Class="typography-h6">@ExpenseTable.Name</MudTd>
-                                <MudTd DataLabel="Value">@ExpenseTable.Value</MudTd>
+                                <MudTd Style="border-collapse:collapse"><MudIcon Icon="@VarExpenseTable.IconString" Color="Color.Primary" Size="Size.Medium"/></MudTd>
+                                <MudTd DataLabel="Name" Class="typography-h6">@VarExpenseTable.Name</MudTd>
+                                <MudTd DataLabel="Value">@VarExpenseTable.Value</MudTd>
                             </RowTemplate>
                         </MudTable>
                 </MudPaper>
                 </MudItem>
                 <MudItem Class="mt-6">
                   <MudPaper Elevation="2" Class="rounded-xl" Style="height:390px">
-                    <MudText Typo="Typo.h5" Class="pa-3" >Top-5 fixed expenses</MudText>
-                    <MudList Clickable="true" Dense="false" DisableGutters="false">
-                        <MudListItem Text="Housing" Avatar="@Icons.Filled.House" IconColor="Color.Primary" />
-                        <MudListItem Text="Insurance" Avatar="@Icons.Filled.InsertInvitation" IconColor="Color.Primary" />
-                        <MudListItem Text="Kids" Avatar="@Icons.Filled.Image" IconColor="Color.Primary" />
-                        <MudListItem Text="Electricity" Avatar="@Icons.Filled.Image" IconColor="Color.Primary" />
-                        <MudListItem Text="Something" Avatar="@Icons.Filled.Image" IconColor="Color.Primary" />
-                    </MudList>
+                    <MudText Typo="Typo.h5" Class="pa-3" >Top-5 fixed expenses by category</MudText>
+                     <MudTable
+                                T="TableItem"
+                                OnRowClick="OnFixedExpenseClick"
+                                Height="334px"
+                                Items="ExpenseService.FixedExpenseTableItems.Take(5)" 
+                                Elevation="25"
+                                Class="rounded-xl"
+                                Style="margin:auto; overflow-y:hidden" 
+                                Dense="false" 
+                                Hover="true" 
+                                Bordered="false"
+                                Outlined="false"
+                                Striped="false"
+                                Loading="@loading"
+                                LoadingProgressColor="Color.Primary"
+                                @bind-SelectedItem="@selectedTableItem"
+                                >
+                                <!--Filter="new Func<Transaction,bool>(FilterFunc1)" -->
+                            <!--<HeaderContent>
+                                <MudTh>Icon</MudTh>
+                                <MudTh>Date</MudTh>
+                                <MudTh>Source</MudTh>
+                                <MudTh>Value</MudTh>
+                            </HeaderContent>-->
+
+                            <RowTemplate
+                                Context="FixedExpenseTable"
+                            >
+                                <MudTd Style="border-collapse:collapse"><MudIcon Icon="@FixedExpenseTable.IconString" Color="Color.Primary" Size="Size.Medium"/></MudTd>
+                                <MudTd DataLabel="Name" Class="typography-h6">@FixedExpenseTable.Name</MudTd>
+                                <MudTd DataLabel="Value">@FixedExpenseTable.Value</MudTd>
+                            </RowTemplate>
+                        </MudTable>
                 </MudPaper>
                 </MudItem>
             </MudItem>
