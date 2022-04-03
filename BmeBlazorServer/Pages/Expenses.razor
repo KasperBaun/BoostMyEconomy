@@ -88,7 +88,6 @@
                                 @bind-SelectedItem="@selectedTransaction"
                                 >
                             <HeaderContent>
-                                <!--<MudTh>Icon</MudTh>-->
                                 <MudTh>Date</MudTh>
                                 <MudTh>Source</MudTh>
                                 <MudTh>Value</MudTh>
@@ -99,7 +98,6 @@
                             <RowTemplate
                                 Context="ExpenseTable"
                             >
-                                <!--<MudTd DataLabel="Icon"><MudIcon Icon="@Icons.Material.Filled.House"></MudIcon></MudTd>-->
                                 <MudTd DataLabel="Date">@DateOnly.FromDateTime(ExpenseTable.MadeAt)</MudTd>
                                 <MudTd DataLabel="Source">@ExpenseTable.Source</MudTd>
                                 <MudTd DataLabel="Value">@ExpenseTable.Value</MudTd>

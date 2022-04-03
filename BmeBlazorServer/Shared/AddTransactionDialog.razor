@@ -214,6 +214,11 @@
         {
             transaction.SubcategoryId = SubCategories.Single(c => c.Title == value2).Id;
         }
+        if (transaction.Type == "Expense")
+        {
+            if (transaction.Value > 0)
+                transaction.Value = transaction.Value * (-1);
+        }
         return true;
     }
 }

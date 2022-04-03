@@ -76,7 +76,7 @@ namespace BmeBlazorServer.Services
                 {
                     transactionCategories.Add(t.Source);
                     int index = transactionCategories.FindIndex(c => c == t.Source);
-                    data.Insert(index, t.Value);
+                    data.Insert(index, t.Value*(-1));
                 }
             }
 
@@ -113,7 +113,7 @@ namespace BmeBlazorServer.Services
                     int index = months.FindIndex(m => m == tMonthConverted);
                     double sourceSum = incomeTransactions.Where(x => 
                         x.MadeAt.Month == tMonth).ToList().Sum(y => y.Value);
-                    data.Insert(index,sourceSum);
+                    data.Insert(index,sourceSum*(-1));
                 }
             }
 

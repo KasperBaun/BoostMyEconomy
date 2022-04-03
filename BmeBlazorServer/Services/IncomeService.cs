@@ -12,6 +12,8 @@ namespace BmeBlazorServer.Services
         public List<Transaction> IncomeForPeriod { get; set; } = new();
         public ChartData IncomeSourcesForPeriod { get; set; } = new();
         public List<ChartSeries> IncomeHistory { get; set; } = new();
+        public List<TableItem> IncomeSourceTableItems { get; set; } = new();
+        public List<TableItem> IncomeCategoryTableItems { get; set; } = new();
         public string[] IncomeHistoryLabels { get; set; } = Array.Empty<string>();
         public event Action? OnChange;
         public IncomeService(ITransactionRepository _transactionRepository)
@@ -33,6 +35,8 @@ namespace BmeBlazorServer.Services
             }
             IncomeSourcesForPeriod = FilterSources(IncomeForPeriod);
             FilterHistory(IncomeForPeriod);
+            FilterIncomeSource(IncomeForPeriod);
+            FilterIncomeCategory(IncomeForPeriod);
             OnChange?.Invoke();
             return true;
         }
@@ -140,6 +144,84 @@ namespace BmeBlazorServer.Services
             IncomeHistoryLabels = months.ToArray();
             return;
         }
+        private void FilterIncomeSource(List<Transaction> expensesList)
+        {
+            List<double> sum = new();
+            List<string> sumCategories = new();
+            foreach (Transaction t in expensesList)
+            {
+                if (sumCategories.Contains(t.Category.Title))
+                {
+                    int index = sumCategories.FindIndex(c => c == t.Category.Title);
+                    double sourceSum = expensesList.Where(x => x.Category.Title == t.Category.Title).Sum(y => y.Value);
+                    sum[index] = sourceSum;
+                }
+                else
+                {
+                    sumCategories.Add(t.Category.Title);
+                    int index = sumCategories.FindIndex(c => c == t.Category.Title);
+                    sum.Insert(index, t.Value);
+                }
+            }
+
+            List<TableItem> incomeCategory = new();
+            foreach (string category in sumCategories)
+            {
+                Category cat = expensesList.Find(c => c.Category.Title == category).Category;
+                int index = sumCategories.FindIndex(c => c == category);
+                TableItem item = new TableItem();
+                item.Name = category;
+                item.Value = sum[index];
+                item.IconString = CategoryToIcon(cat.Id);
+                incomeCategory.Add(item);
+            }
+            incomeCategory.Sort((a, b) =>
+                    a.Value
+                    .CompareTo(
+                    b.Value
+                    ));
+            incomeCategory.Reverse();
+            IncomeCategoryTableItems = incomeCategory;
+        }
+        private void FilterIncomeCategory(List<Transaction> expensesList)
+        {
+            List<double> sum = new();
+            List<string> sumSources = new();
+            foreach (Transaction t in expensesList)
+            {
+                if (sumSources.Contains(t.Source))
+                {
+                    int index = sumSources.FindIndex(c => c == t.Source);
+                    double sourceSum = expensesList.Where(x => x.Source == t.Source).Sum(y => y.Value);
+                    sum[index] = sourceSum;
+                }
+                else
+                {
+                    sumSources.Add(t.Source);
+                    int index = sumSources.FindIndex(c => c == t.Source);
+                    sum.Insert(index, t.Value);
+                }
+            }
+
+            List<TableItem> incomeSources = new();
+            foreach (string source in sumSources)
+            {
+                Category cat = expensesList.Find(c => c.Source == source).Category;
+                int index = sumSources.FindIndex(c => c == source);
+                TableItem item = new TableItem();
+                item.Name = source;
+                item.Value = sum[index];
+                item.IconString = CategoryToIcon(cat.Id);
+                incomeSources.Add(item);
+            }
+            incomeSources.Sort((a, b) =>
+                    a.Value
+                    .CompareTo(
+                    b.Value
+                    ));
+            incomeSources.Reverse();
+            IncomeSourceTableItems = incomeSources;
+        }
         private static string ConvertMonthToString(int month)
         {
             return month switch
@@ -157,6 +239,47 @@ namespace BmeBlazorServer.Services
                 11 => "Nov",
                 12 => "Dec",
                 _ => String.Empty,
+            };
+        }
+        private static string CategoryToIcon(int categoryId)
+        {
+            return categoryId switch
+            {
+                /* 0-14 is income categories */
+                0 => Icons.Material.Filled.Work,
+                1 => Icons.Material.Filled.MonetizationOn,
+                2 => Icons.Material.Rounded.Payments,
+                3 => Icons.Material.Filled.Business,
+                4 => Icons.Material.Rounded.ChildCare,
+                5 => Icons.Material.Filled.Balance,
+                6 => Icons.Material.Filled.PriceChange,
+                7 => Icons.Material.Filled.AttachMoney,
+                8 => Icons.Material.Filled.AreaChart,
+                9 => Icons.Material.Filled.AreaChart,
+                10 => Icons.Material.Filled.CardGiftcard,
+                11 => Icons.Material.Filled.ShoppingCart,
+                12 => Icons.Material.Filled.Elderly,
+                13 => Icons.Material.Filled.WaterfallChart,
+                14 => Icons.Material.Filled.Chair,
+
+                /* 15-30 is expense categories */
+                15 => Icons.Material.Filled.HomeWork,
+                16 => Icons.Material.Filled.Power,
+                17 => Icons.Material.Rounded.EmojiTransportation,
+                18 => Icons.Material.Filled.Policy,
+                19 => Icons.Material.Filled.ChildFriendly,
+                20 => Icons.Material.Filled.CurrencyExchange,
+                21 => Icons.Material.Filled.AddShoppingCart,
+                22 => Icons.Material.Filled.Theaters,
+                23 => Icons.Material.Filled.Restaurant,
+                24 => Icons.Material.Filled.CrisisAlert,
+                25 => Icons.Material.Filled.Subscriptions,
+                26 => Icons.Material.Filled.EscalatorWarning,
+                27 => Icons.Material.Filled.MedicalServices,
+                28 => Icons.Material.Filled.Handyman,
+                29 => Icons.Material.Filled.Pets,
+                30 => Icons.Material.Filled.Engineering,
+                _ => string.Empty,
             };
         }
     }
