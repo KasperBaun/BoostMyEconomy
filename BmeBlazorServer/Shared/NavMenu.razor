@@ -57,6 +57,8 @@
         bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "This will log you out of the system. \n Are you sure?"); // Confirm
         if(confirmed){
             await LocalStorage.RemoveItemAsync("token");
+            string lastlogin = DateTime.Now.ToString();
+            await LocalStorage.SetItemAsStringAsync("lastlogin", lastlogin);
             await AuthStateProvider.GetAuthenticationStateAsync();
         }
     }

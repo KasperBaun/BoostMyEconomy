@@ -11,6 +11,7 @@ namespace BmeBlazorServer.Repositories
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
         public User CurrentUser { get; set; } = new();
+        public string LastLogin { get; set; } = string.Empty;
         public event Action? OnChange;
 
         public UserRepository(HttpClient _httpClient, ILocalStorageService _localStorageService)
@@ -96,7 +97,7 @@ namespace BmeBlazorServer.Repositories
         }
         public async Task<User> GetCurrentUser()
         {
-            if(CurrentUser == null)
+            if(CurrentUser.FirstName == null || CurrentUser.LastName == null)
             {
                 await FetchCurrentUser();
             }
@@ -108,6 +109,15 @@ namespace BmeBlazorServer.Repositories
             try
             {
                 {
+                    string lastLogin = await localStorageService.GetItemAsStringAsync("lastlogin");
+                    if (lastLogin == null)
+                        LastLogin = "not known =(";
+                    else
+                    {
+                        LastLogin = DateTime.Parse(lastLogin).ToString("dddd, dd, MMMM");
+                    }
+                    Console.WriteLine(LastLogin);
+                            
                     int userId = await ParseLoggedInUserId();
                     string requestUri = "api/User/"+userId;
                     var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);

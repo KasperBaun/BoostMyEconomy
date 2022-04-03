@@ -71,8 +71,8 @@
                                 <MudGrid>
                                     <MudItem xs="12" sm="12" md="4">
                                         <MudText Typo="Typo.h5">Notifications</MudText>
-                                        <MudText Typo="Typo.body1">Welcome TODO</MudText>
-                                        <MudText Typo="Typo.body1">Last time you logged on was 17th feb. 15:36</MudText>
+                                        <MudText Typo="Typo.body1">Welcome @UserRepository.CurrentUser.FirstName @UserRepository.CurrentUser.LastName</MudText>
+                                        <MudText Typo="Typo.body1">Last time you logged on was @UserRepository.LastLogin</MudText>
                                     </MudItem>
                                     <MudItem xs="12" sm="12" md="4">
                                         Test
@@ -259,7 +259,7 @@
 
 @code {
 
-     // Style the cells according to a positive or negative result
+    // Style the cells according to a positive or negative result
     private Func<Result, string> _cellStyle => x =>
     {
         string style = "";
@@ -277,6 +277,7 @@
     {
         try
         {
+            await UserRepository.GetCurrentUser();
             OverviewService.OnChange += StateHasChanged;
             bool dataReady = await OverviewService.InitializeService();
             if (dataReady)

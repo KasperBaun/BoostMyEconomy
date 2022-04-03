@@ -107,9 +107,11 @@
             HttpResponseMessage response = await AuthService.Login(user);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
+               
                 token = await response.Content.ReadAsStringAsync();
                 //Console.WriteLine(token);
                 await LocalStorage.SetItemAsStringAsync("token", token);
+                ;
                 await AuthStateProvider.GetAuthenticationStateAsync();
                 Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
                 Snackbar.Configuration.SnackbarVariant = Variant.Filled;
