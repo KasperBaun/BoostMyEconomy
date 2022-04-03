@@ -107,7 +107,7 @@
                             <MudPaper Elevation="25" Class=" rounded-xl pa-3" Style="height: 400px;">
                                 <MudText Typo="Typo.h5">Expenses breakdown</MudText>
                                 <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
-                                    InputData="@data" InputLabels="@labels">
+                                    InputData="OverviewService.ExpenseSourcesForPeriod.Data" InputLabels="OverviewService.ExpenseSourcesForPeriod.Labels">
                                 </MudChart>
                             </MudPaper>
                         </MudItem>
@@ -233,12 +233,14 @@
                                     OnRowClick="RowClickEvent" 
                                     T="Transaction">
                                 <HeaderContent>
+                                    <MudTh></MudTh>
                                     <MudTh>Date</MudTh>
                                     <MudTh>Source</MudTh>
                                     <MudTh>Value</MudTh>
                                 </HeaderContent>
                                 <RowTemplate Context="recentTransactions">
-                                    <MudTd DataLabel="Date">@recentTransactions.MadeAt</MudTd>
+                                    <MudTd DataLabel="Icon"><MudIcon Icon="@OverviewService.CategoryToIcon(recentTransactions.Category.Id)" Color="Color.Primary"></MudIcon></MudTd>
+                                    <MudTd DataLabel="Date">@DateOnly.FromDateTime(recentTransactions.MadeAt)</MudTd>
                                     <MudTd DataLabel="Name">@recentTransactions.Source</MudTd>
                                     <MudTd DataLabel="Value">@recentTransactions.Value</MudTd>
                                 </RowTemplate>
@@ -258,7 +260,7 @@
 </AuthorizeView>
 
 @code {
-
+    
     // Style the cells according to a positive or negative result
     private Func<Result, string> _cellStyle => x =>
     {
@@ -276,7 +278,7 @@
     protected override async Task OnInitializedAsync()
     {
         try
-        {
+        {   
             await UserRepository.GetCurrentUser();
             OverviewService.OnChange += StateHasChanged;
             bool dataReady = await OverviewService.InitializeService();

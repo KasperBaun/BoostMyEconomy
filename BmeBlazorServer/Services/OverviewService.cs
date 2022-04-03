@@ -15,6 +15,7 @@ namespace BmeBlazorServer.Services
         public List<double> ResultPrMonthAcc { get; set; } = new();
         public List <Result> Results { get; set; } = new();
         public List<ChartSeries> IncomeAndExpense { get; set; } = new();
+        public ChartData ExpenseSourcesForPeriod { get; set; } = new();
         public List<string> GetMonths { get; set; } = new(){ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
         public string SumIncome { get; set; } = string.Empty;
         public int Balance { get; set; } = 1;
@@ -48,6 +49,7 @@ namespace BmeBlazorServer.Services
             ResultForPeriod();
             ResultForPeriodAcc();
             GenerateResultsList();
+            ExpenseSourcesForPeriod = FilterSources(TransactionsForPeriod);
             OnChange?.Invoke();
             return true;
         }
@@ -56,6 +58,7 @@ namespace BmeBlazorServer.Services
             List<Transaction> list = new();
             list = UserTransactions.Where(x =>  x.MadeAt.Year == yearSelected.Year).ToList();
             list.Sort((x, y) => DateTime.Compare(x.MadeAt, y.MadeAt));
+            list.Reverse();
             OnChange?.Invoke();
             return list;
         }
@@ -199,6 +202,80 @@ namespace BmeBlazorServer.Services
                         MonthResultAcc=monthlyResultAcc[i]
                     });
             }
+        }
+        public string CategoryToIcon(int categoryId)
+        {
+            return categoryId switch
+            {
+                /* 0-14 is income categories */
+                0 => Icons.Material.Filled.Work,
+                1 => Icons.Material.Filled.MonetizationOn,
+                2 => Icons.Material.Rounded.Payments,
+                3 => Icons.Material.Filled.Business,
+                4 => Icons.Material.Rounded.ChildCare,
+                5 => Icons.Material.Filled.Balance,
+                6 => Icons.Material.Filled.PriceChange,
+                7 => Icons.Material.Filled.AttachMoney,
+                8 => Icons.Material.Filled.AreaChart,
+                9 => Icons.Material.Filled.AreaChart,
+                10 => Icons.Material.Filled.CardGiftcard,
+                11 => Icons.Material.Filled.ShoppingCart,
+                12 => Icons.Material.Filled.Elderly,
+                13 => Icons.Material.Filled.WaterfallChart,
+                14 => Icons.Material.Filled.Chair,
+
+                /* 15-30 is expense categories */
+                15 => Icons.Material.Filled.HomeWork,
+                16 => Icons.Material.Filled.Power,
+                17 => Icons.Material.Rounded.EmojiTransportation,
+                18 => Icons.Material.Filled.Policy,
+                19 => Icons.Material.Filled.ChildFriendly,
+                20 => Icons.Material.Filled.CurrencyExchange,
+                21 => Icons.Material.Filled.AddShoppingCart,
+                22 => Icons.Material.Filled.Theaters,
+                23 => Icons.Material.Filled.Restaurant,
+                24 => Icons.Material.Filled.CrisisAlert,
+                25 => Icons.Material.Filled.Subscriptions,
+                26 => Icons.Material.Filled.EscalatorWarning,
+                27 => Icons.Material.Filled.MedicalServices,
+                28 => Icons.Material.Filled.Handyman,
+                29 => Icons.Material.Filled.Pets,
+                30 => Icons.Material.Filled.Engineering,
+                _ => string.Empty,
+            };
+        }
+        private static ChartData FilterSources(List<Transaction> expenseTransactions)
+        {
+            List<double> data = new();
+            List<string> transactionCategories = new();
+            foreach (Transaction t in expenseTransactions)
+            {
+                if (t.Type == "Expense")
+                {
+                    if (transactionCategories.Contains(t.Source))
+                    {
+                        int index = transactionCategories.FindIndex(c => c == t.Source);
+                        double sourceSum = expenseTransactions.Where(x => x.Source == t.Source).Sum(y => y.Value);
+                        data[index] = sourceSum;
+                    }
+                    else
+                    {
+                        transactionCategories.Add(t.Source);
+                        int index = transactionCategories.FindIndex(c => c == t.Source);
+                        data.Insert(index, t.Value * (-1));
+                    }
+                }
+            }
+
+            // Test
+            //Console.WriteLine("$Incomeservice.cs@FilterSources() - double[] Data.length: {0}  string[] Labels.length: {1}\n", data.ToArray().Length, transactionCategories.ToArray().Length);
+
+            ChartData chartData = new()
+            {
+                Data = data.ToArray(),
+                Labels = transactionCategories.ToArray()
+            };
+            return chartData;
         }
     }
 }
