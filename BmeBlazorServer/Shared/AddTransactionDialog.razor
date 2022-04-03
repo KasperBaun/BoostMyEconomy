@@ -18,7 +18,7 @@
             Label="Debitor/Source" 
             HelperText="E.g: Microsoft"  
             Class="pa-3" 
-            Variant="@incomeFieldVariant"
+            Variant="@FieldVariant"
             AdornmentColor="Color.Primary"
             Adornment="Adornment.End" 
             AdornmentIcon="@Icons.Material.Filled.Business"/>
@@ -28,7 +28,7 @@
             For="@(() => transaction.Type)"
             ReadOnly="true"
             Label="Type"
-            Variant="@incomeFieldVariant" 
+            Variant="@FieldVariant" 
             Class="pa-3"
             Adornment="Adornment.End" 
             AdornmentIcon="@Icons.Material.Filled.AccountBalance" 
@@ -40,7 +40,7 @@
             Label="Value" 
             HelperText="E.g: 4000" 
             Class="pa-3" 
-            Variant="@incomeFieldVariant" 
+            Variant="@FieldVariant" 
             AdornmentColor="Color.Primary"
             Adornment="Adornment.End" 
             AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
@@ -52,7 +52,7 @@
             ShowWeekNumbers="true"
             AdornmentColor="Color.Primary"
             Adornment="Adornment.End"
-            Variant="@incomeFieldVariant">
+            Variant="@FieldVariant">
         </MudDatePicker>
                    
         <MudAutocomplete 
@@ -61,7 +61,7 @@
             Label="Category"
             Class="pa-3"
             Clearable="true"
-            Variant="@incomeFieldVariant"
+            Variant="@FieldVariant"
             MaxItems="15"
             SearchFunc="@Search1"
             ResetValueOnEmptyText="true" >
@@ -73,7 +73,7 @@
             Label="Subcategory"
             Class="pa-3"
             Clearable="true"
-            Variant="@incomeFieldVariant"
+            Variant="@FieldVariant"
             MaxItems="15"
             SearchFunc="@Search2"
             ResetValueOnEmptyText="true" >
@@ -85,7 +85,7 @@
             Label="Description" 
             HelperText="E.g: Sold my car"  
             Class="pa-3" 
-            Variant="@incomeFieldVariant"
+            Variant="@FieldVariant"
             AdornmentColor="Color.Primary"
             Adornment="Adornment.End" 
             AdornmentIcon="@Icons.Material.Filled.TextSnippet" >
@@ -108,7 +108,7 @@
 
 
     void Cancel() => MudDialog.Cancel();
-    private Variant incomeFieldVariant = Variant.Filled;
+    private Variant FieldVariant = Variant.Filled;
     private DateTime? date { get; set; }
     private string value1 = string.Empty;
     private string value2 = string.Empty;
@@ -125,9 +125,22 @@
             Categories = await CategoryRepository.GetCategories();
             foreach(Category c in Categories)
             {   
-                // Only take income part of categories
-                if(c.Id<=14)
-                    categories.Add(c.Title);
+                if(transaction.Type == "Income")
+                {
+                    // Income part of categories
+                    if(c.Id<=14)
+                    {
+                        categories.Add(c.Title);
+                    }
+                }
+                if(transaction.Type == "Expense")
+                {
+                    // Expense part of categories
+                    if(c.Id>=14)
+                    {
+                        categories.Add(c.Title);
+                    }
+                }
             }
         }
 
@@ -163,7 +176,7 @@
             var response = await TransactionRepository.CreateTransaction(transaction);
             if (response.Status)
             {
-                Snackbar.Add("Income transaction submitted!", Severity.Success);
+                Snackbar.Add("Transaction submitted!", Severity.Success);
                 MudDialog.Close(DialogResult.Ok(true));
             }
         }

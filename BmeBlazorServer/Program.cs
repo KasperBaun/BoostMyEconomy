@@ -41,6 +41,7 @@ builder.Services.AddHttpClient<ICategoryRepository, CategoryRepository>(client =
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<IOverviewService, OverviewService>();
 builder.Services.AddScoped<IIncomeService, IncomeService>();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 
 var app = builder.Build();
