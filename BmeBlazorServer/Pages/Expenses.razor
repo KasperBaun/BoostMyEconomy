@@ -64,12 +64,13 @@
                     </MudToolBar>
                 </MudPaper>
             </MudItem>
+
             <!-- Expense table -->
             <MudItem xs="12" sm="12" md="9">
                 <MudGrid>
                     <MudItem xs="12" sm="12" md="12">
                             <MudTable
-                                @ref="mudTable"
+                                @ref="expenseTable"
                                 T="Transaction"
                                 RowClassFunc="@SelectedRowClassFunc"
                                 OnRowClick="OpenEditTransactionDialog"
@@ -81,11 +82,13 @@
                                 Dense="@dense" 
                                 Hover="true" 
                                 Bordered="false"
+                                Loading="@loading"
                                 Striped="@striped"
                                 Filter="new Func<Transaction,bool>(FilterFunc1)" 
                                 @bind-SelectedItem="@selectedTransaction"
                                 >
                             <HeaderContent>
+                                <!--<MudTh>Icon</MudTh>-->
                                 <MudTh>Date</MudTh>
                                 <MudTh>Source</MudTh>
                                 <MudTh>Value</MudTh>
@@ -94,6 +97,7 @@
                             <RowTemplate
                                 Context="ExpenseTable"
                             >
+                                <!--<MudTd DataLabel="Icon"><MudIcon Icon="@Icons.Material.Filled.House"></MudIcon></MudTd>-->
                                 <MudTd DataLabel="Date">@ExpenseTable.MadeAt</MudTd>
                                 <MudTd DataLabel="Source">@ExpenseTable.Source</MudTd>
                                 <MudTd DataLabel="Value">@ExpenseTable.Value</MudTd>
@@ -124,10 +128,11 @@
                             </MudChart>
                         </MudPaper>
                     </MudItem>
-                    <!--Sources-->
+
+                    <!--Expenses breakdown-->
                     <MudItem xs="12" sm="12" md="6">
                         <MudPaper Elevation="2" Class="rounded-xl" Style="height: 330px;">
-                            <MudText Typo="Typo.h5" Class="pa-3" >Sources</MudText>
+                            <MudText Typo="Typo.h5" Class="pa-3" >Expenses breakdown</MudText>
                             <MudChart 
                                 ChartType="ChartType.Pie" 
                                 LegendPosition="Position.Right" 
@@ -141,11 +146,57 @@
                 </MudGrid>
             </MudItem>
 
+            <!-- Top fixed expenses by category -->
             <MudItem xs="12" sm="12" md="3">
-                <MudPaper Elevation="2" Class="rounded-xl" Style="height:804px">
-                    <MudText Typo="Typo.h5" Class="pa-3" >Expenses by category</MudText>
+                <MudItem>
+                <MudPaper Elevation="2" Class="rounded-xl" Style="height:390px">
+                    <MudText Typo="Typo.h5" Class="pa-3" >Top-5 variable expenses</MudText>
+                    <MudTable
+                                T="TableItem"
+                                OnRowClick="OnVariableExpenseClick"
+                                Height="360px"
+                                Items="ExpenseService.VarExpenseTableItems.Take(5)" 
+                                Elevation="25"
+                                Class="rounded-xl"
+                                Style="margin:auto; overflow-y:hidden" 
+                                Dense="false" 
+                                Hover="true" 
+                                Bordered="false"
+                                Striped="false"
+                                Loading="@loading"
+                                LoadingProgressColor="Color.Primary"
+                                @bind-SelectedItem="@selectedTableItem"
+                                >
+                                <!--Filter="new Func<Transaction,bool>(FilterFunc1)" -->
+                            <!--<HeaderContent>
+                                <MudTh>Icon</MudTh>
+                                <MudTh>Date</MudTh>
+                                <MudTh>Source</MudTh>
+                                <MudTh>Value</MudTh>
+                            </HeaderContent>-->
 
+                            <RowTemplate
+                                Context="ExpenseTable"
+                            >
+                                <MudTd DataLabel="Icon"><MudIcon Icon="@ExpenseTable.IconString" Color="Color.Primary" Size="Size.Medium"/></MudTd>
+                                <MudTd DataLabel="Name" Class="typography-h6">@ExpenseTable.Name</MudTd>
+                                <MudTd DataLabel="Value">@ExpenseTable.Value</MudTd>
+                            </RowTemplate>
+                        </MudTable>
                 </MudPaper>
+                </MudItem>
+                <MudItem Class="mt-6">
+                  <MudPaper Elevation="2" Class="rounded-xl" Style="height:390px">
+                    <MudText Typo="Typo.h5" Class="pa-3" >Top-5 fixed expenses</MudText>
+                    <MudList Clickable="true" Dense="false" DisableGutters="false">
+                        <MudListItem Text="Housing" Avatar="@Icons.Filled.House" IconColor="Color.Primary" />
+                        <MudListItem Text="Insurance" Avatar="@Icons.Filled.InsertInvitation" IconColor="Color.Primary" />
+                        <MudListItem Text="Kids" Avatar="@Icons.Filled.Image" IconColor="Color.Primary" />
+                        <MudListItem Text="Electricity" Avatar="@Icons.Filled.Image" IconColor="Color.Primary" />
+                        <MudListItem Text="Something" Avatar="@Icons.Filled.Image" IconColor="Color.Primary" />
+                    </MudList>
+                </MudPaper>
+                </MudItem>
             </MudItem>
          
         </MudGrid>
@@ -160,6 +211,8 @@
 
 @code {
     User currentUser = new();
+    private bool loading = true;
+    /* Instantiate service and manipulate data */
     protected override async Task OnInitializedAsync()
     {
         try
@@ -172,7 +225,7 @@
             bool dataReady = await ExpenseService.InitializeService();
             if (dataReady)
             {
-                // Loading = done
+                loading = false;
             }
         }
         catch (Exception ex)
@@ -180,15 +233,12 @@
             Console.WriteLine(ex.Message);
         }
     }
-
     public void Dispose()
     {
         ExpenseService.OnChange -= StateHasChanged;
         UserRepository.OnChange -= StateHasChanged;
         TransactionRepository.OnChange -= StateHasChanged;
     }
-
-
     /* Add expense */
     async Task OpenAddTransactionDialog()
     {
@@ -197,17 +247,12 @@
         var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
         var dialog = DialogService.Show<AddTransactionDialog>("", transactionParameter, options);
         var result = await dialog.Result;
-
-        if (result.Cancelled)
-        {
-            // Snackbar with could not add expense
-        }
         ExpenseService.PeriodChanged();
         StateHasChanged();
     }
 
-    /* expense table */
-    private MudTable<Transaction> mudTable;
+    /* Expense table */
+    private MudTable<Transaction> expenseTable;
     private int selectedRowNumber = -1;
     private bool dense = false;
     private bool striped = false;
@@ -241,7 +286,7 @@
             selectedRowNumber = -1;
             return string.Empty;
         }
-        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(transaction))
+        else if (expenseTable.SelectedItem != null && expenseTable.SelectedItem.Equals(transaction))
         {
             selectedRowNumber = rowNumber;
             return "selected";
@@ -251,8 +296,7 @@
             return string.Empty;
         }
     }
-
-
+    /* Edit/delete expense */
     async Task OpenEditTransactionDialog()
     {
         var transactionParameter = new DialogParameters { 
@@ -279,5 +323,14 @@
             MaxNumYAxisTicks = 5,
             XAxisLines = true
     };
- 
+    /* Top-5 expenses */
+    public TableItem selectedTableItem { get; set; } = new();
+    async Task OnVariableExpenseClick()
+    {
+        
+    }
+    async Task OnFixedExpenseClick()
+    {
+        
+    }
 }

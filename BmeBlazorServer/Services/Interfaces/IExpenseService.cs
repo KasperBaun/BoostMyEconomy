@@ -10,6 +10,7 @@ namespace BmeBlazorServer.Services
         ChartData ExpenseSourcesForPeriod { get; set; }
         List<ChartSeries> ExpenseHistory { get; set; }
         string[] ExpenseHistoryLabels { get; set; }
+        List<TableItem> VarExpenseTableItems { get; set; }
         Task<bool> InitializeService();
         DateRange? PeriodSelected { get; set; }
         void PeriodChanged();
