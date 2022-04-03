@@ -35,8 +35,7 @@ namespace BmeBlazorServer.Services
             }
             ExpenseSourcesForPeriod = FilterSources(ExpensesForPeriod);
             FilterHistory(ExpensesForPeriod);
-            VarExpenseTableItems = FilterVarFixedExpenses(ExpensesForPeriod);
-            FixedExpenseTableItems = FilterVarFixedExpenses(ExpensesForPeriod);
+            FilterVarFixedExpenses(ExpensesForPeriod);
             OnChange?.Invoke();
             return true;
         }
@@ -144,7 +143,7 @@ namespace BmeBlazorServer.Services
             ExpenseHistoryLabels = months.ToArray();
             return;
         }
-        private List<TableItem> FilterVarFixedExpenses(List<Transaction> expensesList)
+        private void FilterVarFixedExpenses(List<Transaction> expensesList)
         {
             List<double> sum = new();
             List<string> sumCategories = new();
@@ -163,8 +162,11 @@ namespace BmeBlazorServer.Services
                     sum.Insert(index, t.Value);
                 }
             }
-            List<TableItem> tableItems = new List<TableItem>();
-            foreach(string category in sumCategories)
+            List<TableItem> varItems = new List<TableItem>();
+            List<int> varIds = new() { 19, 21, 22, 23, 26, 29, 30 };
+            List<TableItem> fixedItems = new List<TableItem>();
+            List<int> fixedIds = new() { 15, 16, 17, 18, 20, 25, 27, 28 };
+            foreach (string category in sumCategories)
             {
                 Category cat = expensesList.Find(c => c.Category.Title == category).Category;
                 int index = sumCategories.FindIndex(c => c == category);
@@ -172,20 +174,29 @@ namespace BmeBlazorServer.Services
                 item.Name = category;
                 item.Value = sum[index];
                 item.IconString = CategoryToIcon(cat.Id);
-                tableItems.Add(item);
+                if (varIds.Contains(cat.Id)){
+                    varItems.Add(item);
+                }
+                if (fixedIds.Contains(cat.Id))
+                {
+                    fixedItems.Add(item);
+                }
             }
-            tableItems.Sort((a, b) =>
+            varItems.Sort((a, b) =>
                     a.Value
                     .CompareTo(
                     b.Value
                     ));
-            tableItems.Reverse();
-            foreach(TableItem item in tableItems)
-            {
-                Console.WriteLine(item.ToString());
-            }
+            varItems.Reverse();
+            fixedItems.Sort((a, b) =>
+                    a.Value
+                    .CompareTo(
+                    b.Value
+                    ));
+            fixedItems.Reverse();
 
-            return tableItems;
+            VarExpenseTableItems = varItems;
+            FixedExpenseTableItems= fixedItems;
         }
         private static string ConvertMonthToString(int month)
         {

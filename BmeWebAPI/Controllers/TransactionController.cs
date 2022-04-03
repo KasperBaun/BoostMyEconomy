@@ -46,9 +46,16 @@ namespace BmeWebAPI.Controllers
             {
                 return BadRequest("UserId not found!");
             }
+            int id = _context.Transactions.Count() + 1;
+            bool exists = _context.Transactions.Any(t => t.Id == id);
+            while (exists)
+            {
+                id = id + 1;
+                exists = _context.Transactions.Any(t => t.Id == id);
+            }
             TransactionEntity dbTransaction = new()
             {   
-                Id = _context.Transactions.Count() + 1,
+                Id = id,
                 UserId = int.Parse(userId.Value),
                 Source = transaction.Source,
                 Value = transaction.Value,
