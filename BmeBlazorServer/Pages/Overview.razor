@@ -106,7 +106,7 @@
                         <MudItem xs="12" sm="12" md="6">
                             <MudPaper Elevation="25" Class=" rounded-xl pa-3" Style="height: 400px;">
                                 <MudText Typo="Typo.h5">Expenses breakdown</MudText>
-                                <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
+                                <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="350px" Height="350px"
                                     InputData="OverviewService.ExpenseSourcesForPeriod.Data" InputLabels="OverviewService.ExpenseSourcesForPeriod.Labels">
                                 </MudChart>
                             </MudPaper>
@@ -209,7 +209,7 @@
                     <MudGrid>
                         <!-- User info -->
                         <MudItem xs="12">
-                            <BmeBlazorServer.Pages.Components.UserInfo/>
+                            <UserInfo UserName="@UserName"/>
                         </MudItem>
 
                         <!-- Recent transactions -->
@@ -260,7 +260,7 @@
 </AuthorizeView>
 
 @code {
-    
+    public string UserName { get; set; } = string.Empty;
     // Style the cells according to a positive or negative result
     private Func<Result, string> _cellStyle => x =>
     {
@@ -280,6 +280,7 @@
         try
         {   
             await UserRepository.GetCurrentUser();
+            UserName = UserRepository.CurrentUser.FirstName + " " + UserRepository.CurrentUser.LastName;
             OverviewService.OnChange += StateHasChanged;
             bool dataReady = await OverviewService.InitializeService();
             if (dataReady)

@@ -252,16 +252,16 @@ namespace BmeBlazorServer.Services
             {
                 if (t.Type == "Expense")
                 {
-                    if (transactionCategories.Contains(t.Source))
+                    if (transactionCategories.Contains(t.Category.Title))
                     {
-                        int index = transactionCategories.FindIndex(c => c == t.Source);
-                        double sourceSum = expenseTransactions.Where(x => x.Source == t.Source).Sum(y => y.Value);
+                        int index = transactionCategories.FindIndex(c => c == t.Category.Title);
+                        double sourceSum = expenseTransactions.Where(x => x.Category.Title == t.Category.Title).Sum(y => y.Value);
                         data[index] = sourceSum;
                     }
                     else
                     {
-                        transactionCategories.Add(t.Source);
-                        int index = transactionCategories.FindIndex(c => c == t.Source);
+                        transactionCategories.Add(t.Category.Title);
+                        int index = transactionCategories.FindIndex(c => c == t.Category.Title);
                         data.Insert(index, t.Value * (-1));
                     }
                 }
