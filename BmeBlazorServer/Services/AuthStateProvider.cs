@@ -8,8 +8,9 @@ namespace BmeBlazorServer.Services
     public class AuthStateProvider : AuthenticationStateProvider
     {
         private readonly ILocalStorageService _localStorage;
-        public static AuthenticationHeaderValue TokenBearer { get; set; }
-        public AuthStateProvider (ILocalStorageService localStorage)
+
+        public static AuthenticationHeaderValue? TokenBearer { get; set; }
+        public AuthStateProvider(ILocalStorageService localStorage)
         {
             _localStorage = localStorage;
         }

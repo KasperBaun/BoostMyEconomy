@@ -155,8 +155,9 @@ namespace BmeBlazorServer.Services
                             double prevSum = ResultPrMonthAcc.ToArray()[i-1];
                             if(prevSum == 0)
                             {
-                                for( int x = resultPrMonth.Length; x>resultPrMonth.Length; x--)
+                                for (int x = resultPrMonth.Length; x >= 0;)
                                 {
+                                    x--;
                                     if(resultPrMonth[x] > prevSum)
                                         prevSum = ResultPrMonthAcc.ToArray()[x]; break;
                                 }

@@ -33,7 +33,7 @@ namespace BmeBlazorServer.Repositories
                 responseModel.Status = true;
                 Console.WriteLine(response.ReasonPhrase + response.Content+"\n");
                 responseModel.Message = response.ReasonPhrase + response.Content;
-                UserTransactions.Add(responseContent);
+                UserTransactions.Add(responseContent!);
                 OnChange?.Invoke();
                 return responseModel;
             }

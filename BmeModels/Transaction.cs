@@ -10,7 +10,7 @@ namespace BmeModels
         public DateTime MadeAt { get; set; } 
         public int Value { get; set; }
         public string Type { get; set; } = null!;
-        public Category Category { get; set; }
+        public Category Category { get; set; } = new();
         public string Source { get; set; } = null!;
         public Subcategory? Subcategory { get; set; }
         public string? Description { get; set; }

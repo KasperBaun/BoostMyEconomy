@@ -111,11 +111,11 @@
 </EditForm>               
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new();
     [Parameter] public Transaction transaction { get; set; } = new Transaction();
     [Parameter] public DateTime? date { get; set; } = new DateTime();
-    [Parameter] public string category { get; set; }
-    [Parameter] public string subcategory { get; set; } 
+    [Parameter] public string category { get; set; } = string.Empty;
+    [Parameter] public string subcategory { get; set; } = string.Empty;
 
     void Cancel() => MudDialog.Cancel();
     private Variant incomeFieldVariant = Variant.Filled;
@@ -160,7 +160,8 @@
         return subCategories.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
     private async Task<IEnumerable<string>> TypeSearch(string value)
-    {   
+    {
+        await Task.Delay(1);
         if (string.IsNullOrEmpty(value))
             return types;
         return types.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));

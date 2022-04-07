@@ -25,14 +25,16 @@ namespace BmeBlazorServer.Services
         {
             UserTransactions.Clear();
             UserTransactions = await transactionRepository.GetTransactions();
-            if(PeriodSelected.Start.HasValue && PeriodSelected.End.HasValue)
-            {
-                ExpensesForPeriod = FilterTransactionsFromSelectedPeriod(new DateRange(PeriodSelected.Start.Value,PeriodSelected.End.Value));
-            }
-            else
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            if (!PeriodSelected.Start.HasValue || !PeriodSelected.End.HasValue)
             {
                 throw new Exception("Error with value from PeriodSelected@IncomeService.cs");
             }
+            else
+            {
+                ExpensesForPeriod = FilterTransactionsFromSelectedPeriod(new DateRange(PeriodSelected.Start.Value, PeriodSelected.End.Value));
+            }
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
             ExpenseSourcesForPeriod = FilterSources(ExpensesForPeriod);
             FilterHistory(ExpensesForPeriod);
             FilterVarFixedExpenses(ExpensesForPeriod);
@@ -162,15 +164,15 @@ namespace BmeBlazorServer.Services
                     sum.Insert(index, t.Value);
                 }
             }
-            List<TableItem> varItems = new List<TableItem>();
+            List<TableItem> varItems = new();
             List<int> varIds = new() { 19, 21, 22, 23, 26, 29, 30 };
-            List<TableItem> fixedItems = new List<TableItem>();
+            List<TableItem> fixedItems = new();
             List<int> fixedIds = new() { 15, 16, 17, 18, 20, 25, 27, 28 };
             foreach (string category in sumCategories)
             {
-                Category cat = expensesList.Find(c => c.Category.Title == category).Category;
+                Category cat = expensesList.Find(c => c.Category.Title == category)!.Category;
                 int index = sumCategories.FindIndex(c => c == category);
-                TableItem item = new TableItem();
+                TableItem item = new();
                 item.Name = category;
                 item.Value = sum[index];
                 item.IconString = CategoryToIcon(cat.Id);

@@ -25,7 +25,7 @@ namespace BmeBlazorServer.Services
         {
             UserTransactions.Clear();
             UserTransactions = await transactionRepository.GetTransactions();
-            if(PeriodSelected.Start.HasValue && PeriodSelected.End.HasValue)
+            if(PeriodSelected!.Start.HasValue && PeriodSelected.End.HasValue)
             {
                 IncomeForPeriod = FilterTransactionsFromSelectedPeriod(new DateRange(PeriodSelected.Start.Value,PeriodSelected.End.Value));
             }
@@ -166,9 +166,9 @@ namespace BmeBlazorServer.Services
             List<TableItem> incomeCategory = new();
             foreach (string category in sumCategories)
             {
-                Category cat = expensesList.Find(c => c.Category.Title == category).Category;
+                Category cat = expensesList.Find(c => c.Category.Title == category)!.Category;
                 int index = sumCategories.FindIndex(c => c == category);
-                TableItem item = new TableItem();
+                TableItem item = new();
                 item.Name = category;
                 item.Value = sum[index];
                 item.IconString = CategoryToIcon(cat.Id);
@@ -205,9 +205,9 @@ namespace BmeBlazorServer.Services
             List<TableItem> incomeSources = new();
             foreach (string source in sumSources)
             {
-                Category cat = expensesList.Find(c => c.Source == source).Category;
+                Category cat = expensesList.Find(c => c.Source == source)!.Category;
                 int index = sumSources.FindIndex(c => c == source);
-                TableItem item = new TableItem();
+                TableItem item = new();
                 item.Name = source;
                 item.Value = sum[index];
                 item.IconString = CategoryToIcon(cat.Id);

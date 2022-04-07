@@ -286,7 +286,7 @@
     }
 
     /* Income table */
-    private MudTable<Transaction> mudTable;
+    private MudTable<Transaction> mudTable = new();
     private int selectedRowNumber = -1;
     private bool dense = false;
     private bool striped = false;
@@ -338,7 +338,7 @@
             ["transaction"]=selectedTransaction, 
             ["date"]=selectedTransaction.MadeAt,
             ["category"]=selectedTransaction.Category.Title,
-            ["subcategory"]=selectedTransaction.Subcategory.Title
+            ["subcategory"]=selectedTransaction.Subcategory!.Title
         };
         var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
         var dialog = DialogService.Show<EditTransactionDialog>("",transactionParameter, options);
@@ -363,11 +363,11 @@
     public TableItem selectedTableItem { get; set; } = new();
     async Task OnSourceIncomeClicked()
     {
-        
+        await Task.Delay(1000);
     }
     async Task OnCategoryIncomeClicked ()
     {
-        
+        await Task.Delay(1000);
     }
  
 }

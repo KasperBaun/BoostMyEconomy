@@ -281,7 +281,7 @@
     }
 
     /* Expense table */
-    private MudTable<Transaction> expenseTable;
+    private MudTable<Transaction> expenseTable = new();
     private int selectedRowNumber = -1;
     private bool dense = false;
     private bool striped = false;
@@ -332,7 +332,7 @@
             ["transaction"]=selectedTransaction, 
             ["date"]=selectedTransaction.MadeAt,
             ["category"]=selectedTransaction.Category.Title,
-            ["subcategory"]=selectedTransaction.Subcategory.Title
+            ["subcategory"]=selectedTransaction.Subcategory!.Title
         };
         var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
         var dialog = DialogService.Show<EditTransactionDialog>("",transactionParameter, options);
@@ -356,10 +356,10 @@
     public TableItem selectedTableItem { get; set; } = new();
     async Task OnVariableExpenseClick()
     {
-        
+        await Task.Delay(1000);
     }
     async Task OnFixedExpenseClick()
     {
-        
+        await Task.Delay(1000);
     }
 }

@@ -79,7 +79,7 @@ namespace BmeBlazorServer.Repositories
                         }
                         else
                         {
-                            return subcategories;
+                            return subcategories!;
                         }
                     }
                 }

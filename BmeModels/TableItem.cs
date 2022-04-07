@@ -10,7 +10,7 @@ namespace BmeModels
     {
         public string Name { get; set; } =  string.Empty;
         public double Value { get; set; }
-        public string IconString { get; set; }
+        public string IconString { get; set; } = "Icons.Material.Filled.People";
     public override string ToString()
     {
             return "Name: "+ Name + " Value: "  + Value + " IconString: " + IconString;
