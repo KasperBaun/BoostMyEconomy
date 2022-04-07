@@ -18,6 +18,7 @@ namespace BmeBlazorServer.Services
         public ChartData ExpenseSourcesForPeriod { get; set; } = new();
         public List<string> GetMonths { get; set; } = new(){ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
         public string SumIncome { get; set; } = string.Empty;
+        public string NetIncome { get; set; } = string.Empty;
         public int Balance { get; set; } = 1;
         public event Action? OnChange;
 
@@ -76,6 +77,7 @@ namespace BmeBlazorServer.Services
             List<Transaction> expensesForPeriod =
                 TransactionsForPeriod.Where(x => x.Type == "Expense").ToList();
             int expenses = expensesForPeriod.Sum(x => x.Value);
+            NetIncome = (income - expenses).ToString();
           
             //int result = (((income+expenses)*100/income));
             //Console.WriteLine("$TransactionService.cs - Income: {0}, Expenses: {1}, Income+Expenses: {2}, Balance: {3}", income, expenses, (income+expenses), result);   

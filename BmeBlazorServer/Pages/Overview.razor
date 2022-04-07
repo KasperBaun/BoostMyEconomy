@@ -75,10 +75,10 @@
                                         <MudText Typo="Typo.body1">Last time you logged on was @UserRepository.LastLogin</MudText>
                                     </MudItem>
                                     <MudItem xs="12" sm="12" md="4">
-                                        Test
+                                        <!--Test-->
                                     </MudItem>
                                     <MudItem xs="12" sm="12" md="4">
-                                        Virker det
+                                        <!--Virker det-->
                                     </MudItem>
 
                                 </MudGrid>
@@ -209,7 +209,7 @@
                     <MudGrid>
                         <!-- User info -->
                         <MudItem xs="12">
-                            <UserInfo UserName="@UserName"/>
+                            <UserInfo UserName="@UserName" Profit="@NetIncome"/>
                         </MudItem>
 
                         <!-- Recent transactions -->
@@ -261,6 +261,7 @@
 
 @code {
     public string UserName { get; set; } = string.Empty;
+    public string NetIncome { get; set; } = string.Empty;
     // Style the cells according to a positive or negative result
     private Func<Result, string> _cellStyle => x =>
     {
@@ -285,6 +286,7 @@
             bool dataReady = await OverviewService.InitializeService();
             if (dataReady)
             {
+                NetIncome = OverviewService.NetIncome;
                 LoadingRecentTransactions = false;
             }
         }
