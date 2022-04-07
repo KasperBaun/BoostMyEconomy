@@ -2,17 +2,19 @@
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using BmeBlazorServer.Services;
 
-namespace BmeBlazorServer.Services
+namespace BmeBlazorServer.Repositories
 {
-    public class UserService : IUserService
+    public class UserRepository : IUserRepository
     {
         private readonly HttpClient httpClient;
         private readonly ILocalStorageService localStorageService;
         public User CurrentUser { get; set; } = new();
+        public string LastLogin { get; set; } = string.Empty;
         public event Action? OnChange;
 
-        public UserService(HttpClient _httpClient, ILocalStorageService _localStorageService)
+        public UserRepository(HttpClient _httpClient, ILocalStorageService _localStorageService)
         {
             httpClient = _httpClient;
             localStorageService = _localStorageService;
@@ -56,10 +58,7 @@ namespace BmeBlazorServer.Services
         {
             List<User> users = new();    
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri: "api/User/All");
-            var token =  await localStorageService.GetItemAsync<string>("token");
-            requestMessage.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            
+            requestMessage.Headers.Authorization = AuthStateProvider.TokenBearer;
             var response = await httpClient.SendAsync(requestMessage);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -96,18 +95,33 @@ namespace BmeBlazorServer.Services
         {  
             return await httpClient.PutAsJsonAsync("api/User/", user);
         }
-        public async Task<bool> FetchCurrentUser()
+        public async Task<User> GetCurrentUser()
+        {
+            if(CurrentUser.FirstName == null || CurrentUser.LastName == null)
+            {
+                await FetchCurrentUser();
+            }
+
+            return CurrentUser;
+        }
+        private async Task<bool> FetchCurrentUser()
         {
             try
             {
                 {
+                    string lastLogin = await localStorageService.GetItemAsStringAsync("lastlogin");
+                    if (lastLogin == null)
+                        LastLogin = "not known =(";
+                    else
+                    {
+                        LastLogin = DateTime.Parse(lastLogin).ToString("dddd, dd, MMMM");
+                    }
+                    Console.WriteLine(LastLogin);
+                            
                     int userId = await ParseLoggedInUserId();
-                    Console.WriteLine("$UserService.cs@FetchCurrentUser(): Error - userId = " + userId);
                     string requestUri = "api/User/"+userId;
                     var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
-                    var token = await localStorageService.GetItemAsync<string>("token");
-                    requestMessage.Headers.Authorization =
-                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    requestMessage.Headers.Authorization = AuthStateProvider.TokenBearer;
                     var response = await httpClient.SendAsync(requestMessage);
 
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -117,6 +131,7 @@ namespace BmeBlazorServer.Services
                         if (responseUser != null)
                         {
                             CurrentUser = responseUser;
+                            //Console.WriteLine(responseUser.ToString());
                             OnChange?.Invoke();
                             return true;
                         }

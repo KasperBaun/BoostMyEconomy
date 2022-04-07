@@ -1,8 +1,8 @@
 ﻿using BmeModels;
 
-namespace BmeBlazorServer.Services
+namespace BmeBlazorServer.Repositories
 {
-    public interface ICategoryService
+    public interface ICategoryRepository
     {
         Task<bool> InitializeService();
         Task<List<Subcategory>> GetSubCategories();

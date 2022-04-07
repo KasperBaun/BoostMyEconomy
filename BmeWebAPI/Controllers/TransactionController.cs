@@ -21,29 +21,45 @@ namespace BmeWebAPI.Controllers
         // GET: api/Transaction/All
         [Authorize(Roles ="Admin,User")]
         [HttpGet("All")]
-        public async Task<ActionResult<IEnumerable<Models.Transaction>>> GetTransactions()
+        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
         {
-            List<Models.Transaction> transactions = _context.Transactions.ToList();
-            return transactions;
+            return await Task.Run(() =>
+                {
+                    List<TransactionEntity> dbTransactions = _context.Transactions.ToList();
+                    List<Transaction> transactions = new();
+                    foreach (var transaction in dbTransactions)
+                    {
+                        Transaction transactionModel = DbToModel(transaction);
+                        transactions.Add(transactionModel);
+                    }
+                    return transactions;
+                });
         }
 
         // POST: api/Transaction/
         [Authorize(Roles = "Admin,User")]
         [HttpPost]
-        public async Task<IActionResult> CreateTransaction(TransactionDTO transaction)
+        public async Task<ActionResult<Transaction>> CreateTransaction(TransactionDTO transaction)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier);
             if(userId == null)
             {
                 return BadRequest("UserId not found!");
             }
-            Models.Transaction dbTransaction = new()
+            int id = _context.Transactions.Count() + 1;
+            bool exists = _context.Transactions.Any(t => t.Id == id);
+            while (exists)
+            {
+                id = id + 1;
+                exists = _context.Transactions.Any(t => t.Id == id);
+            }
+            TransactionEntity dbTransaction = new()
             {   
-                Id = _context.Transactions.Count() + 1,
+                Id = id,
                 UserId = int.Parse(userId.Value),
                 Source = transaction.Source,
                 Value = transaction.Value,
-                MadeAt = transaction.MadeAt,
+                MadeAt = transaction.MadeAt.ToString(),
                 CategoryId = transaction.CategoryId,
                 Type = transaction.Type,
                 SubcategoryId = transaction.SubcategoryId,
@@ -54,7 +70,7 @@ namespace BmeWebAPI.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok(true);
+                return DbToModel(dbTransaction);
             }
             catch (DbUpdateException ex)
             {
@@ -66,9 +82,10 @@ namespace BmeWebAPI.Controllers
         // PUT: api/Transaction/
         [Authorize(Roles = "Admin,User")]
         [HttpPut]
-        public async Task<IActionResult> UpdateTransaction(Models.Transaction transaction)
-        {
-            _context.Transactions.Update(transaction);
+        public async Task<IActionResult> UpdateTransaction(Transaction transaction)
+        {   
+            TransactionEntity dbTransaction = ModelToDb(transaction);
+            _context.Transactions.Update(dbTransaction);
             try
             {
                 await _context.SaveChangesAsync();
@@ -83,18 +100,98 @@ namespace BmeWebAPI.Controllers
 
         // DELETE: api/Transaction/5
         [Authorize(Roles = "Admin,User")]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteTransaction(Transaction transaction)
         {
-            var transaction = await _context.Transactions.FindAsync(id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
+            var dbTransaction = await _context.Transactions.FindAsync(transaction.Id);
+            if (dbTransaction == null) { return NotFound(); }
 
-            _context.Transactions.Remove(transaction);
+            _context.Transactions.Remove(dbTransaction);
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        private Transaction DbToModel(TransactionEntity dbTransaction)
+        {
+            CategoryEntity dbCategory = _context.Categories.Single(c => c.Id == dbTransaction.CategoryId);
+            SubcategoryEntity dbSubcategory = new()
+            {
+                Id = 0,
+                ParentCategoryId = 0,
+                Title = " ",
+                Description = " ",
+            };
+            if (_context.Subcategories.Any())
+            {
+                SubcategoryEntity dbSub = _context.Subcategories.Single(s => s.Id == dbTransaction.SubcategoryId);
+                if(dbSub == null)
+                {
+
+                }
+                else
+                {
+                    dbSubcategory = dbSub;
+                }
+            }
+            Subcategory subcategory = new();
+            Category category = new()
+            {
+                Id = dbCategory.Id,
+                Decription = dbCategory.Decription,
+                Title = dbCategory.Title,
+            };
+            
+            subcategory.Id = dbSubcategory.Id;
+            subcategory.Title = dbSubcategory.Title;
+            subcategory.ParentCategoryId = dbSubcategory.ParentCategoryId;
+            subcategory.Description = dbSubcategory.Description;
+            Transaction transactionModel = new()
+            {
+                Id = dbTransaction.Id,
+                UserId = dbTransaction.UserId,
+                MadeAt = DateTime.Parse(dbTransaction.MadeAt),
+                Source = dbTransaction.Source,
+                Type = dbTransaction.Type,
+                Value = dbTransaction.Value,
+                Description = dbTransaction.Description,
+                Category = category,
+                Subcategory = subcategory,
+            };
+            return transactionModel;
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        private static TransactionEntity ModelToDb(Transaction transaction)
+        {
+            string descrip = "";
+            Subcategory subcategory = new();
+            TransactionEntity transactionEntity = new();
+            if(transaction.Category == null)
+            {
+                throw new Exception(message:"Category is null @ ModelToDb - TransactionController.cs ");
+            }
+            if(transaction.Subcategory == null)
+            {
+                subcategory.Id = 0;
+            }
+            if(!string.IsNullOrEmpty(transaction.Description))
+            {
+                descrip = transaction.Description;
+            }
+
+            transactionEntity.Id = transaction.Id;
+            transactionEntity.UserId = transaction.UserId;
+            transactionEntity.MadeAt = transaction.MadeAt.ToString();
+            transactionEntity.Value = transaction.Value;
+            transactionEntity.Type = transaction.Type;
+            transactionEntity.CategoryId = transaction.Category.Id;
+            transactionEntity.Source = transaction.Source;
+            transactionEntity.SubcategoryId = subcategory.Id;
+            transactionEntity.Description = descrip;
+
+            return transactionEntity;
+
         }
     }
 }

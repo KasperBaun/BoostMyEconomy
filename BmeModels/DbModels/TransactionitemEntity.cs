@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BmeWebAPI.Models
+namespace BmeModels.DbModels
 {
-    public partial class Transactionitem
+    public partial class TransactionitemEntity
     {
         public int Id { get; set; }
         public int TransactionId { get; set; }
@@ -11,6 +11,6 @@ namespace BmeWebAPI.Models
         public int Value { get; set; }
         public int Quantity { get; set; }
 
-        public virtual Transaction Transaction { get; set; } = null!;
+        public virtual TransactionEntity Transaction { get; set; } = null!;
     }
 }

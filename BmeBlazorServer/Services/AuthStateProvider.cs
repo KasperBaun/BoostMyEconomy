@@ -1,13 +1,15 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 
 namespace BmeBlazorServer.Services
 {
-    public class CustomAuthStateProvider : AuthenticationStateProvider
+    public class AuthStateProvider : AuthenticationStateProvider
     {
         private readonly ILocalStorageService _localStorage;
-        public CustomAuthStateProvider (ILocalStorageService localStorage)
+        public static AuthenticationHeaderValue TokenBearer { get; set; }
+        public AuthStateProvider (ILocalStorageService localStorage)
         {
             _localStorage = localStorage;
         }
@@ -32,6 +34,7 @@ namespace BmeBlazorServer.Services
                         {
                             IEnumerable<Claim> claimsList = token.Claims.ToList();
                             identity = new ClaimsIdentity(claimsList, "jwt");
+                            TokenBearer = new AuthenticationHeaderValue("Bearer", jwt);
                         }
                         else
                         {

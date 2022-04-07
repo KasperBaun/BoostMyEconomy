@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BmeWebAPI.Models
+namespace BmeModels.DbModels
 {
-    public partial class Transaction
+    public class TransactionEntity
     {
-        public Transaction()
+        public TransactionEntity()
         {
             Transactionitems = new HashSet<Transactionitem>();
         }
@@ -20,8 +20,8 @@ namespace BmeWebAPI.Models
         public int? SubcategoryId { get; set; }
         public string? Description { get; set; }
 
-        public virtual Category Category { get; set; } = null!;
-        public virtual User User { get; set; } = null!;
+        public virtual CategoryEntity Category { get; set; } = null!;
+        public virtual UserEntity User { get; set; } = null!;
         public virtual ICollection<Transactionitem> Transactionitems { get; set; }
     }
 }

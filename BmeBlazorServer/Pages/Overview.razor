@@ -1,7 +1,8 @@
 ﻿@page "/overview"
 @using BmeModels
+@using BmeBlazorServer.Repositories
 @inject ISnackbar Snackbar
-@inject IUserService UserService
+@inject IUserRepository UserRepository
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IOverviewService OverviewService
 @implements IDisposable
@@ -70,14 +71,14 @@
                                 <MudGrid>
                                     <MudItem xs="12" sm="12" md="4">
                                         <MudText Typo="Typo.h5">Notifications</MudText>
-                                        <MudText Typo="Typo.body1">Welcome TODO</MudText>
-                                        <MudText Typo="Typo.body1">Last time you logged on was 17th feb. 15:36</MudText>
+                                        <MudText Typo="Typo.body1">Welcome @UserRepository.CurrentUser.FirstName @UserRepository.CurrentUser.LastName</MudText>
+                                        <MudText Typo="Typo.body1">Last time you logged on was @UserRepository.LastLogin</MudText>
                                     </MudItem>
                                     <MudItem xs="12" sm="12" md="4">
-                                        Test
+                                        <!--Test-->
                                     </MudItem>
                                     <MudItem xs="12" sm="12" md="4">
-                                        Virker det
+                                        <!--Virker det-->
                                     </MudItem>
 
                                 </MudGrid>
@@ -105,8 +106,8 @@
                         <MudItem xs="12" sm="12" md="6">
                             <MudPaper Elevation="25" Class=" rounded-xl pa-3" Style="height: 400px;">
                                 <MudText Typo="Typo.h5">Expenses breakdown</MudText>
-                                <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="225px" Height="225px"
-                                    InputData="@data" InputLabels="@labels">
+                                <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" Width="350px" Height="350px"
+                                    InputData="OverviewService.ExpenseSourcesForPeriod.Data" InputLabels="OverviewService.ExpenseSourcesForPeriod.Labels">
                                 </MudChart>
                             </MudPaper>
                         </MudItem>
@@ -208,7 +209,7 @@
                     <MudGrid>
                         <!-- User info -->
                         <MudItem xs="12">
-                            <BmeBlazorServer.Pages.Components.UserInfo/>
+                            <UserInfo UserName="@UserName" Profit="@NetIncome"/>
                         </MudItem>
 
                         <!-- Recent transactions -->
@@ -232,12 +233,14 @@
                                     OnRowClick="RowClickEvent" 
                                     T="Transaction">
                                 <HeaderContent>
+                                    <MudTh></MudTh>
                                     <MudTh>Date</MudTh>
                                     <MudTh>Source</MudTh>
                                     <MudTh>Value</MudTh>
                                 </HeaderContent>
                                 <RowTemplate Context="recentTransactions">
-                                    <MudTd DataLabel="Date">@recentTransactions.MadeAt</MudTd>
+                                    <MudTd DataLabel="Icon"><MudIcon Icon="@OverviewService.CategoryToIcon(recentTransactions.Category.Id)" Color="Color.Primary"></MudIcon></MudTd>
+                                    <MudTd DataLabel="Date">@DateOnly.FromDateTime(recentTransactions.MadeAt)</MudTd>
                                     <MudTd DataLabel="Name">@recentTransactions.Source</MudTd>
                                     <MudTd DataLabel="Value">@recentTransactions.Value</MudTd>
                                 </RowTemplate>
@@ -257,8 +260,9 @@
 </AuthorizeView>
 
 @code {
-
-     // Style the cells according to a positive or negative result
+    public string UserName { get; set; } = string.Empty;
+    public string NetIncome { get; set; } = string.Empty;
+    // Style the cells according to a positive or negative result
     private Func<Result, string> _cellStyle => x =>
     {
         string style = "";
@@ -275,11 +279,14 @@
     protected override async Task OnInitializedAsync()
     {
         try
-        {
+        {   
+            await UserRepository.GetCurrentUser();
+            UserName = UserRepository.CurrentUser.FirstName + " " + UserRepository.CurrentUser.LastName;
             OverviewService.OnChange += StateHasChanged;
             bool dataReady = await OverviewService.InitializeService();
             if (dataReady)
             {
+                NetIncome = OverviewService.NetIncome;
                 LoadingRecentTransactions = false;
             }
         }

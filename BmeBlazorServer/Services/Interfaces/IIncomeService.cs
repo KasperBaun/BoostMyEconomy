@@ -9,12 +9,11 @@ namespace BmeBlazorServer.Services
         List<Transaction> IncomeForPeriod { get; set; }
         ChartData IncomeSourcesForPeriod { get; set; }
         List<ChartSeries> IncomeHistory { get; set; }
+        public List<TableItem> IncomeSourceTableItems { get; set; }
+        public List<TableItem> IncomeCategoryTableItems { get; set; }
         string[] IncomeHistoryLabels { get; set; }
-        Task<bool> AddIncomeTransaction(Transaction transaction);
-        Task<bool> RemoveIncomeTransaction(Transaction transaction);
         Task<bool> InitializeService();
         DateRange? PeriodSelected { get; set; }
         void PeriodChanged();
-
     }
 }

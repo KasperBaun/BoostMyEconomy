@@ -1,9 +1,11 @@
 ﻿@page "/income"
-@using MudBlazor;
-@using BmeModels;
+@using MudBlazor
+@using BmeModels
+@using BmeBlazorServer.Repositories
 @inject IDialogService DialogService
 @inject IIncomeService IncomeService
-@inject IUserService UserService
+@inject IUserRepository UserRepository
+@inject ITransactionRepository TransactionRepository
 @implements IDisposable
 
 <PageTitle>Income</PageTitle>
@@ -48,14 +50,14 @@
                     </MudToolBar>
                 </MudPaper>
             </MudItem>
-             <!-- Add expense -->
+             <!-- Add transaction -->
             <MudItem xs="12" sm="6" md="3">
                 <MudPaper Elevation="25" Class="rounded-xl">
                     <MudToolBar Class="px-0">
                     <MudButton Variant="Variant.Filled" 
                         Class="rounded-xl mud-height-full mud-button-full-width" 
                         StartIcon="@Icons.Material.Outlined.Add" 
-                        OnClick="OpenAddIncomeDialog"
+                        OnClick="OpenAddTransactionDialog"
                         Color="Color.Primary">
                         Add income
                     </MudButton>
@@ -67,6 +69,10 @@
                 <MudGrid>
                     <MudItem xs="12" sm="12" md="12">
                             <MudTable
+                                @ref="mudTable"
+                                T="Transaction"
+                                RowClassFunc="@SelectedRowClassFunc"
+                                OnRowClick="OpenEditTransactionDialog"
                                 Height="360px"
                                 Items="IncomeService.IncomeForPeriod" 
                                 Elevation="25"
@@ -74,22 +80,27 @@
                                 Style="margin:auto; overflow-y:hidden" 
                                 Dense="@dense" 
                                 Hover="true" 
-                                Bordered="false" 
+                                Bordered="false"
                                 Striped="@striped"
-                                Filter="new Func<Transaction,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                                Filter="new Func<Transaction,bool>(FilterFunc1)" 
+                                @bind-SelectedItem="@selectedTransaction"
                                 >
                             <HeaderContent>
                                 <MudTh>Date</MudTh>
                                 <MudTh>Source</MudTh>
                                 <MudTh>Value</MudTh>
+                                <MudTh>Category</MudTh>
+                                <MudTh>Comment</MudTh>
                             </HeaderContent>
 
                             <RowTemplate
                                 Context="IncomeTable"
                             >
-                                <MudTd DataLabel="Date">@IncomeTable.MadeAt</MudTd>
+                                <MudTd DataLabel="Date">@DateOnly.FromDateTime(IncomeTable.MadeAt)</MudTd>
                                 <MudTd DataLabel="Source">@IncomeTable.Source</MudTd>
                                 <MudTd DataLabel="Value">@IncomeTable.Value</MudTd>
+                                <MudTd>@IncomeTable.Category.Title</MudTd>
+                                <MudTd>@IncomeTable.Description</MudTd>
                             </RowTemplate>
 
                             <PagerContent >
@@ -119,7 +130,7 @@
                     </MudItem>
                     <!--Sources-->
                     <MudItem xs="12" sm="12" md="6">
-                        <MudPaper Elevation="2" Class=" rounded-xl" Style="height: 330px;">
+                        <MudPaper Elevation="2" Class="rounded-xl" Style="height: 330px;">
                             <MudText Typo="Typo.h5" Class="pa-3" >Sources</MudText>
                             <MudChart 
                                 ChartType="ChartType.Pie" 
@@ -134,20 +145,85 @@
                 </MudGrid>
             </MudItem>
 
+             <!-- Top income by category -->
             <MudItem xs="12" sm="12" md="3">
-                <MudGrid>
-                    <!-- User info -->
-                    <MudItem xs="12" Style="height: 250px;" >
-                            <BmeBlazorServer.Pages.Components.UserInfo/>
-                    </MudItem>
+                <MudItem>
+                <MudPaper Elevation="2" Class="rounded-xl" Style="height:390px">
+                    <MudText Typo="Typo.h5" Class="pa-3" >Top-5 income by category</MudText>
+                    <MudTable
+                                T="TableItem"
+                                OnRowClick="OnCategoryIncomeClicked"
+                                Height="334px"
+                                Items="IncomeService.IncomeCategoryTableItems.Take(5)" 
+                                Elevation="25"
+                                Class="rounded-xl"
+                                Style="margin:auto; overflow-y:hidden" 
+                                Dense="false" 
+                                Hover="true" 
+                                Bordered="false"
+                                Outlined="false"
+                                Striped="false"
+                                Loading="@loading"
+                                LoadingProgressColor="Color.Primary"
+                                @bind-SelectedItem="@selectedTableItem"
+                                >
+                                <!--Filter="new Func<Transaction,bool>(FilterFunc1)" -->
+                            <!--<HeaderContent>
+                                <MudTh>Icon</MudTh>
+                                <MudTh>Date</MudTh>
+                                <MudTh>Source</MudTh>
+                                <MudTh>Value</MudTh>
+                            </HeaderContent>-->
 
-                    <!-- Recent transactions -->
-                    <MudItem xs="12">
-                        <MudPaper Elevation="2" Class="rounded-xl" Style="height: 499px;">
-                        
-                        </MudPaper>
-                    </MudItem>
-                </MudGrid>
+                            <RowTemplate
+                                Context="IncomeCategory"
+                            >
+                                <MudTd Style="border-collapse:collapse"><MudIcon Icon="@IncomeCategory.IconString" Color="Color.Primary" Size="Size.Medium"/></MudTd>
+                                <MudTd DataLabel="Name" Class="typography-h6">@IncomeCategory.Name</MudTd>
+                                <MudTd DataLabel="Value">@IncomeCategory.Value</MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                </MudPaper>
+                </MudItem>
+                <!-- Top income by source -->
+                <MudItem Class="mt-6">
+                  <MudPaper Elevation="2" Class="rounded-xl" Style="height:390px">
+                    <MudText Typo="Typo.h5" Class="pa-3" >Top-5 income by source</MudText>
+                     <MudTable
+                                T="TableItem"
+                                OnRowClick="OnSourceIncomeClicked"
+                                Height="334px"
+                                Items="IncomeService.IncomeSourceTableItems.Take(5)" 
+                                Elevation="25"
+                                Class="rounded-xl"
+                                Style="margin:auto; overflow-y:hidden" 
+                                Dense="false" 
+                                Hover="true" 
+                                Bordered="false"
+                                Outlined="false"
+                                Striped="false"
+                                Loading="@loading"
+                                LoadingProgressColor="Color.Primary"
+                                @bind-SelectedItem="@selectedTableItem"
+                                >
+                                <!--Filter="new Func<Transaction,bool>(FilterFunc1)" -->
+                            <!--<HeaderContent>
+                                <MudTh>Icon</MudTh>
+                                <MudTh>Date</MudTh>
+                                <MudTh>Source</MudTh>
+                                <MudTh>Value</MudTh>
+                            </HeaderContent>-->
+
+                            <RowTemplate
+                                Context="IncomeSource"
+                            >
+                                <MudTd Style="border-collapse:collapse"><MudIcon Icon="@IncomeSource.IconString" Color="Color.Primary" Size="Size.Medium"/></MudTd>
+                                <MudTd DataLabel="Name" Class="typography-h6">@IncomeSource.Name</MudTd>
+                                <MudTd DataLabel="Value">@IncomeSource.Value</MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                </MudPaper>
+                </MudItem>
             </MudItem>
          
         </MudGrid>
@@ -161,20 +237,21 @@
 
 
 @code {
-
-
+    User currentUser = new();
+    private bool loading;
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            await UserService.FetchCurrentUser();
-            UserService.OnChange += StateHasChanged;
-            Console.WriteLine("$Income.razor@OnInitializedAsync(): Attempting to fetch user from API: "+ UserService.CurrentUser.Email);
+            currentUser = await UserRepository.GetCurrentUser();
+            /* Subscripe to changes @ UserRepository and IncomeService */
+            UserRepository.OnChange += StateHasChanged;
             IncomeService.OnChange += StateHasChanged;
-            bool dataReady = await IncomeService.InitializeService();
-            if (dataReady)
+            TransactionRepository.OnChange += StateHasChanged;
+            loading = await IncomeService.InitializeService();
+            if (loading)
             {
-                // Loading = done
+                loading = false;
             }
         }
         catch (Exception ex)
@@ -186,32 +263,37 @@
     public void Dispose()
     {
         IncomeService.OnChange -= StateHasChanged;
-        UserService.OnChange -= StateHasChanged;
+        UserRepository.OnChange -= StateHasChanged;
+        TransactionRepository.OnChange -= StateHasChanged;
     }
 
 
     /* Add income */
-    async Task OpenAddIncomeDialog()
+    async Task OpenAddTransactionDialog()
     {
+        TransactionDTO transactionDTO = new() { Type = "Income" };
+        var transactionParameter = new DialogParameters { ["transaction"]=transactionDTO };
         var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
-        var dialog = DialogService.Show<AddIncomeDialog>("",options);
+        var dialog = DialogService.Show<AddTransactionDialog>("", transactionParameter, options);
         var result = await dialog.Result;
 
         if (result.Cancelled)
         {
             // Snackbar with could not add income
         }
-        await IncomeService.InitializeService();
+        IncomeService.PeriodChanged();
         StateHasChanged();
     }
 
     /* Income table */
+    private MudTable<Transaction> mudTable;
+    private int selectedRowNumber = -1;
     private bool dense = false;
     private bool striped = false;
     private string searchString1 = "";
-    private Transaction selectedItem1 = new();
+    [Parameter]
+    public Transaction selectedTransaction { get; set; } = new();
     private HashSet<Transaction> selectedItems = new HashSet<Transaction>();
-    private void HandleOnIncomeRowClicked(){ }
     public bool FilterFunc1(Transaction transaction) => FilterFunc(transaction, searchString1);
     public bool FilterFunc(Transaction transaction, string searchString)
     {
@@ -226,13 +308,46 @@
         }
         if (transaction.Value.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if ($"{transaction.Description} {transaction.CategoryId} {transaction.MadeAt}".Contains(searchString))
+        if ($"{transaction.Description} {transaction.Category.Title} {transaction.MadeAt}".Contains(searchString))
             return true;
         return false;
     }
 
-    /* History */
+    private string SelectedRowClassFunc(Transaction transaction, int rowNumber)
+    {
+        if (selectedRowNumber == rowNumber)
+        {
+            selectedRowNumber = -1;
+            return string.Empty;
+        }
+        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(transaction))
+        {
+            selectedRowNumber = rowNumber;
+            return "selected";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
 
+
+    async Task OpenEditTransactionDialog()
+    {
+        var transactionParameter = new DialogParameters { 
+            ["transaction"]=selectedTransaction, 
+            ["date"]=selectedTransaction.MadeAt,
+            ["category"]=selectedTransaction.Category.Title,
+            ["subcategory"]=selectedTransaction.Subcategory.Title
+        };
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader=true, CloseButton=true, FullWidth=true,  CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<EditTransactionDialog>("",transactionParameter, options);
+        var result = await dialog.Result;
+        IncomeService.PeriodChanged();
+        StateHasChanged();
+    }
+
+    /* History */
     private ChartOptions incomeHistoryOptions = new ChartOptions()
         {
             DisableLegend = true,
@@ -243,5 +358,16 @@
             MaxNumYAxisTicks = 5,
             XAxisLines = true
     };
+
+    /* Top income by category and source */
+    public TableItem selectedTableItem { get; set; } = new();
+    async Task OnSourceIncomeClicked()
+    {
+        
+    }
+    async Task OnCategoryIncomeClicked ()
+    {
+        
+    }
  
 }

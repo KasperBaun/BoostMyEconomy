@@ -7,20 +7,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-using System.Security.Cryptography.X509Certificates;
-using System.Net;
-using System.Net.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
 /* Add services to the container */
 builder.Services.AddControllers();
-ServicePointManager.ServerCertificateValidationCallback = delegate (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-{
-    return true;
-};
-/* Setup DBContext and add configuration options */
 
+/* Setup DBContext and add configuration options */
 builder.Services.AddDbContext<BmeDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

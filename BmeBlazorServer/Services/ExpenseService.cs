@@ -4,19 +4,19 @@ using BmeBlazorServer.Repositories;
 
 namespace BmeBlazorServer.Services
 {
-    public class IncomeService : IIncomeService
+    public class ExpenseService : IExpenseService
     {
         private readonly ITransactionRepository transactionRepository;
         private List<Transaction> UserTransactions { get; set; } = new();
         public DateRange? PeriodSelected { get; set; }
-        public List<Transaction> IncomeForPeriod { get; set; } = new();
-        public ChartData IncomeSourcesForPeriod { get; set; } = new();
-        public List<ChartSeries> IncomeHistory { get; set; } = new();
-        public List<TableItem> IncomeSourceTableItems { get; set; } = new();
-        public List<TableItem> IncomeCategoryTableItems { get; set; } = new();
-        public string[] IncomeHistoryLabels { get; set; } = Array.Empty<string>();
+        public List<Transaction> ExpensesForPeriod { get; set; } = new();
+        public ChartData ExpenseSourcesForPeriod { get; set; } = new();
+        public List<ChartSeries> ExpenseHistory { get; set; } = new();
+        public string[] ExpenseHistoryLabels { get; set; } = Array.Empty<string>();
+        public List<TableItem> VarExpenseTableItems { get; set; } = new();
+        public List<TableItem> FixedExpenseTableItems { get; set; } = new();
         public event Action? OnChange;
-        public IncomeService(ITransactionRepository _transactionRepository)
+        public ExpenseService(ITransactionRepository _transactionRepository)
         {
             transactionRepository = _transactionRepository;
             PeriodSelected = new DateRange(new DateTime(DateTime.Now.Year, 1, 1), DateTime.Now.Date);
@@ -27,16 +27,15 @@ namespace BmeBlazorServer.Services
             UserTransactions = await transactionRepository.GetTransactions();
             if(PeriodSelected.Start.HasValue && PeriodSelected.End.HasValue)
             {
-                IncomeForPeriod = FilterTransactionsFromSelectedPeriod(new DateRange(PeriodSelected.Start.Value,PeriodSelected.End.Value));
+                ExpensesForPeriod = FilterTransactionsFromSelectedPeriod(new DateRange(PeriodSelected.Start.Value,PeriodSelected.End.Value));
             }
             else
             {
                 throw new Exception("Error with value from PeriodSelected@IncomeService.cs");
             }
-            IncomeSourcesForPeriod = FilterSources(IncomeForPeriod);
-            FilterHistory(IncomeForPeriod);
-            FilterIncomeSource(IncomeForPeriod);
-            FilterIncomeCategory(IncomeForPeriod);
+            ExpenseSourcesForPeriod = FilterSources(ExpensesForPeriod);
+            FilterHistory(ExpensesForPeriod);
+            FilterVarFixedExpenses(ExpensesForPeriod);
             OnChange?.Invoke();
             return true;
         }
@@ -45,6 +44,7 @@ namespace BmeBlazorServer.Services
             await InitializeService();
             OnChange?.Invoke();
         }
+      
         private List<Transaction> FilterTransactionsFromSelectedPeriod(DateRange periodSelected)
         {
             List<Transaction> list = new();
@@ -52,7 +52,7 @@ namespace BmeBlazorServer.Services
             {
                 var Start = DateOnly.FromDateTime(periodSelected.Start.Value);
                 var End = DateOnly.FromDateTime(periodSelected.End.Value);
-                list = UserTransactions.Where(x => DateOnly.FromDateTime(x.MadeAt) >= Start && DateOnly.FromDateTime(x.MadeAt) <= End && x.Type=="Income").ToList();
+                list = UserTransactions.Where(x => DateOnly.FromDateTime(x.MadeAt) >= Start && DateOnly.FromDateTime(x.MadeAt) <= End && x.Type=="Expense").ToList();
                 return list;
             }
             else
@@ -60,23 +60,23 @@ namespace BmeBlazorServer.Services
                 throw new Exception("Error with periodSelected.Value @ IncomeService.cs - FilterTransactionsFromSelectedPeriod()");
             }
         }
-        private static ChartData FilterSources(List<Transaction> incomeTransactions)
+        private static ChartData FilterSources(List<Transaction> expenseTransactions)
         {
             List<double> data = new();
             List<string> transactionCategories = new();
-            foreach(Transaction t in incomeTransactions)
+            foreach(Transaction t in expenseTransactions)
             {
                 if (transactionCategories.Contains(t.Source))
                 {
                     int index = transactionCategories.FindIndex(c => c == t.Source);
-                    double sourceSum = incomeTransactions.Where(x => x.Source == t.Source).Sum(y => y.Value);
+                    double sourceSum = expenseTransactions.Where(x => x.Source == t.Source).Sum(y => y.Value);
                     data[index] = sourceSum;
                 }
                 else
                 {
                     transactionCategories.Add(t.Source);
                     int index = transactionCategories.FindIndex(c => c == t.Source);
-                    data.Insert(index, t.Value);
+                    data.Insert(index, t.Value*(-1));
                 }
             }
 
@@ -113,12 +113,12 @@ namespace BmeBlazorServer.Services
                     int index = months.FindIndex(m => m == tMonthConverted);
                     double sourceSum = incomeTransactions.Where(x => 
                         x.MadeAt.Month == tMonth).ToList().Sum(y => y.Value);
-                    data.Insert(index,sourceSum);
+                    data.Insert(index,sourceSum*(-1));
                 }
             }
 
             // Test
-            Console.WriteLine("$Incomeservice.cs@FilterHistory() - double[] Data.length: {0}  string[] Months.length: {1}\n", data.ToArray().Length, months.ToArray().Length);
+            Console.WriteLine("$ExpenseService.cs@FilterHistory() - double[] Data.length: {0}  string[] Months.length: {1}\n", data.ToArray().Length, months.ToArray().Length);
             /*
              * Dirty-fix required because the chart needs atleast 4 x-points and 4-y points 
              * should not hit this edge case very often, only when data-representation is very low
@@ -139,11 +139,11 @@ namespace BmeBlazorServer.Services
                 Data = data.ToArray(),
                 Name = "Income history"
             });
-            IncomeHistory = series;
-            IncomeHistoryLabels = months.ToArray();
+            ExpenseHistory = series;
+            ExpenseHistoryLabels = months.ToArray();
             return;
         }
-        private void FilterIncomeSource(List<Transaction> expensesList)
+        private void FilterVarFixedExpenses(List<Transaction> expensesList)
         {
             List<double> sum = new();
             List<string> sumCategories = new();
@@ -162,8 +162,10 @@ namespace BmeBlazorServer.Services
                     sum.Insert(index, t.Value);
                 }
             }
-
-            List<TableItem> incomeCategory = new();
+            List<TableItem> varItems = new List<TableItem>();
+            List<int> varIds = new() { 19, 21, 22, 23, 26, 29, 30 };
+            List<TableItem> fixedItems = new List<TableItem>();
+            List<int> fixedIds = new() { 15, 16, 17, 18, 20, 25, 27, 28 };
             foreach (string category in sumCategories)
             {
                 Category cat = expensesList.Find(c => c.Category.Title == category).Category;
@@ -172,54 +174,29 @@ namespace BmeBlazorServer.Services
                 item.Name = category;
                 item.Value = sum[index];
                 item.IconString = CategoryToIcon(cat.Id);
-                incomeCategory.Add(item);
+                if (varIds.Contains(cat.Id)){
+                    varItems.Add(item);
+                }
+                if (fixedIds.Contains(cat.Id))
+                {
+                    fixedItems.Add(item);
+                }
             }
-            incomeCategory.Sort((a, b) =>
+            varItems.Sort((a, b) =>
                     a.Value
                     .CompareTo(
                     b.Value
                     ));
-            incomeCategory.Reverse();
-            IncomeCategoryTableItems = incomeCategory;
-        }
-        private void FilterIncomeCategory(List<Transaction> expensesList)
-        {
-            List<double> sum = new();
-            List<string> sumSources = new();
-            foreach (Transaction t in expensesList)
-            {
-                if (sumSources.Contains(t.Source))
-                {
-                    int index = sumSources.FindIndex(c => c == t.Source);
-                    double sourceSum = expensesList.Where(x => x.Source == t.Source).Sum(y => y.Value);
-                    sum[index] = sourceSum;
-                }
-                else
-                {
-                    sumSources.Add(t.Source);
-                    int index = sumSources.FindIndex(c => c == t.Source);
-                    sum.Insert(index, t.Value);
-                }
-            }
+            varItems.Reverse();
+            fixedItems.Sort((a, b) =>
+                    a.Value
+                    .CompareTo(
+                    b.Value
+                    ));
+            fixedItems.Reverse();
 
-            List<TableItem> incomeSources = new();
-            foreach (string source in sumSources)
-            {
-                Category cat = expensesList.Find(c => c.Source == source).Category;
-                int index = sumSources.FindIndex(c => c == source);
-                TableItem item = new TableItem();
-                item.Name = source;
-                item.Value = sum[index];
-                item.IconString = CategoryToIcon(cat.Id);
-                incomeSources.Add(item);
-            }
-            incomeSources.Sort((a, b) =>
-                    a.Value
-                    .CompareTo(
-                    b.Value
-                    ));
-            incomeSources.Reverse();
-            IncomeSourceTableItems = incomeSources;
+            VarExpenseTableItems = varItems;
+            FixedExpenseTableItems= fixedItems;
         }
         private static string ConvertMonthToString(int month)
         {
@@ -245,16 +222,16 @@ namespace BmeBlazorServer.Services
             return categoryId switch
             {
                 /* 0-14 is income categories */
-                0 => Icons.Material.Filled.Work,
-                1 => Icons.Material.Filled.MonetizationOn,
-                2 => Icons.Material.Rounded.Payments,
-                3 => Icons.Material.Filled.Business,
-                4 => Icons.Material.Rounded.ChildCare,
-                5 => Icons.Material.Filled.Balance,
-                6 => Icons.Material.Filled.PriceChange,
-                7 => Icons.Material.Filled.AttachMoney,
-                8 => Icons.Material.Filled.AreaChart,
-                9 => Icons.Material.Filled.AreaChart,
+                0 =>  Icons.Material.Filled.Work,
+                1 =>  Icons.Material.Filled.MonetizationOn,
+                2 =>  Icons.Material.Rounded.Payments,
+                3 =>  Icons.Material.Filled.Business,
+                4 =>  Icons.Material.Rounded.ChildCare,
+                5 =>  Icons.Material.Filled.Balance,
+                6 =>  Icons.Material.Filled.PriceChange,
+                7 =>  Icons.Material.Filled.AttachMoney,
+                8 =>  Icons.Material.Filled.AreaChart,
+                9 =>  Icons.Material.Filled.AreaChart,
                 10 => Icons.Material.Filled.CardGiftcard,
                 11 => Icons.Material.Filled.ShoppingCart,
                 12 => Icons.Material.Filled.Elderly,

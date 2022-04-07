@@ -1,32 +1,34 @@
 ﻿@using MudBlazor
+@inject IUserRepository UserRepository
 
-<MudCard Class="rounded-xl justify-center">
-            <MudText Class="center" Typo="Typo.body1">Kasper Baun</MudText> 
-            <MudTextField
-                T="string"
-                Text="Verified account"
-                Style="font-size:10px;"
-                Class="mud-typography-body2 mud-text-secondary"
-                ReadOnly="true"
-                DisableUnderLine="true"
-                AdornmentColor="Color.Primary"
-                AdornmentIcon="@Icons.Filled.VerifiedUser"
-                IconSize="Size.Medium"
-                Adornment="Adornment.Start" 
-            />
-            <MudButton Variant="Variant.Text" Color="Color.Primary">Edit account</MudButton>
-    <MudCardContent>
-        <MudText Color="Color.Primary" Style="font-size:26px;">Net worth</MudText>
-        <MudText >DKK 1.426.719</MudText>
-        <MudText Typo="Typo.body2">This photo was taken in a small village in Istra Croatia.</MudText>
-    </MudCardContent>
-    <MudCardActions>
-        <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
-        <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
-    </MudCardActions>
-</MudCard>
 
+<MudPaper Elevation="25" Class="rounded-xl pa-3" Height="281px">
+    <MudGrid Spacing="0">
+        <MudItem xs="12" md="12" lg="12" Style="text-align-last:center;">
+            <MudIcon  Class="d-inline-flex" Style="align-center center text-align-last:center;" Icon="@Icons.Filled.PersonPin" Color="Color.Primary" Size="Size.Large"></MudIcon>
+            <MudText Class="d-inline-flex mud-typography-h5">@UserName</MudText>
+        </MudItem>
+        <MudItem xs="12" md="12" lg="12" Style="text-align-last:center;" >
+            <MudText Class="mud-typography-body2" Style="font-size:12px;" Color="Color.Dark">
+            Verified Account
+            </MudText>
+        </MudItem>
+        <MudItem xs="12" md="12" lg="12">
+        <MudButton Class="d-flex align-center mx-auto mud-typography-subtitle1" Variant="Variant.Text" Color="Color.Primary">Edit account</MudButton>
+        </MudItem>
+        <MudItem xs="12" md="12" lg="12" Style="text-align-last:center;">
+            <MudText Color="Color.Primary" Style="font-size:26px;">Net income for year</MudText>
+            <MudText >DKK @Profit</MudText>
+        </MudItem>
+        <MudItem>
+       
+        </MudItem>
+    </MudGrid>
+</MudPaper>
 
 @code {
-
+    [Parameter]
+    public string UserName { get; set; } = string.Empty;
+    [Parameter]
+    public string Profit { get; set; } = string.Empty;
 }

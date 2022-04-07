@@ -21,7 +21,7 @@ namespace BmeWebAPI.Controllers
         // GET: api/Users/All
         [Authorize(Roles ="Admin")]
         [HttpGet("All")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserEntity>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
@@ -29,7 +29,7 @@ namespace BmeWebAPI.Controllers
         // GET: api/User/LoggedIn
         [Authorize(Roles = "Admin, User")]
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserEntity>> GetUser(int id)
         {
             var response = await _context.Users.FindAsync(id);
             if(response != null)
@@ -59,7 +59,7 @@ namespace BmeWebAPI.Controllers
         // PUT: api/Users/5
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(int id, UserEntity user)
         {
             if (id != user.Id)
             {
