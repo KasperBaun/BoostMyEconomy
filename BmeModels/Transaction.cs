@@ -8,7 +8,7 @@ namespace BmeModels
         public int Id { get; set; }
         public int UserId { get; set; }
         public DateTime MadeAt { get; set; } 
-        public int Value { get; set; }
+        public double Value { get; set; }
         public string Type { get; set; } = null!;
         public Category Category { get; set; } = new();
         public string Source { get; set; } = null!;

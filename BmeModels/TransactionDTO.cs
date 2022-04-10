@@ -11,7 +11,7 @@ namespace BmeModels
 
         [Required]
         [RegularExpression(@"[-0-9][^\>A-Za-z]*", ErrorMessage = "Value must only contain numbers!")]
-        public int Value { get; set; }
+        public double Value { get; set; }
 
         [Required(ErrorMessage = "Transaction date is required!")]
         public DateTime MadeAt { get; set; }

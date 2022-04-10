@@ -72,11 +72,11 @@ namespace BmeBlazorServer.Services
         {
             List<Transaction> incomeForPeriod =
                 TransactionsForPeriod.Where(x => x.Type == "Income").ToList();
-            int income = incomeForPeriod.Sum(x => x.Value);
+            double income = incomeForPeriod.Sum(x => x.Value);
 
             List<Transaction> expensesForPeriod =
                 TransactionsForPeriod.Where(x => x.Type == "Expense").ToList();
-            int expenses = expensesForPeriod.Sum(x => x.Value);
+            double expenses = expensesForPeriod.Sum(x => x.Value);
             NetIncome = (income - expenses).ToString();
           
             //int result = (((income+expenses)*100/income));
@@ -87,7 +87,7 @@ namespace BmeBlazorServer.Services
             }
             else
             {
-                Balance = (income + expenses) * 100 / income;
+                Balance = (int)((income + expenses) * 100 / income);
             }
         }
         private void IncomeForPeriod()
