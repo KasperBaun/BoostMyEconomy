@@ -148,7 +148,7 @@
                                         </th>
                                         @foreach (double i in OverviewService.IncomePrMonth.ToArray())
                                         {
-                                        <td><div class="mud-typography-body1">@i</div></td>
+                                        <td><div class="mud-typography-body1">@String.Format("{0:C}", @i)</div></td>
                                         }
                                     </tr>
                                     <tr style="background-color:teal">
@@ -157,7 +157,7 @@
                                         </th>
                                         @foreach (double e in OverviewService.ExpensesPrMonth.ToArray())
                                         {
-                                        <td><div class="mud-typography-body1">@e</div></td>
+                                        <td><div class="mud-typography-body1">@String.Format("{0:C}", @e)</div></td>
                                         }
                                     </tr>
                                     <tr>
@@ -168,11 +168,11 @@
                                         {
                                             @if (r < 0)
                                             {
-                                                <td><div class="mud-typography-body1 red-text">@r</div></td>
+                                                <td><div class="mud-typography-body1 red-text">@String.Format("{0:C}", @r)</div></td>
                                             }
                                             else
                                             {
-                                                <td><div class="mud-typography-body1 green-text">@r</div></td>
+                                                <td><div class="mud-typography-body1 green-text">@String.Format("{0:C}", @r)</div></td>
                                             }
                                         }
                                     </tr>
@@ -184,11 +184,11 @@
                                         {
                                             @if (ra < 0)
                                             {
-                                                <td><div class="mud-typography-body1 red-text">@ra</div></td>
+                                                <td><div class="mud-typography-body1 red-text">@String.Format("{0:C}", @ra)</div></td>
                                             }
                                             else
                                             {
-                                                <td><div class="mud-typography-body1 green-text">@ra</div></td>
+                                                <td><div class="mud-typography-body1 green-text">@String.Format("{0:C}", @ra)</div></td>
                                             }
                                         }
                                     </tr>
@@ -242,7 +242,7 @@
                                     <MudTd DataLabel="Icon"><MudIcon Icon="@OverviewService.CategoryToIcon(recentTransactions.Category.Id)" Color="Color.Primary"></MudIcon></MudTd>
                                     <MudTd DataLabel="Date">@DateOnly.FromDateTime(recentTransactions.MadeAt)</MudTd>
                                     <MudTd DataLabel="Name">@recentTransactions.Source</MudTd>
-                                    <MudTd DataLabel="Value">@recentTransactions.Value</MudTd>
+                                    <MudTd DataLabel="Value">@String.Format("{0:C}",@recentTransactions.Value)</MudTd>
                                 </RowTemplate>
                             </MudTable>
                             </MudPaper>
@@ -286,7 +286,7 @@
             bool dataReady = await OverviewService.InitializeService();
             if (dataReady)
             {
-                NetIncome = OverviewService.NetIncome;
+                NetIncome = String.Format("{0:C}", OverviewService.NetIncome);
                 LoadingRecentTransactions = false;
             }
         }

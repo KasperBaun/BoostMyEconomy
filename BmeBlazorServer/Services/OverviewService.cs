@@ -50,7 +50,7 @@ namespace BmeBlazorServer.Services
             ResultForPeriod();
             ResultForPeriodAcc();
             GenerateResultsList();
-            ExpenseSourcesForPeriod = FilterSources(TransactionsForPeriod);
+            ExpenseSourcesForPeriod = FilterCategories(TransactionsForPeriod);
             OnChange?.Invoke();
             return true;
         }
@@ -77,7 +77,7 @@ namespace BmeBlazorServer.Services
             List<Transaction> expensesForPeriod =
                 TransactionsForPeriod.Where(x => x.Type == "Expense").ToList();
             double expenses = expensesForPeriod.Sum(x => x.Value);
-            NetIncome = (income - expenses).ToString();
+            NetIncome = Math.Round((income + expenses),2).ToString();
           
             //int result = (((income+expenses)*100/income));
             //Console.WriteLine("$TransactionService.cs - Income: {0}, Expenses: {1}, Income+Expenses: {2}, Balance: {3}", income, expenses, (income+expenses), result);   
@@ -247,37 +247,54 @@ namespace BmeBlazorServer.Services
                 _ => string.Empty,
             };
         }
-        private static ChartData FilterSources(List<Transaction> expenseTransactions)
+        private static ChartData FilterCategories(List<Transaction> expenseTransactions)
         {
+            ChartData chartData = new();
             List<double> data = new();
             List<string> transactionCategories = new();
             foreach (Transaction t in expenseTransactions)
             {
-                if (t.Type == "Expense")
+                if (transactionCategories.Contains(t.Category.Title))
                 {
-                    if (transactionCategories.Contains(t.Category.Title))
-                    {
-                        int index = transactionCategories.FindIndex(c => c == t.Category.Title);
-                        double sourceSum = expenseTransactions.Where(x => x.Category.Title == t.Category.Title).Sum(y => y.Value);
-                        data[index] = sourceSum;
-                    }
-                    else
-                    {
-                        transactionCategories.Add(t.Category.Title);
-                        int index = transactionCategories.FindIndex(c => c == t.Category.Title);
-                        data.Insert(index, t.Value * (-1));
-                    }
+                    int index = transactionCategories.FindIndex(c => c == t.Category.Title);
+                    double sourceSum = expenseTransactions.Where(x => x.Category.Title == t.Category.Title).Sum(y => y.Value);
+                    data[index] = sourceSum;
+                }
+                else
+                {
+                    transactionCategories.Add(t.Category.Title);
+                    int index = transactionCategories.FindIndex(c => c == t.Category.Title);
+                    data.Insert(index, t.Value * (-1));
                 }
             }
-
-            // Test
-            //Console.WriteLine("$Incomeservice.cs@FilterSources() - double[] Data.length: {0}  string[] Labels.length: {1}\n", data.ToArray().Length, transactionCategories.ToArray().Length);
-
-            ChartData chartData = new()
+            double total = data.Sum();
+            List<double> temp = data.OrderByDescending(sum => sum).ToList();
+            temp.Reverse();
+            List<string> orderedCategories = new();
+            foreach (double d in temp)
             {
-                Data = data.ToArray(),
-                Labels = transactionCategories.ToArray()
-            };
+                int index = data.FindIndex(c => c == d);
+                orderedCategories.Add(transactionCategories[index]);
+            }
+            for (int i = 0; i < temp.Count; i++)
+            {
+                temp[i] = temp[i] / total;
+                temp[i] = Math.Round(temp[i], 3);
+            }
+            chartData.Labels = orderedCategories.Take(10).ToArray();
+            chartData.Data = temp.Take(10).ToArray();
+            /*
+            for (int i = 0; i < data.Count; i++)
+            {
+                Console.WriteLine("Data: {0}, Label: {1}", data[i], transactionCategories[i]);
+            }
+            Console.WriteLine("\n");
+            for (int i = 0; i < chartData.Data.Length; i++)
+            {
+                Console.WriteLine("Data: {0}, Label: {1}", chartData.Data[i], chartData.Labels[i]);
+            }
+            */
+
             return chartData;
         }
     }

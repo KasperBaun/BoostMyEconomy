@@ -1,4 +1,5 @@
 ﻿@using MudBlazor
+@using System
 @inject IUserRepository UserRepository
 
 
@@ -18,7 +19,7 @@
         </MudItem>
         <MudItem xs="12" md="12" lg="12" Style="text-align-last:center;">
             <MudText Color="Color.Primary" Style="font-size:26px;">Net income for year</MudText>
-            <MudText >DKK @Profit</MudText>
+            <p style="font-size:16px;">@Profit</p>
         </MudItem>
         <MudItem>
        

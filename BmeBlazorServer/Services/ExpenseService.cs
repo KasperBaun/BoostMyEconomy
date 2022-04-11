@@ -106,6 +106,7 @@ namespace BmeBlazorServer.Services
             }
             chartData.Labels = orderedCategories.Take(10).ToArray();
             chartData.Data = temp.Take(10).ToArray();
+            /*
             for (int i = 0; i < data.Count; i++)
             {
                 Console.WriteLine("Data: {0}, Label: {1}", data[i], transactionCategories[i]);
@@ -115,6 +116,7 @@ namespace BmeBlazorServer.Services
             {
                 Console.WriteLine("Data: {0}, Label: {1}", chartData.Data[i], chartData.Labels[i] );
             }
+            */
 
             return chartData;
         }
