@@ -79,7 +79,7 @@ namespace BmeBlazorServer.Services
             double expenses = expensesForPeriod.Sum(x => x.Value);
             double netString = Math.Round((income + expenses), 2);
             NetIncome = string.Format("{0:C}", netString);
-            Console.Write(NetIncome);
+            //Console.Write(NetIncome);
           
             //int result = (((income+expenses)*100/income));
             //Console.WriteLine("$TransactionService.cs - Income: {0}, Expenses: {1}, Income+Expenses: {2}, Balance: {3}", income, expenses, (income+expenses), result);   
@@ -101,7 +101,7 @@ namespace BmeBlazorServer.Services
             double[] chartData = new double[12];
             for(int i=0; i < 12; i++)
             {
-                List<Transaction> monthlyList = list.Where(x => x.MadeAt.Month == i).ToList();
+                List<Transaction> monthlyList = list.Where(x => x.MadeAt.Month-1 == i).ToList();
                 double monthlySum = monthlyList.Sum(x => x.Value);
                 //Console.WriteLine("$OverviewService.cs_IncomeForPeriod(): monthlysum for {0} is {1}",i,monthlySum);
                 IncomePrMonth.Insert(i,monthlySum);
@@ -118,7 +118,7 @@ namespace BmeBlazorServer.Services
             double[] chartData = new double[12];
             for (int i = 0; i < 12; i++)
             {
-                List<Transaction> monthlyList = list.Where(x => x.MadeAt.Month == i).ToList();
+                List<Transaction> monthlyList = list.Where(x => x.MadeAt.Month-1 == i).ToList();
                 double monthlySum = monthlyList.Sum(x => x.Value);
                 //Console.WriteLine("$OverviewService.cs_IncomeForPeriod(): monthlysum for {0} is {1}", i, monthlySum);
                 ExpensesPrMonth.Insert(i, monthlySum*(-1));
