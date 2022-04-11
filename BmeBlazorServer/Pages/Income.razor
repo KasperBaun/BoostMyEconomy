@@ -180,7 +180,7 @@
                             >
                                 <MudTd Style="border-collapse:collapse"><MudIcon Icon="@IncomeCategory.IconString" Color="Color.Primary" Size="Size.Medium"/></MudTd>
                                 <MudTd DataLabel="Name" Class="typography-h6">@IncomeCategory.Name</MudTd>
-                                <MudTd DataLabel="Value">@IncomeCategory.Value</MudTd>
+                                <MudTd DataLabel="Value">@String.Format("{0:C}", @IncomeCategory.Value)</MudTd>
                             </RowTemplate>
                         </MudTable>
                 </MudPaper>
@@ -219,7 +219,7 @@
                             >
                                 <MudTd Style="border-collapse:collapse"><MudIcon Icon="@IncomeSource.IconString" Color="Color.Primary" Size="Size.Medium"/></MudTd>
                                 <MudTd DataLabel="Name" Class="typography-h6">@IncomeSource.Name</MudTd>
-                                <MudTd DataLabel="Value">@IncomeSource.Value</MudTd>
+                                <MudTd DataLabel="Value">@String.Format("{0:C}", @IncomeSource.Value)</MudTd>
                             </RowTemplate>
                         </MudTable>
                 </MudPaper>
@@ -352,7 +352,7 @@
         {
             DisableLegend = true,
             LineStrokeWidth = 5,
-            InterpolationOption = InterpolationOption.Straight,
+            InterpolationOption = InterpolationOption.NaturalSpline,
             YAxisFormat = "c",
             YAxisLines = false,
             MaxNumYAxisTicks = 5,

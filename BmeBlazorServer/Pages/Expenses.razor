@@ -134,13 +134,13 @@
                     <!--Expenses breakdown-->
                     <MudItem xs="12" sm="12" md="6">
                         <MudPaper Elevation="2" Class="rounded-xl" Style="height: 330px;">
-                            <MudText Typo="Typo.h5" Class="pa-3" >Expenses breakdown by source</MudText>
+                            <MudText Typo="Typo.h5" Class="pa-3">Expenses breakdown by category</MudText>
                             <MudChart 
                                 ChartType="ChartType.Pie" 
                                 LegendPosition="Position.Right" 
                                 Width="250px" Height="250px"
-                                InputData="ExpenseService.ExpenseSourcesForPeriod.Data" 
-                                InputLabels="ExpenseService.ExpenseSourcesForPeriod.Labels"
+                                InputData="ExpenseService.ExpenseCategoriesForPeriod.Data" 
+                                InputLabels="ExpenseService.ExpenseCategoriesForPeriod.Labels"
                             >
                             </MudChart>
                         </MudPaper>
@@ -183,7 +183,7 @@
                             >
                                 <MudTd Style="border-collapse:collapse"><MudIcon Icon="@VarExpenseTable.IconString" Color="Color.Primary" Size="Size.Medium"/></MudTd>
                                 <MudTd DataLabel="Name" Class="typography-h6">@VarExpenseTable.Name</MudTd>
-                                <MudTd DataLabel="Value">@VarExpenseTable.Value</MudTd>
+                                <MudTd DataLabel="Value">@String.Format("{0:C}", @VarExpenseTable.Value)</MudTd>
                             </RowTemplate>
                         </MudTable>
                 </MudPaper>
@@ -221,7 +221,7 @@
                             >
                                 <MudTd Style="border-collapse:collapse"><MudIcon Icon="@FixedExpenseTable.IconString" Color="Color.Primary" Size="Size.Medium"/></MudTd>
                                 <MudTd DataLabel="Name" Class="typography-h6">@FixedExpenseTable.Name</MudTd>
-                                <MudTd DataLabel="Value">@FixedExpenseTable.Value</MudTd>
+                                <MudTd DataLabel="Value">@String.Format("{0:C}", @FixedExpenseTable.Value)</MudTd>
                             </RowTemplate>
                         </MudTable>
                 </MudPaper>
@@ -346,7 +346,7 @@
         {
             DisableLegend = true,
             LineStrokeWidth = 5,
-            InterpolationOption = InterpolationOption.Straight,
+            InterpolationOption = InterpolationOption.NaturalSpline,
             YAxisFormat = "c",
             YAxisLines = false,
             MaxNumYAxisTicks = 5,

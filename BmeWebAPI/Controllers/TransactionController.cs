@@ -23,9 +23,14 @@ namespace BmeWebAPI.Controllers
         [HttpGet("All")]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
         {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            if (userId == 0)
+            {
+                return BadRequest("UserId not found!");
+            }
             return await Task.Run(() =>
                 {
-                    List<TransactionEntity> dbTransactions = _context.Transactions.ToList();
+                    List<TransactionEntity> dbTransactions = _context.Transactions.Where(t => t.UserId == userId).ToList();
                     List<Transaction> transactions = new();
                     foreach (var transaction in dbTransactions)
                     {
@@ -50,7 +55,7 @@ namespace BmeWebAPI.Controllers
             bool exists = _context.Transactions.Any(t => t.Id == id);
             while (exists)
             {
-                id = id + 1;
+                id = id++;
                 exists = _context.Transactions.Any(t => t.Id == id);
             }
             TransactionEntity dbTransaction = new()

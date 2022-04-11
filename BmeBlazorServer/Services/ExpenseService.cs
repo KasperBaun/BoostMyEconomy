@@ -10,7 +10,7 @@ namespace BmeBlazorServer.Services
         private List<Transaction> UserTransactions { get; set; } = new();
         public DateRange? PeriodSelected { get; set; }
         public List<Transaction> ExpensesForPeriod { get; set; } = new();
-        public ChartData ExpenseSourcesForPeriod { get; set; } = new();
+        public ChartData ExpenseCategoriesForPeriod { get; set; } = new();
         public List<ChartSeries> ExpenseHistory { get; set; } = new();
         public string[] ExpenseHistoryLabels { get; set; } = Array.Empty<string>();
         public List<TableItem> VarExpenseTableItems { get; set; } = new();
@@ -23,10 +23,8 @@ namespace BmeBlazorServer.Services
         }
         public async Task<bool> InitializeService()
         {
-            UserTransactions.Clear();
             UserTransactions = await transactionRepository.GetTransactions();
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-            if (!PeriodSelected.Start.HasValue || !PeriodSelected.End.HasValue)
+            if (!PeriodSelected!.Start.HasValue || !PeriodSelected.End.HasValue)
             {
                 throw new Exception("Error with value from PeriodSelected@IncomeService.cs");
             }
@@ -34,8 +32,7 @@ namespace BmeBlazorServer.Services
             {
                 ExpensesForPeriod = FilterTransactionsFromSelectedPeriod(new DateRange(PeriodSelected.Start.Value, PeriodSelected.End.Value));
             }
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-            ExpenseSourcesForPeriod = FilterSources(ExpensesForPeriod);
+            ExpenseCategoriesForPeriod = FilterCategories(ExpensesForPeriod);
             FilterHistory(ExpensesForPeriod);
             FilterVarFixedExpenses(ExpensesForPeriod);
             OnChange?.Invoke();
@@ -43,8 +40,19 @@ namespace BmeBlazorServer.Services
         }
         public async void PeriodChanged()
         {
+            ClearData();
             await InitializeService();
             OnChange?.Invoke();
+        }
+        private void ClearData()
+        {
+            UserTransactions.Clear();
+            ExpensesForPeriod.Clear();
+            ExpenseHistory.Clear();
+            ExpenseCategoriesForPeriod = new();
+            ExpenseHistoryLabels = Array.Empty<string>();
+            VarExpenseTableItems.Clear();
+            FixedExpenseTableItems.Clear();
         }
       
         private List<Transaction> FilterTransactionsFromSelectedPeriod(DateRange periodSelected)
@@ -62,33 +70,52 @@ namespace BmeBlazorServer.Services
                 throw new Exception("Error with periodSelected.Value @ IncomeService.cs - FilterTransactionsFromSelectedPeriod()");
             }
         }
-        private static ChartData FilterSources(List<Transaction> expenseTransactions)
+        private static ChartData FilterCategories(List<Transaction> expenseTransactions)
         {
+            ChartData chartData = new();
             List<double> data = new();
             List<string> transactionCategories = new();
             foreach(Transaction t in expenseTransactions)
             {
-                if (transactionCategories.Contains(t.Source))
+                if (transactionCategories.Contains(t.Category.Title))
                 {
-                    int index = transactionCategories.FindIndex(c => c == t.Source);
-                    double sourceSum = expenseTransactions.Where(x => x.Source == t.Source).Sum(y => y.Value);
+                    int index = transactionCategories.FindIndex(c => c == t.Category.Title);
+                    double sourceSum = expenseTransactions.Where(x => x.Category.Title == t.Category.Title).Sum(y => y.Value);
                     data[index] = sourceSum;
                 }
                 else
                 {
-                    transactionCategories.Add(t.Source);
-                    int index = transactionCategories.FindIndex(c => c == t.Source);
+                    transactionCategories.Add(t.Category.Title);
+                    int index = transactionCategories.FindIndex(c => c == t.Category.Title);
                     data.Insert(index, t.Value*(-1));
                 }
             }
+            double total = data.Sum();
+            List<double> temp = data.OrderByDescending(sum => sum).ToList();
+            temp.Reverse();
+            List<string> orderedCategories = new();
+            foreach (double d in temp)
+            {
+                int index = data.FindIndex(c => c == d);
+                orderedCategories.Add(transactionCategories[index]);
+            }
+            for (int i = 0; i < temp.Count; i++)
+            {
+                temp[i] = temp[i] / total;
+                temp[i] = Math.Round(temp[i], 3);
+            }
+            chartData.Labels = orderedCategories.Take(10).ToArray();
+            chartData.Data = temp.Take(10).ToArray();
+            for (int i = 0; i < data.Count; i++)
+            {
+                Console.WriteLine("Data: {0}, Label: {1}", data[i], transactionCategories[i]);
+            }
+            Console.WriteLine("\n");
+            for (int i=0; i < chartData.Data.Length; i++)
+            {
+                Console.WriteLine("Data: {0}, Label: {1}", chartData.Data[i], chartData.Labels[i] );
+            }
 
-            // Test
-            //Console.WriteLine("$Incomeservice.cs@FilterSources() - double[] Data.length: {0}  string[] Labels.length: {1}\n", data.ToArray().Length, transactionCategories.ToArray().Length);
-
-            ChartData chartData = new(){
-                Data = data.ToArray(),
-                Labels = transactionCategories.ToArray()
-            };
             return chartData;
         }
         private void FilterHistory(List<Transaction> incomeTransactions)
@@ -164,6 +191,10 @@ namespace BmeBlazorServer.Services
                     sum.Insert(index, t.Value);
                 }
             }
+            foreach(double d in sum)
+            {
+                Math.Round(d, 2);
+            }
             List<TableItem> varItems = new();
             List<int> varIds = new() { 19, 21, 22, 23, 26, 29, 30 };
             List<TableItem> fixedItems = new();
@@ -189,13 +220,11 @@ namespace BmeBlazorServer.Services
                     .CompareTo(
                     b.Value
                     ));
-            varItems.Reverse();
             fixedItems.Sort((a, b) =>
                     a.Value
                     .CompareTo(
                     b.Value
                     ));
-            fixedItems.Reverse();
 
             VarExpenseTableItems = varItems;
             FixedExpenseTableItems= fixedItems;

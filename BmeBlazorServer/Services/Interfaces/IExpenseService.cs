@@ -7,7 +7,7 @@ namespace BmeBlazorServer.Services
     {
         event Action? OnChange;
         List<Transaction> ExpensesForPeriod { get; set; }
-        ChartData ExpenseSourcesForPeriod { get; set; }
+        ChartData ExpenseCategoriesForPeriod { get; set; }
         List<ChartSeries> ExpenseHistory { get; set; }
         string[] ExpenseHistoryLabels { get; set; }
         List<TableItem> VarExpenseTableItems { get; set; }
