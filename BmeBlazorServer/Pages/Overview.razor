@@ -286,7 +286,7 @@
             bool dataReady = await OverviewService.InitializeService();
             if (dataReady)
             {
-                NetIncome = String.Format("{0:C}", OverviewService.NetIncome);
+                NetIncome = OverviewService.NetIncome;
                 LoadingRecentTransactions = false;
             }
         }

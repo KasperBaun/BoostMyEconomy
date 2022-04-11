@@ -77,7 +77,9 @@ namespace BmeBlazorServer.Services
             List<Transaction> expensesForPeriod =
                 TransactionsForPeriod.Where(x => x.Type == "Expense").ToList();
             double expenses = expensesForPeriod.Sum(x => x.Value);
-            NetIncome = Math.Round((income + expenses),2).ToString();
+            double netString = Math.Round((income + expenses), 2);
+            NetIncome = string.Format("{0:C}", netString);
+            Console.Write(NetIncome);
           
             //int result = (((income+expenses)*100/income));
             //Console.WriteLine("$TransactionService.cs - Income: {0}, Expenses: {1}, Income+Expenses: {2}, Balance: {3}", income, expenses, (income+expenses), result);   
