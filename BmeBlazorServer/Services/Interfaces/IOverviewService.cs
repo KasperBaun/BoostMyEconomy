@@ -10,7 +10,7 @@ namespace BmeBlazorServer.Services
         int Balance { get; set; }
         event Action? OnChange;
         List<Transaction> TransactionsForPeriod { get; set; }
-        public ChartData ExpenseSourcesForPeriod { get; set; }
+        public ChartData ExpenseCategoriesForPeriod { get; set; }
         List<Result> Results { get; set; }
         List<double> IncomePrMonth { get; set; }
         List<double> ExpensesPrMonth { get; set; }

@@ -15,7 +15,7 @@ namespace BmeBlazorServer.Services
         public List<double> ResultPrMonthAcc { get; set; } = new();
         public List <Result> Results { get; set; } = new();
         public List<ChartSeries> IncomeAndExpense { get; set; } = new();
-        public ChartData ExpenseSourcesForPeriod { get; set; } = new();
+        public ChartData ExpenseCategoriesForPeriod { get; set; } = new();
         public List<string> GetMonths { get; set; } = new(){ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
         public string SumIncome { get; set; } = string.Empty;
         public string NetIncome { get; set; } = string.Empty;
@@ -50,7 +50,7 @@ namespace BmeBlazorServer.Services
             ResultForPeriod();
             ResultForPeriodAcc();
             GenerateResultsList();
-            ExpenseSourcesForPeriod = FilterCategories(TransactionsForPeriod);
+            ExpenseCategoriesForPeriod = FilterCategories(TransactionsForPeriod.Where(t => t.Type=="Expense").ToList());
             OnChange?.Invoke();
             return true;
         }
