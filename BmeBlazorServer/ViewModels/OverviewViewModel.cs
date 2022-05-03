@@ -3,7 +3,7 @@ using MudBlazor;
 using BmeBlazorServer.Repositories;
 namespace BmeBlazorServer.Services
 {
-    public class OverviewService : IOverviewService
+    public class OverviewViewModel : IOverviewViewModel
     {
         private readonly ITransactionRepository transactionRepository;
         private List<Transaction> UserTransactions { get; set; } = new();
@@ -22,7 +22,7 @@ namespace BmeBlazorServer.Services
         public int Balance { get; set; } = 1;
         public event Action? OnChange;
 
-        public OverviewService(ITransactionRepository _transactionRepository)
+        public OverviewViewModel(ITransactionRepository _transactionRepository)
         {
            transactionRepository = _transactionRepository;
         }

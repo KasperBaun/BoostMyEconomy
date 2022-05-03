@@ -3,7 +3,7 @@ using MudBlazor;
 
 namespace BmeBlazorServer.Services
 {
-    public interface IIncomeService
+    public interface IIncomeViewModel
     {
         event Action? OnChange;
         List<Transaction> IncomeForPeriod { get; set; }

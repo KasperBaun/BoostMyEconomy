@@ -4,7 +4,7 @@ using BmeBlazorServer.Repositories;
 
 namespace BmeBlazorServer.Services
 {
-    public class ExpenseService : IExpenseService
+    public class ExpenseViewModel : IExpenseViewModel
     {
         private readonly ITransactionRepository transactionRepository;
         private List<Transaction> UserTransactions { get; set; } = new();
@@ -16,7 +16,7 @@ namespace BmeBlazorServer.Services
         public List<TableItem> VarExpenseTableItems { get; set; } = new();
         public List<TableItem> FixedExpenseTableItems { get; set; } = new();
         public event Action? OnChange;
-        public ExpenseService(ITransactionRepository _transactionRepository)
+        public ExpenseViewModel(ITransactionRepository _transactionRepository)
         {
             transactionRepository = _transactionRepository;
             PeriodSelected = new DateRange(new DateTime(DateTime.Now.Year, 1, 1), DateTime.Now.Date);

@@ -4,7 +4,7 @@ using BmeBlazorServer.Repositories;
 
 namespace BmeBlazorServer.Services
 {
-    public class IncomeService : IIncomeService
+    public class IncomeViewModel : IIncomeViewModel
     {
         private readonly ITransactionRepository transactionRepository;
         private List<Transaction> UserTransactions { get; set; } = new();
@@ -16,7 +16,7 @@ namespace BmeBlazorServer.Services
         public List<TableItem> IncomeCategoryTableItems { get; set; } = new();
         public string[] IncomeHistoryLabels { get; set; } = Array.Empty<string>();
         public event Action? OnChange;
-        public IncomeService(ITransactionRepository _transactionRepository)
+        public IncomeViewModel(ITransactionRepository _transactionRepository)
         {
             transactionRepository = _transactionRepository;
             PeriodSelected = new DateRange(new DateTime(DateTime.Now.Year, 1, 1), DateTime.Now.Date);

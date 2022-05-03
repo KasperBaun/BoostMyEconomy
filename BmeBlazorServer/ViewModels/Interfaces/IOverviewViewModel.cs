@@ -3,7 +3,7 @@ using MudBlazor;
 
 namespace BmeBlazorServer.Services
 {
-    public interface IOverviewService
+    public interface IOverviewViewModel
     {
         public string SumIncome { get; set; }
         public string NetIncome { get; set; }
